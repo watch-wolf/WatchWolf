@@ -1,0 +1,666 @@
+\documentclass[11pt]{article}
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%\pdfminorversion=4
+	% NOTE: To produce blinded version, replace "0" with "1" below.
+	\newcommand{\blind}{0}
+	
+	\AddToHook{cmd/section/before}{\clearpage} % all sections in new page
+	
+	%%%%%%% IISE Transactions margin specifications %%%%%%%%%%%%%%%%%%%
+	% DON'T change margins - should be 1 inch all around.
+	\addtolength{\oddsidemargin}{-.5in}%
+	\addtolength{\evensidemargin}{-.5in}%
+	\addtolength{\textwidth}{1in}%
+	\addtolength{\textheight}{1.3in}%
+	\addtolength{\topmargin}{-.8in}%
+    \makeatletter
+    \renewcommand\section{\@startsection {section}{1}{\z@}%
+                                       {-3.5ex \@plus -1ex \@minus -.2ex}%
+                                       {2.3ex \@plus.2ex}%
+                                       {\normalfont\fontfamily{phv}\fontsize{16}{19}\bfseries}}
+    \renewcommand\subsection{\@startsection{subsection}{2}{\z@}%
+                                         {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\fontfamily{phv}\fontsize{14}{17}\bfseries}}
+    \renewcommand\subsubsection{\@startsection{subsubsection}{3}{\z@}%
+                                        {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                         {1.5ex \@plus .2ex}%
+                                         {\normalfont\normalsize\fontfamily{phv}\fontsize{14}{17}\selectfont}}
+    \makeatother
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	%%%%% IISE Transactions package list %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\usepackage{amsmath}
+	\usepackage{graphicx}
+	\usepackage{enumerate}
+	\usepackage{xcolor}
+	\usepackage{soul}		% highlight
+	\usepackage{url} 		% not crucial - just used below for the URL
+	\usepackage{bytefield} 	% network protocol
+	\usepackage{hyperref} 	% go to labels on click
+	\usepackage{chngcntr}	% count figures/tables with sections
+	\usepackage{footnote}	% notes inside tables
+	\usepackage[natbibapa]{apacite}	% bibliography
+	\usepackage[acronym,section=subsection]{glossaries}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	% centered bytefield
+	\newenvironment{cbytefield}
+		{\begin{center}\begin{bytefield}}
+		{\end{bytefield}\end{center}}
+	
+	% rename titles
+	\renewcommand{\listfigurename}{Figures}
+	\renewcommand{\listtablename}{Tables}
+	
+	% allow footnotes inside tabular
+	\makesavenoteenv{tabular}
+	\makesavenoteenv{table}
+	\makesavenoteenv{figure}
+	
+	% count figures/tables with sections
+	\counterwithin{table}{section}
+	\counterwithin{figure}{section}
+	
+	% TODOs
+	\newcommand\myworries[1]{\sethlcolor{red}\hl{#1}}
+	
+	% acronyms
+	\makeglossaries
+	\loadglsentries{glossaries}
+	
+
+	
+	%%%%% Author package list and commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%%%%% Here are some examples %%%%%%%%%%%%%%
+	%	\usepackage{amsfonts, amsthm, latexsym, amssymb}
+	%	\usepackage{lineno}
+	%	\newcommand{\mb}{\mathbf}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\begin{document}
+		
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		\def\spacingset#1{\renewcommand{\baselinestretch}%
+			{#1}\small\normalsize} \spacingset{1}
+		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+		
+		\if0\blind
+		{
+			\title{\bf \emph{IISE Transactions} \LaTeX \ Template}
+			\author{John Doe $^a$ and Jane Roe $^b$ \\
+			$^a$ Department, University, City, Country \\
+             $^b$ Department, University, City, Country }
+			\date{}
+			\maketitle
+		} \fi
+		
+		\if1\blind
+		{
+
+            \title{\bf \emph{IISE Transactions} \LaTeX \ Template}
+			\author{Author information is purposely removed for double-blind review}
+			
+\bigskip
+			\bigskip
+			\bigskip
+			\begin{center}
+				{\LARGE\bf \emph{IISE Transactions} \LaTeX \ Template}
+			\end{center}
+			\medskip
+		} \fi
+		\bigskip
+		
+	\begin{abstract}
+This document provides a \LaTeX \ template for \emph{IISE Transactions}. Your paper should be compiled in the following order: title; abstract; keywords; main text, including an introduction and a conclusion or summary; acknowledgments; declaration of interest statement; references; appendices (as appropriate). Figures and tables should be inserted into the text as close to first mention as possible (NOT appended to the end of the manuscript). In-text citations and the reference list must follow \emph{IISE Transactions} guidelines. Use 11 point font, 1 inch margins, and double-spacing for the manuscript. A typical paper for this journal should be no more than 30 pages in manuscript format, counting from the title page to references. Appendices should be included as supplemental online materials. Do not use footnotes. \emph{IISE Transactions} uses a double-blind review process. Please make sure that you submit the \textbf{blind version} of your manuscript, which does not contain any information identifying the authors.  This includes removing the authors information on the title page as well as the information that may be identifying in the Acknowledgment section. \\
+
+\textcolor[rgb]{0.00,0.07,1.00}{We strongly encourage authors to address the following three questions in their \textbf{abstract}, preferably following the order shown: (1) Research problem statement: what is the research problem to be addressed? (2) Methods and results: how do the authors address the research problem and what are the main results? (3) Insights and implications:  What have the authors learned (as opposed to what they did, which is covered in point (2)) from conducting this research? What is the knowledge gained and why does it matter? The abstract should be written in \textbf{a single paragraph}.}.\\
+
+We thank you for your attention to these details.
+	\end{abstract}
+			
+	\noindent%
+	{\it Keywords:} \emph{IISE Transactions}; \LaTeX; Manuscript format; Taylor \& Francis.
+
+	%\newpage
+	\spacingset{1.5} % DON'T change the spacing!
+
+\maketitle
+\tableofcontents
+
+\listoffigures
+
+\listoftables
+
+\section{Documentation conventions}
+\myworries{...}
+
+\myworries{abbreviations}
+
+% Glossary
+\printglossary[numberedsection]
+
+\section{Introduction} \label{s:intro}
+\myworries{explicar los distintos protocolos que se hablaran a continuacion}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{DST}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{operation}} & \bitbox[lrt]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[s:args]{arguments}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Packet structure}
+	\label{fig:packet-structure}
+\end{figure}
+
+\subsection{Destiny} \label{s:dst}
+\myworries{explain}
+
+\myworries{reference to the interconnected blocks}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ |c|c|c|c| }
+		\hline
+		DST[2] & DST[1] & DST[0] & Destination \\
+		\hline
+		0 & 0 & 0 & ServerManagerPetition \\
+		0 & 0 & 1 & ServerPetition \\
+		0 & 1 & 0 & ClientConnectorPetition \\
+		0 & 1 & 1 & ClientPetition \\
+		\hline
+		1 & X & X & \textit{Reserved} \\
+		\hline
+	\end{tabular}
+	\caption{DST bits meaning}
+\end{table}
+
+\subsection{Response} \label{s:response}
+Some of the petitions have return objects. Those petitions will return to the sender (TesterConnector) with the same code, but with a '1' on the Response parameter. In that case, the parameter \hyperref[s:dst]{Destiny} now means 'Origin'.
+
+Some petitions have \gls{async} "returns" (for example: \myworries{examples}). Those will be sent using petitions without return's \hyperref[s:operation]{operations} (so, petitions without a mirror petition with a '1' as Response), marked as responses (Response bit at '1').
+
+\subsection{Operation} \label{s:operation}
+The Operation parameter specifies the desired request. Those change according to the \hyperref[s:dst]{Destiny}, so they will be discussed in more detail in their respective sections.
+
+The only exception is the all-zeroes operation (0b000000000000) which represents a \gls{NOP} request. That way, if you need to perform a long test, you won't be \myworries{explain the 'kicked by inactivity' concept} kicked by inactivity if you send this request every few minutes.
+
+\subsection{Arguments} \label{s:args}
+The Arguments parameter specifies the arguments (if any) to the \textit{\hyperref[s:operation]{Operation}} request. Those change according to the \hyperref[s:dst]{Destiny}, so the amount of arguments, and their types and order will be discussed in more detail in their respective sections.
+
+Now there will be discussed the most common data types, so they will be independent of any programming language.
+
+\subsubsection{Character}\label{type:char}
+Characters are sent as a 1-byte integer, representing its ASCII \myworries{ref?} value.
+
+\subsubsection{Integer}\label{type:int}
+Integers are signed 4-bytes integers.
+
+\subsubsection{Boolean}\label{type:bool}
+Booleans are 1-bit element that represents \textit{true} (0b1), or \textit{false} (0b0).
+
+For alignment \myworries{define?} reasons, booleans will be sent as 1-byte element. To avoid misunderstandings, let's define \textit{false} as 0x00, and \textit{true} as '\textit{not \myworries{define?} false}'. That way, this two packets are valid \textit{true} elements:
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{8}
+		\bitheader{0,7} \\
+		\bitbox{8}{0x01}
+	\end{bytefield}
+	\caption{True packet with the \glslink{LSB}{LSB} at 1}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{8}
+		\bitheader{0,7} \\
+		\bitbox{8}{0xFF}
+	\end{bytefield}
+	\caption{True packet with all bits at 1}
+\end{figure}
+
+\subsubsection{Float}\label{type:float}
+Floats are 4-bytes floating-point numbers. They are represented following the \gls{IEEE-754}\footnote{This standard should be used by C, Java and Python. \myworries{cite?}}.
+
+\subsubsection{String}\label{type:str}
+Strings are \hyperref[type:array]{arrays} of \hyperref[type:char]{characters}. Refer to the respective subsections for more information.
+
+\subsubsection{Array}\label{type:array}
+Arrays are a set of \textit{n} elements of the same type.
+
+The structure is a 2-byte \myworries{first (0..7) MSB, then (8..15) LSB} integer (representing the number of elements, \textit{n}), followed by \textit{n} elements of the same type. As a note here, by representing the size with a 2-byte integer the maximum number of elements per array is 65,535.
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,15,16,23,24,31} \\
+		\bitbox{16}{size} & \bitbox{8}{char[0]} & \bitbox{8}{char[1]} \\
+		\wordbox[ltr]{1}{...} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\bitbox{8}{char[n-4]} & \bitbox{8}{char[n-3]} & \bitbox{8}{char[n-2]} & \bitbox{8}{char[n-1]}
+	\end{bytefield}
+	\caption{Structure of a \hyperref[type:str]{String}}
+\end{figure}
+
+Arrays can be \glslink{multidimensional-array}{multidimensional}, holding \textit{n} arrays of the same type. It's worth mentioning that they don't have to be arrays of the same length, as can be seen in Figure \ref{fig:multidimensional-array-example}, Example of a string array.
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,15,16,23,24,31} \\
+		\bitbox{16}{2 [number of arrays]} & \bitbox{16}{5 [str[0]'s length]} \\
+		\bitbox{8}{h} & \bitbox{8}{e} & \bitbox{8}{l} & \bitbox{8}{l} \\
+		\bitbox{8}{o} & \bitbox{16}{6 [str[1]'s length]} & \bitbox{8}{w} \\
+		\bitbox{8}{o} & \bitbox{8}{r} & \bitbox{8}{l} & \bitbox{8}{d} \\
+		\bitbox{8}{!} & \bitbox{24}[bgcolor=lightgray]{next type}
+	\end{bytefield}
+	\caption{Example of a string array}
+	\label{fig:multidimensional-array-example}
+\end{figure}
+
+\subsubsection{File}\label{type:file}
+Similar to the \hyperref[type:array]{Array}, a File is a name (\hyperref[type:str]{String}), followed by a group of bytes.
+
+The problem here is that if we stick with the \hyperref[type:array]{Array} structure, the maximum size of a file will be around 8kB. To solve this, the File structure implements some kind of 'extended array', that extends the 'size' parameter to 32 bits. That way, the file size restriction by protocol definition\footnote{Besides defining here what's allowed, remember that this packet will be inside a TCP payload \myworries{definition?}. This means that the maximum file size will be probably redefined by the machine's TCP firewalls.} is 4GB.
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,31} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{file name}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{file path\footnote{The path must be relative, and you can't go outside the Server directory (using '../'). Both '' and './' means the root of the Server directory.}}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\bitbox{32}{file number of bytes} \\
+		\wordbox[ltr]{1}{file contents} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{File structure}
+\end{figure}
+
+\subsubsection{Server type}\label{type:server-type}
+The Server type specifies the Minecraft server.
+
+As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-mc}), but for major compatibility this parameter is a \hyperref[type:str]{String} specifying the server type.
+
+\section{Server manager petition}
+\myworries{...}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{operation}} & \bitbox[lrt]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[s:args]{arguments}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Server manager petition structure}
+\end{figure}
+
+\myworries{Table of operations}
+
+You don't have to implement the NOP operation in this destiny block because the timeout happens inside the \hyperref[s:server-petition]{Server petition block}. That is, if you don't call operations (or send NOPs) to the \hyperref[s:server-petition]{Server petition} for a long time, the server will stop, and because the server stopped the Server manager will close the established connection.
+
+\subsection{Start server operation}\label{s:server-manager-start}
+\myworries{...}
+
+\newpage
+\vfill
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:server-type]{server type}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[s:server-version]{server version}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:plugins]{plugins}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[lr]{1}{\hyperref[type:maps]{maps}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:config-files]{config files}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Start server petition structure}
+\end{figure}
+\vfill
+\clearpage
+
+Once a 'start server' request is received the program should create a server with the specified arguments, and return its IP:Port (for example, '127.0.0.1:25565', a 15-characters string; see \hyperref[fig:start-response-structure]{Figure \ref{fig:start-response-structure}, Start server response structure}). The IP to send the \hyperref[s:server-petition]{Server Petitions} is the same, but the next port (IP:$<$port+1$>$).
+
+If it's not possible to create it (for example: one argument is invalid, the user sent a plugin when it's specified that only Usual Plugins are allowed \myworries{explain}, or there's no free servers of that type), then an empty IP is returned (see \hyperref[fig:start-error-response-structure]{Figure \ref{fig:start-error-response-structure}, Start server error response structure}).
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{IP:port}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Start server response structure}
+	\label{fig:start-response-structure}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox{16}{0x0000\footnote{Being the argument an array, the first 2 bytes specifies its size. As we must return an empty array, the argument should be exactly 16 zeroes.}}
+	\end{bytefield}
+	\caption{Start server error response structure}
+	\label{fig:start-error-response-structure}
+\end{figure}
+
+\subsubsection{Maps}\label{type:maps}
+Array of maps (worlds; Map[]). To have more information about arrays check the \hyperref[type:array]{subsection \ref{type:array}, Array}.
+
+About the Map type, Minecraft is divided on different worlds (\cite{minecraft-world}). By default there's only three, but with some plugins this number can increase.
+
+In order to properly test some plugins, there may be needed some kind of known place. To avoid overusing the Set block operation \myworries{link} you can send using this argument your(s) world(s).
+
+\myworries{Map in more detail}
+
+\subsubsection{Plugins}\label{type:plugins}
+Array of plugins (Plugin[]). To have more information check the \hyperref[type:array]{subsection \ref{type:array}, Array}.
+
+About the Plugin type, there's three types of plugins:
+\begin{enumerate}
+	\item Usual plugins
+	
+		The Usual plugins are plugins that you expect everyone to have for being extremely common, like WorldGuard (\cite{worldguard}), or to allow the user to test plugins with Premium plugins\footnote{Premium plugins are paid plugins. For that reason, only the purchaser can download them (so you can't send a link to the plugin), and sending them through the internet via file upload may not be legal, so the plugin must be already downloaded in the machine.} dependencies. This allows both security and performance.
+
+		Something to highlight is the fact that, as mentioned in the operation Allows non usual plugins \myworries{reference}, some ServerManager will only allow plugins that are already in the machine.
+	
+		As can be seen in the \hyperref[fig:usual-plugin-structure]{Figure \ref{fig:usual-plugin-structure}, Usual plugin structure}, the first argument (that specifies the Plugin type) is 0x00.
+		
+		The plugin version is optional, and can't be specified in the parameter \textit{name}. If no version is provided (an empty string) then the Server Manager will pick the plugin with the highest version that is compatible with the desired server version.
+		
+		\begin{figure}[h]
+			\centering
+			\begin{bytefield}{32}
+				\bitheader{0,7,8,31} \\
+				\bitbox{8}{0x00} & \bitbox[ltr]{24}{} \\
+				\wordbox[lr]{1}{\hyperref[type:str]{name}} \\
+				\skippedwords \\
+				\wordbox[lrb]{1}{} \\
+				\wordbox[lr]{1}{\hyperref[type:str]{version}} \\
+				\skippedwords \\
+				\wordbox[lrb]{1}{}
+			\end{bytefield}
+			\caption{Usual plugin structure}
+			\label{fig:usual-plugin-structure}
+		\end{figure}
+	
+	\item Uploaded plugins
+		
+		The Uploaded plugins are plugins available in some website, thus can be sent through an URL.
+		
+		\myworries{structure?}
+		
+	\item File plugins
+		
+		File plugins are plugins that are non-usual and aren't uploaded in any website, so they must be sent as a file.
+		
+		As can be seen in the \hyperref[fig:file-plugin-structure]{Figure \ref{fig:file-plugin-structure}, File plugin structure}, the first argument (that specifies the Plugin type) is 0x02.
+		
+		\begin{figure}[h]
+			\centering
+			\begin{bytefield}{32}
+				\bitheader{0,7,8,31} \\
+				\bitbox{8}{0x02} & \bitbox[ltr]{24}{} \\
+				\wordbox[lr]{1}{\hyperref[type:file]{file}} \\
+				\skippedwords \\
+				\wordbox[lrb]{1}{}
+			\end{bytefield}
+			\caption{File plugin structure}
+			\label{fig:file-plugin-structure}
+		\end{figure}
+		
+\end{enumerate}
+
+\myworries{mixed plugin types example?}
+
+\subsubsection{Server version}\label{s:server-version}
+\hyperref[type:str]{String} specifying the \hyperref[type:server-type]{server type}'s version. For example, '1.12.2'.
+
+\subsubsection{Config files}\label{type:config-files}
+\myworries{...}
+
+\subsection{Server started notification}
+
+After a \hyperref[s:server-manager-start]{Start server operation} the server will start. Due to the unpredictable amount of time that the server takes to start up you'll receive a Server started notification once the server socket is available.
+
+You may notice that there's another \hyperref[s:server-started]{Server started notification} under the \hyperref[s:s:server-petition]{Server petition section}. That notification goes to the ServerManager \myworries{ref?}, while this goes to the Tester \myworries{ref?}. Also, the Server one have a token that is only shared between Server and the ServerManager, and the Tester doesn't have to know it too.
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{16}
+		\bitheader{0,2,3,4,15} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}}
+	\end{bytefield}
+	\caption{Server started notification structure}
+\end{figure}
+
+\subsection{Error notification}
+\myworries{...}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} &  \bitbox[ltr]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{error}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Error notification structure}
+\end{figure}
+
+\section{Server petition} \label{s:server-petition}
+\myworries{...}
+
+The server petitions are a bit different from the rest. The server petitions are designed in a way that everyone have some common operations, and then you can add some others optionally (and even non-standard ones). We'll define this 'set of operations' as \hyperref[s:server-group]{groups}.
+
+For that reason, the operation field (defined on the Figure \ref{fig:packet-structure}, Packet structure) becomes the \hyperref[s:server-group]{group}, and then the \hyperref[s:operation]{operation} is defined on the next 2 bytes, as shown in the \hyperref[fig:server-structure]{Figure \ref{fig:server-structure}, Server petition structure}.
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:server-group]{group}} & \bitbox{16}{\hyperref[s:server-operation]{operation}} \\
+		\wordbox[ltr]{1}{\hyperref[s:args]{arguments}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Server petition structure}
+	\label{fig:server-structure}
+\end{figure}
+
+\subsection{Server petition group} \label{s:server-group}
+The group tells which kind of petitions we're talking about.
+
+The \glslink{MSB}{MSB} \myworries{abbreviation?} tells if the group is one of the standards, thus must be followed by specification, or if it's non-standard, so the petition can be whatever the user want it to be. This is useful if you want to implement a petition not followed by the standard, or if the petition only makes sense in your personal environment.
+
+The 0b000000000001 group represents the 'base group'. This group implements some basic operations, and must be implemented. All the others are optional.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		type[15] & type[14..4] & Extended type \\
+		\hline
+		0 & 0b00000000000 & NOP\footnote{As stated on the  \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}, the all-zeroes operation represents a NOP request.} \\
+		0 & 0b00000000001 & \hyperref[g:base]{Base operations} \\
+		0 & 0b00000000010 & \hyperref[g:performance]{Performance operations} \\
+		0 & 0b00000000011 & \hyperref[g:worldguard]{WorldGuard operations} \\
+		0 & 0b00000000100 & \hyperref[g:residence]{Residence operations} \\
+		\hline
+		1 &   XXXXXXXXXXX & Reserved for internal use \\
+		\hline
+	\end{tabular}
+	\caption{Extended types}
+\end{table}
+
+If you've implemented an extended type and you believe that it makes sense to be part of the standard contact \href{mailto:contacto@rogermiranda1000.com?subject=WatchWolf - New extended type}{contacto@rogermiranda1000.com} to reserve one of the addresses.
+
+\subsection{Server petition operation} \label{s:server-operation}
+Like the parameter \hyperref[s:operation]{Operation}, it specifies the desired request. For more information, refer to the \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}.
+
+The only reserved operation is the all-zeroes operation (0x0000). It represents the question 'is this extended petition implemented?'. The server must response (with the \hyperref[s:response]{response bit at 1}) with \textit{true} (group implemented on this machine) or \textit{false} (unknown/unimplemented group), as it can be seen in Figure \ref{fig:implemented-eop}, Implemented group response structure.
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:server-group]{group\footnote{except for groups 0b000000000000 and 0b000000000001}}} & \bitbox{16}{0x0000} \\
+		\bitbox{8}{\hyperref[type:bool]{\textit{true}}} & \bitbox{24}[bgcolor=lightgray]{}
+	\end{bytefield}
+	\caption{Implemented group response structure}
+	\label{fig:implemented-eop}
+\end{figure}
+
+\subsection{Base operations} \label{g:base}
+\myworries{...}
+
+\myworries{'is implemented' (all zeroes) optional}
+
+\subsubsection{Server stop operation}
+\myworries{...}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
+	\end{bytefield}
+	\caption{Stop server operation structure}
+\end{figure}
+
+\subsubsection{Server stopped notification}
+\myworries{... response to...}
+
+To have more information about the \textit{server id} parameter check the \hyperref[s:server-started]{Subsection \ref{s:server-started}, Server started notification}.
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{server id}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Server stopped response structure}
+\end{figure}
+
+\subsubsection{Server started notification}\label{s:server-started}
+
+This notification is sent to the Server Manager \myworries{ref?}, as a response for the \hyperref[s:server-manager-start]{Start server operation}, thus not really a response of a Server's operation.
+
+As one IP can have multiple servers, a \hyperref[type:str]{string} that identifies the server must be sent with the response. This argument can be whatever you want (for example, $<$server ip$>$:$<$server port$>$ will be unique), but must be shared between both the Server Manager and the Server. For security reasons \myworries{cite IP spoofing or similar} (because the Tester \myworries{ref?} also knows the server's IP and port) a hash function is encouraged to be used.
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0002}} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{server id}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Server started response structure}
+\end{figure}
+
+\subsubsection{Whitelist player operation}
+\myworries{...}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0003}} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{username}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Whitelist player operation structure}
+\end{figure}
+
+\subsubsection{OP player operation}
+\myworries{...}
+
+\begin{figure}[h]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0004}} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{username}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{OP player operation structure}
+\end{figure}
+
+\subsubsection{Error notification}
+\myworries{...}
+
+\subsection{Performance operations} \label{g:performance}
+\myworries{...}
+
+\subsection{WorldGuard operations} \label{g:worldguard}
+\myworries{...}
+
+\subsection{Residence operations} \label{g:residence}
+\myworries{...}
+
+\section{? petition} \label{s:methods}
+First-level headings should be in bold.
+
+\subsection{
+\emph{Subsection heading 3.1}} \label{s:methods.1}
+Second-level headings should be in bold italics.
+
+\subsubsection{\emph{Sub-subsection heading 3.1.1}} \label{s:methods.1.1}
+
+Third-level headings should be in italics.
+	
+\subsection{\emph{Subsection heading 3.2}} \label{s:methods.2}
+
+
+\subsection{\emph{Subsection heading 3.3}} \label{s:methods.3}
+
+\section{Revision history}
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		Date & Revision & Changes \\
+		\hline
+		\myworries{date} & 1 & Initial release. \\
+		\hline
+	\end{tabular}
+	\caption{Revision history}
+\end{table}
+
+% Bibliography
+\addcontentsline{toc}{section}{References}
+\bibliographystyle{apacite}
+\bibliography{sample}
+	
+\end{document}
