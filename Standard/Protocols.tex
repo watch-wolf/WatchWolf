@@ -290,6 +290,12 @@ The Server type specifies the Minecraft server.
 
 As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-mc}), but for major compatibility this parameter is a \hyperref[type:str]{String} specifying the server type.
 
+\subsubsection{Block}\label{type:block}
+\myworries{...}
+
+\subsubsection{Item}\label{type:item}
+\myworries{...}
+
 \section{Server manager petition}
 \myworries{...}
 
@@ -657,6 +663,106 @@ Third-level headings should be in italics.
 	\end{tabular}
 	\caption{Revision history}
 \end{table}
+
+
+\appendix
+\section{Blocks}\label{appendix:blocks}
+For generating the \hyperref[type:block]{blocks} enum Spigot 1.19 was used.
+That means that all the block names \it{should} be the exact same as \cite{spigot-material}.
+
+\subsection{Material modifiers}
+There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.
+
+That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, this has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces in Spigot 1.19).
+
+\subsubsection{Unused modifiers}
+There's some Spigot modifiers that beside existing it won't be imported because there aren't a distinguished block in their own. You can find those in \hyperref[fig:unused-blockdata]{Figure \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}.
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		Modifier name & Reason for discarding \\
+		\hline
+		has\_bottle\_\it{X} & Inventory dependent \\
+		has\_record & Inventory dependent \\
+		enabled & Adjacent redstone dependent \\
+		triggered & Adjacent redstone dependent \\
+		instrument & Bottom-block dependent \\
+		occupied & Entity dependent \\
+		persistent & Admin block \\
+		unstable & Admin block \\
+		distance & Block dependent \\
+		stage & Same block \\
+		short & Tick dependent \\
+		attached & Block dependent \\
+		disarmed & Block dependent \\
+		power & Block/event dependent \\
+		tilt & Entity dependent \\
+		can\_summon & Admin block \\
+		shrieking & Entity dependent \\
+		\hline
+	\end{tabular}
+	\caption{Unused Spigot BlockData's modifiers}
+	\label{fig:unused-blockdata}
+\end{table}
+
+\subsubsection{Age}
+age=0 (MANGROVE_PROPAGULE)
+attachment=floor (BELL)
+axis=y (DEEPSLATE)
+berries=false
+bites=0 (CAKE)
+bloom=false (SCULK_CATALYST)
+bottom=false (SCAFFOLDING)
+candles=1 (CANDLE)
+charges=0 (RESPAWN_ANCHOR)
+conditional=false (COMMAND_BLOCK)
+delay=1 (REPEATER)
+down=false (CHORUS_PLANT)
+east=false (CHORUS_PLANT)
+eggs=1 (TURTLE_EGG)
+extended=false (PISTON)
+eye=false (END_PORTAL_FRAME)
+face=wall (LEVER)
+facing=north (CUT_COPPER_STAIRS)
+half=bottom (CUT_COPPER_STAIRS)
+hanging=false (MANGROVE_PROPAGULE)
+has_book=false (LECTERN)
+hatch=0 (TURTLE_EGG)
+hinge=left (IRON_DOOR)
+honey_level=0 (BEE_NEST)
+in_wall=false (OAK_FENCE_GATE)
+inverted=false (DAYLIGHT_DETECTOR)
+layers=1 (SNOW)
+leaves=none (BAMBOO)
+level=0 (COMPOSTER)
+lit=false (REDSTONE_ORE)
+locked=false (REPEATER)
+mode=compare (COMPARATOR)
+moisture=0 (FARMLAND)
+north=false (CHORUS_PLANT)
+note=0 (NOTE_BLOCK)
+open=false (IRON_DOOR)
+orientation=north_up (JIGSAW)
+part=foot (WHITE_BED)
+pickles=1 (SEA_PICKLE)
+powered=false (REPEATER)
+rotation=0 (OAK_SIGN) % TODO rotation just basic directions
+sculk_sensor_phase=inactive (SCULK_SENSOR)
+shape=straight (CUT_COPPER_STAIRS)
+signal_fire=false (CAMPFIRE)
+snowy=false (GRASS_BLOCK)
+south=false (CHORUS_PLANT)
+thickness=tip (POINTED_DRIPSTONE)
+type=bottom (CUT_COPPER_SLAB)
+up=false (CHORUS_PLANT)
+vertical_direction=up (POINTED_DRIPSTONE)
+waterlogged=false (MANGROVE_PROPAGULE)
+west=false (CHORUS_PLANT)
+
+\subsection{Material modifiers concatenation}
+\myworries{... (how to join modifiers)}
 
 % Bibliography
 \addcontentsline{toc}{section}{References}
