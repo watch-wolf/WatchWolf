@@ -1880,8 +1880,10 @@ waterlogged=true (TUBE_CORAL_WALL_FAN)
 
 \begin{figure}
 	\begin{rail}
-		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED' ) \\
-		"Spigot original material name"
+		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) \\
+		'Spigot original material name' \\
+		([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
+		([age=0] () | [age!=0] '\_' AGE)
 	\end{rail}
 	\caption{Modifier concatenation}
 \end{figure}
