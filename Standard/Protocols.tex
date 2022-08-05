@@ -43,6 +43,7 @@
 	\usepackage{footnote}	% notes inside tables
 	\usepackage[natbibapa]{apacite}	% bibliography
 	\usepackage[acronym,section=subsection]{glossaries}
+	\usepackage{rail}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	% centered bytefield
@@ -703,6 +704,7 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 		shrieking & Entity dependent \\
 		bloom & Admin block \\
 		bottom & Bottom-block dependent \\
+		powered & Admin block / block dependent \\
 		\hline
 	\end{tabular}
 	\caption{Unused Spigot BlockData's modifiers}
@@ -886,6 +888,7 @@ MUSHROOM\_STEM true/false
 RED\_MUSHROOM\_BLOCK true/false
 
 \subsubsection{North, South, East and West}
+Set which faces of the block textures are displayed on.
 
 east=false (ACACIA_FENCE)
 east=false (BIRCH_FENCE)
@@ -948,8 +951,45 @@ east=true (BROWN_MUSHROOM_BLOCK)
 east=true (MUSHROOM_STEM)
 east=true (RED_MUSHROOM_BLOCK)
 
+\subsubsection{Up}
+Set which faces of the block textures are displayed on.
 
+Except for CHORUS\_PLANT, FIRE, GLOW\_LICHEN, SCULK\_VEIN and VINE (which defaults to false), it defaults to true.
+
+up=false (CHORUS_PLANT)
+up=false (FIRE)
+up=false (GLOW_LICHEN)
+up=false (SCULK_VEIN)
+up=false (VINE)
+up=true (ANDESITE_WALL)
+up=true (BLACKSTONE_WALL)
+up=true (BRICK_WALL)
+up=true (BROWN_MUSHROOM_BLOCK)
+up=true (COBBLED_DEEPSLATE_WALL)
+up=true (COBBLESTONE_WALL)
+up=true (DEEPSLATE_BRICK_WALL)
+up=true (DEEPSLATE_TILE_WALL)
+up=true (DIORITE_WALL)
+up=true (END_STONE_BRICK_WALL)
+up=true (GRANITE_WALL)
+up=true (MOSSY_COBBLESTONE_WALL)
+up=true (MOSSY_STONE_BRICK_WALL)
+up=true (MUD_BRICK_WALL)
+up=true (MUSHROOM_STEM)
+up=true (NETHER_BRICK_WALL)
+up=true (POLISHED_BLACKSTONE_BRICK_WALL)
+up=true (POLISHED_BLACKSTONE_WALL)
+up=true (POLISHED_DEEPSLATE_WALL)
+up=true (PRISMARINE_WALL)
+up=true (RED_MUSHROOM_BLOCK)
+up=true (RED_NETHER_BRICK_WALL)
+up=true (RED_SANDSTONE_WALL)
+up=true (SANDSTONE_WALL)
+up=true (STONE_BRICK_WALL)
+
+\subsubsection{Eggs}
 eggs=1 (TURTLE_EGG)
+
 extended=false (PISTON)
 extended=false (STICKY_PISTON)
 eye=false (END_PORTAL_FRAME)
@@ -1408,70 +1448,6 @@ part=foot (RED_BED)
 part=foot (WHITE_BED)
 part=foot (YELLOW_BED)
 pickles=1 (SEA_PICKLE)
-powered=false (ACACIA_BUTTON)
-powered=false (ACACIA_DOOR)
-powered=false (ACACIA_FENCE_GATE)
-powered=false (ACACIA_PRESSURE_PLATE)
-powered=false (ACACIA_TRAPDOOR)
-powered=false (ACTIVATOR_RAIL)
-powered=false (BELL)
-powered=false (BIRCH_BUTTON)
-powered=false (BIRCH_DOOR)
-powered=false (BIRCH_FENCE_GATE)
-powered=false (BIRCH_PRESSURE_PLATE)
-powered=false (BIRCH_TRAPDOOR)
-powered=false (COMPARATOR)
-powered=false (CRIMSON_BUTTON)
-powered=false (CRIMSON_DOOR)
-powered=false (CRIMSON_FENCE_GATE)
-powered=false (CRIMSON_PRESSURE_PLATE)
-powered=false (CRIMSON_TRAPDOOR)
-powered=false (DARK_OAK_BUTTON)
-powered=false (DARK_OAK_DOOR)
-powered=false (DARK_OAK_FENCE_GATE)
-powered=false (DARK_OAK_PRESSURE_PLATE)
-powered=false (DARK_OAK_TRAPDOOR)
-powered=false (DETECTOR_RAIL)
-powered=false (IRON_DOOR)
-powered=false (IRON_TRAPDOOR)
-powered=false (JUNGLE_BUTTON)
-powered=false (JUNGLE_DOOR)
-powered=false (JUNGLE_FENCE_GATE)
-powered=false (JUNGLE_PRESSURE_PLATE)
-powered=false (JUNGLE_TRAPDOOR)
-powered=false (LECTERN)
-powered=false (LEVER)
-powered=false (LIGHTNING_ROD)
-powered=false (MANGROVE_BUTTON)
-powered=false (MANGROVE_DOOR)
-powered=false (MANGROVE_FENCE_GATE)
-powered=false (MANGROVE_PRESSURE_PLATE)
-powered=false (MANGROVE_TRAPDOOR)
-powered=false (NOTE_BLOCK)
-powered=false (OAK_BUTTON)
-powered=false (OAK_DOOR)
-powered=false (OAK_FENCE_GATE)
-powered=false (OAK_PRESSURE_PLATE)
-powered=false (OAK_TRAPDOOR)
-powered=false (OBSERVER)
-powered=false (POLISHED_BLACKSTONE_BUTTON)
-powered=false (POLISHED_BLACKSTONE_PRESSURE_PLATE)
-powered=false (POWERED_RAIL)
-powered=false (REPEATER)
-powered=false (SPRUCE_BUTTON)
-powered=false (SPRUCE_DOOR)
-powered=false (SPRUCE_FENCE_GATE)
-powered=false (SPRUCE_PRESSURE_PLATE)
-powered=false (SPRUCE_TRAPDOOR)
-powered=false (STONE_BUTTON)
-powered=false (STONE_PRESSURE_PLATE)
-powered=false (TRIPWIRE)
-powered=false (TRIPWIRE_HOOK)
-powered=false (WARPED_BUTTON)
-powered=false (WARPED_DOOR)
-powered=false (WARPED_FENCE_GATE)
-powered=false (WARPED_PRESSURE_PLATE)
-powered=false (WARPED_TRAPDOOR)
 rotation=0 (ACACIA_SIGN)
 rotation=0 (BIRCH_SIGN)
 rotation=0 (BLACK_BANNER)
@@ -1622,36 +1598,6 @@ type=normal (MOVING_PISTON)
 type=normal (PISTON_HEAD)
 type=single (CHEST)
 type=single (TRAPPED_CHEST)
-up=false (CHORUS_PLANT)
-up=false (FIRE)
-up=false (GLOW_LICHEN)
-up=false (SCULK_VEIN)
-up=false (VINE)
-up=true (ANDESITE_WALL)
-up=true (BLACKSTONE_WALL)
-up=true (BRICK_WALL)
-up=true (BROWN_MUSHROOM_BLOCK)
-up=true (COBBLED_DEEPSLATE_WALL)
-up=true (COBBLESTONE_WALL)
-up=true (DEEPSLATE_BRICK_WALL)
-up=true (DEEPSLATE_TILE_WALL)
-up=true (DIORITE_WALL)
-up=true (END_STONE_BRICK_WALL)
-up=true (GRANITE_WALL)
-up=true (MOSSY_COBBLESTONE_WALL)
-up=true (MOSSY_STONE_BRICK_WALL)
-up=true (MUD_BRICK_WALL)
-up=true (MUSHROOM_STEM)
-up=true (NETHER_BRICK_WALL)
-up=true (POLISHED_BLACKSTONE_BRICK_WALL)
-up=true (POLISHED_BLACKSTONE_WALL)
-up=true (POLISHED_DEEPSLATE_WALL)
-up=true (PRISMARINE_WALL)
-up=true (RED_MUSHROOM_BLOCK)
-up=true (RED_NETHER_BRICK_WALL)
-up=true (RED_SANDSTONE_WALL)
-up=true (SANDSTONE_WALL)
-up=true (STONE_BRICK_WALL)
 vertical_direction=up (POINTED_DRIPSTONE)
 waterlogged=false (ACACIA_FENCE)
 
@@ -1931,6 +1877,14 @@ waterlogged=true (TUBE_CORAL_WALL_FAN)
 
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
+
+\begin{figure}
+	\begin{rail}
+		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED' ) \\
+		"Spigot original material name"
+	\end{rail}
+	\caption{Modifier concatenation}
+\end{figure}
 
 % Bibliography
 \addcontentsline{toc}{section}{References}
