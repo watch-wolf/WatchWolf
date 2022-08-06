@@ -282,7 +282,7 @@ The problem here is that if we stick with the \hyperref[type:array]{Array} struc
 		\wordbox[ltr]{1}{\hyperref[type:str]{file name}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{} \\
-		\wordbox[ltr]{1}{\hyperref[type:str]{file path\footnote{The path must be relative, and you can't go outside the Server directory (using '../'). Both '' and './' means the root of the Server directory.}}} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{file path\footnotemark}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{} \\
 		\bitbox{32}{file number of bytes} \\
@@ -292,6 +292,9 @@ The problem here is that if we stick with the \hyperref[type:array]{Array} struc
 	\end{bytefield}
 	\caption{File structure}
 \end{figure}
+
+% File structure's file path footnote
+\footnotetext{The path must be relative, and you can't go outside the Server directory (using '../'). Both '' and './' means the root of the Server directory.}
 
 \subsubsection{Server type}\label{type:server-type}
 The Server type specifies the Minecraft server.
@@ -375,11 +378,14 @@ If it's not possible to create it (for example: one argument is invalid, the use
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
-		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox{16}{0x0000\footnote{Being the argument an array, the first 2 bytes specifies its size. As we must return an empty array, the argument should be exactly 16 zeroes.}}
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox{16}{0x0000\footnotemark}
 	\end{bytefield}
 	\caption{Start server error response structure}
 	\label{fig:start-error-response-structure}
 \end{figure}
+
+% start-error-response-structure size footnote
+\footnotetext{Being the argument an array, the first 2 bytes specifies its size. As we must return an empty array, the argument should be exactly 16 zeroes.}
 
 \subsubsection{Maps}\label{type:maps}
 Array of maps (worlds; Map[]). To have more information about arrays check the \hyperref[type:array]{subsection \ref{type:array}, Array}.
@@ -519,7 +525,7 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 		\hline
 		type[15] & type[14..4] & Extended type \\
 		\hline
-		0 & 0b00000000000 & NOP\footnote{As stated on the  \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}, the all-zeroes operation represents a NOP request.} \\
+		0 & 0b00000000000 & NOP\footnotemark \\
 		0 & 0b00000000001 & \hyperref[g:base]{Base operations} \\
 		0 & 0b00000000010 & \hyperref[g:performance]{Performance operations} \\
 		0 & 0b00000000011 & \hyperref[g:worldguard]{WorldGuard operations} \\
@@ -531,7 +537,10 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 	\caption{Extended types}
 \end{table}
 
-If you've implemented an extended type and you believe that it makes sense to be part of the standard contact \href{mailto:contacto@rogermiranda1000.com?subject=WatchWolf - New extended type}{contacto@rogermiranda1000.com} to reserve one of the addresses.
+% Extended types NOP's footnote
+\footnotetext{As stated on the  \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}, the all-zeroes operation represents a NOP request.}
+
+If you've implemented an extended type and you believe that it makes sense to be part of the standard contact \href{mailto:contact@watchwolf.dev?subject=WatchWolf - New extended type}{contact@watchwolf.dev} to reserve one of the addresses.
 
 \subsection{Server petition operation} \label{s:server-operation}
 Like the parameter \hyperref[s:operation]{Operation}, it specifies the desired request. For more information, refer to the \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}.
@@ -542,12 +551,15 @@ The only reserved operation is the all-zeroes operation (0x0000). It represents 
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
-		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:server-group]{group\footnote{except for groups 0b000000000000 and 0b000000000001}}} & \bitbox{16}{0x0000} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:server-group]{group\footnotemark}} & \bitbox{16}{0x0000} \\
 		\bitbox{8}{\hyperref[type:bool]{\textit{true}}} & \bitbox{24}[bgcolor=lightgray]{}
 	\end{bytefield}
 	\caption{Implemented group response structure}
 	\label{fig:implemented-eop}
 \end{figure}
+
+% Implemented group response structure's group footnote
+\footnotetext{except for groups 0b000000000000 and 0b000000000001}
 
 \subsection{Base operations} \label{g:base}
 \myworries{...}
@@ -754,7 +766,7 @@ Defaults to 0.
 		BEETROOTS & 0-3 \\
 		BAMBOO & 0-1 \\
 		CARROTS & 0-7 \\
-		CHORUS\_FLOWER & 0/5\footnote{\myworries{0 => 0; 5 => 1 (the other stages are the same block)}} \\
+		CHORUS\_FLOWER & 0/5\footnotemark \\
 		COCOA & 0-2 \\
 		FROSTED\_ICE & 0-3 \\
 		MELON\_STEM & 0-7 \\
@@ -767,6 +779,9 @@ Defaults to 0.
 	\end{tabular}
 	\caption{Ageable materials}
 \end{table}
+
+% Ageable materials' CHORUS_FLOWER footnote
+\footnotetext{\myworries{0 => 0; 5 => 1 (the other stages are the same block)}}
 
 \subsubsection{Attachment}
 Denotes how the bell is attached to its block.
@@ -1643,7 +1658,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 
 \begin{longtable}{ |c|c|c| }
 	\hline
-	Material & Aquatic block\footnote{If it's an underwater block (defaults to false).} \\
+	Material & Aquatic block\footnotemark \\
 	\hline
 	\endhead
 	ACACIA\_LEAVES & \xmark \\
@@ -1919,6 +1934,9 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 	\hline
 	\caption{Waterlogged materials}
 \end{longtable}
+
+% Aquatic block's footnote
+\footnotetext{If it's an underwater block (defaults to false).}
 
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
