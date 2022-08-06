@@ -724,6 +724,9 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 		bloom & Admin block \\
 		bottom & Bottom-block dependent \\
 		powered & Admin block / block dependent \\
+		has\_book & Inventory dependent \\
+		sculk\_sensor\_phase & Admin block \\
+		signal\_fire & Bottom-block dependent \\
 		\hline
 	\end{tabular}
 	\caption{Unused Spigot BlockData's modifiers}
@@ -1038,11 +1041,19 @@ up=true (SANDSTONE_WALL)
 up=true (STONE_BRICK_WALL)
 
 \subsubsection{Eggs}
-eggs=1 (TURTLE_EGG)
+
+Defaults to 1.
+
+TURTLE_EGG 1-4
+
+\subsubsection{Extended}
+Defaults to false.
 
 extended=false (PISTON)
 extended=false (STICKY_PISTON)
+
 eye=false (END_PORTAL_FRAME)
+
 face=wall (ACACIA_BUTTON)
 face=wall (BIRCH_BUTTON)
 face=wall (CRIMSON_BUTTON)
@@ -1056,6 +1067,7 @@ face=wall (POLISHED_BLACKSTONE_BUTTON)
 face=wall (SPRUCE_BUTTON)
 face=wall (STONE_BUTTON)
 face=wall (WARPED_BUTTON)
+
 facing=down (HOPPER)
 facing=north (ACACIA_BUTTON)
 facing=north (ACACIA_DOOR)
@@ -1289,6 +1301,7 @@ facing=up (SHULKER_BOX)
 facing=up (SMALL_AMETHYST_BUD)
 facing=up (WHITE_SHULKER_BOX)
 facing=up (YELLOW_SHULKER_BOX)
+
 half=bottom (ACACIA_STAIRS)
 half=bottom (ACACIA_TRAPDOOR)
 half=bottom (ANDESITE_STAIRS)
@@ -1367,11 +1380,13 @@ half=lower (SUNFLOWER)
 half=lower (TALL_GRASS)
 half=lower (TALL_SEAGRASS)
 half=lower (WARPED_DOOR)
+
 hanging=false (LANTERN)
 hanging=false (MANGROVE_PROPAGULE)
 hanging=false (SOUL_LANTERN)
-has_book=false (LECTERN)
+
 hatch=0 (TURTLE_EGG)
+
 hinge=left (ACACIA_DOOR)
 hinge=left (BIRCH_DOOR)
 hinge=left (CRIMSON_DOOR)
@@ -1382,8 +1397,10 @@ hinge=left (MANGROVE_DOOR)
 hinge=left (OAK_DOOR)
 hinge=left (SPRUCE_DOOR)
 hinge=left (WARPED_DOOR)
+
 honey_level=0 (BEEHIVE)
 honey_level=0 (BEE_NEST)
+
 in_wall=false (ACACIA_FENCE_GATE)
 in_wall=false (BIRCH_FENCE_GATE)
 in_wall=false (CRIMSON_FENCE_GATE)
@@ -1393,14 +1410,19 @@ in_wall=false (MANGROVE_FENCE_GATE)
 in_wall=false (OAK_FENCE_GATE)
 in_wall=false (SPRUCE_FENCE_GATE)
 in_wall=false (WARPED_FENCE_GATE)
+
 inverted=false (DAYLIGHT_DETECTOR)
+
 layers=1 (SNOW)
+
 leaves=none (BAMBOO)
+
 level=0 (COMPOSTER)
 level=0 (LAVA)
 level=0 (WATER)
 level=1 (POWDER_SNOW_CAULDRON)
 level=1 (WATER_CAULDRON)
+
 lit=false (BLACK_CANDLE)
 lit=false (BLACK_CANDLE_CAKE)
 lit=false (BLAST_FURNACE)
@@ -1445,11 +1467,16 @@ lit=true (CAMPFIRE)
 lit=true (REDSTONE_TORCH)
 lit=true (REDSTONE_WALL_TORCH)
 lit=true (SOUL_CAMPFIRE)
+
 locked=false (REPEATER)
+
 mode=compare (COMPARATOR)
 mode=load (STRUCTURE_BLOCK)
+
 moisture=0 (FARMLAND)
+
 note=0 (NOTE_BLOCK)
+
 open=false (ACACIA_DOOR)
 open=false (ACACIA_FENCE_GATE)
 open=false (ACACIA_TRAPDOOR)
@@ -1480,7 +1507,9 @@ open=false (SPRUCE_TRAPDOOR)
 open=false (WARPED_DOOR)
 open=false (WARPED_FENCE_GATE)
 open=false (WARPED_TRAPDOOR)
+
 orientation=north_up (JIGSAW)
+
 part=foot (BLACK_BED)
 part=foot (BLUE_BED)
 part=foot (BROWN_BED)
@@ -1497,7 +1526,9 @@ part=foot (PURPLE_BED)
 part=foot (RED_BED)
 part=foot (WHITE_BED)
 part=foot (YELLOW_BED)
+
 pickles=1 (SEA_PICKLE)
+
 rotation=0 (ACACIA_SIGN)
 rotation=0 (BIRCH_SIGN)
 rotation=0 (BLACK_BANNER)
@@ -1529,7 +1560,7 @@ rotation=0 (WHITE_BANNER)
 rotation=0 (WITHER_SKELETON_SKULL)
 rotation=0 (YELLOW_BANNER)
 rotation=0 (ZOMBIE_HEAD)
-sculk_sensor_phase=inactive (SCULK_SENSOR)
+
 shape=north_south (ACTIVATOR_RAIL)
 shape=north_south (DETECTOR_RAIL)
 shape=north_south (POWERED_RAIL)
@@ -1584,12 +1615,13 @@ shape=straight (WAXED_EXPOSED_CUT_COPPER_STAIRS)
 shape=straight (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
 shape=straight (WAXED_WEATHERED_CUT_COPPER_STAIRS)
 shape=straight (WEATHERED_CUT_COPPER_STAIRS)
-signal_fire=false (CAMPFIRE)
-signal_fire=false (SOUL_CAMPFIRE)
+
 snowy=false (GRASS_BLOCK)
 snowy=false (MYCELIUM)
 snowy=false (PODZOL)
+
 thickness=tip (POINTED_DRIPSTONE)
+
 type=bottom (ACACIA_SLAB)
 type=bottom (ANDESITE_SLAB)
 type=bottom (BIRCH_SLAB)
@@ -1648,8 +1680,8 @@ type=normal (MOVING_PISTON)
 type=normal (PISTON_HEAD)
 type=single (CHEST)
 type=single (TRAPPED_CHEST)
+
 vertical_direction=up (POINTED_DRIPSTONE)
-waterlogged=false (ACACIA_FENCE)
 
 \subsubsection{Waterlogged}
 Denotes whether this block has fluid in it.
@@ -1661,6 +1693,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 	Material & Aquatic block\footnotemark \\
 	\hline
 	\endhead
+	ACACIA\_FENCE & \xmark \\
 	ACACIA\_LEAVES & \xmark \\
 	ACACIA\_SIGN & \xmark \\
 	ACACIA\_SLAB & \xmark \\
