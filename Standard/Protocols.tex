@@ -1603,6 +1603,8 @@ waterlogged=false (ACACIA_FENCE)
 
 \subsubsection{Waterlogged}
 
+Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL\_WALL\_FAN, BUBBLE\_CORAL, BUBBLE\_CORAL\_FAN, BUBBLE\_CORAL\_WALL\_FAN, CONDUIT, DEAD\_BRAIN\_CORAL, DEAD\_BRAIN\_CORAL\_FAN, DEAD\_BRAIN\_CORAL\_WALL\_FAN, DEAD\_BUBBLE\_CORAL, DEAD\_BUBBLE\_CORAL\_FAN, DEAD\_BUBBLE\_CORAL\_WALL\_FAN, DEAD\_FIRE\_CORAL, DEAD\_FIRE\_CORAL\_FAN, DEAD\_FIRE\_CORAL\_WALL\_FAN, DEAD\_HORN\_CORAL, DEAD\_HORN\_CORAL\_FAN, DEAD\_HORN\_CORAL\_WALL\_FAN, DEAD\_TUBE\_CORAL, DEAD\_TUBE\_CORAL\_FAN, DEAD\_TUBE\_CORAL\_WALL\_FAN, FIRE\_CORAL, FIRE\_CORAL\_FAN, FIRE\_CORAL\_WALL\_FAN, HORN\_CORAL, HORN\_CORAL\_FAN, HORN\_CORAL\_WALL\_FAN, SEA\_PICKLE, TUBE\_CORAL, TUBE\_CORAL\_FAN and TUBE\_CORAL\_WALL\_FAN} (which defaults to true), it defaults to false.
+
 waterlogged=false (ACACIA_LEAVES)
 waterlogged=false (ACACIA_SIGN)
 waterlogged=false (ACACIA_SLAB)
@@ -1841,38 +1843,38 @@ waterlogged=false (WHITE_STAINED_GLASS_PANE)
 waterlogged=false (YELLOW_CANDLE)
 waterlogged=false (YELLOW_STAINED_GLASS_PANE)
 
-waterlogged=true (BRAIN_CORAL)
-waterlogged=true (BRAIN_CORAL_FAN)
-waterlogged=true (BRAIN_CORAL_WALL_FAN)
-waterlogged=true (BUBBLE_CORAL)
-waterlogged=true (BUBBLE_CORAL_FAN)
-waterlogged=true (BUBBLE_CORAL_WALL_FAN)
-waterlogged=true (CONDUIT)
-waterlogged=true (DEAD_BRAIN_CORAL)
-waterlogged=true (DEAD_BRAIN_CORAL_FAN)
-waterlogged=true (DEAD_BRAIN_CORAL_WALL_FAN)
-waterlogged=true (DEAD_BUBBLE_CORAL)
-waterlogged=true (DEAD_BUBBLE_CORAL_FAN)
-waterlogged=true (DEAD_BUBBLE_CORAL_WALL_FAN)
-waterlogged=true (DEAD_FIRE_CORAL)
-waterlogged=true (DEAD_FIRE_CORAL_FAN)
-waterlogged=true (DEAD_FIRE_CORAL_WALL_FAN)
-waterlogged=true (DEAD_HORN_CORAL)
-waterlogged=true (DEAD_HORN_CORAL_FAN)
-waterlogged=true (DEAD_HORN_CORAL_WALL_FAN)
-waterlogged=true (DEAD_TUBE_CORAL)
-waterlogged=true (DEAD_TUBE_CORAL_FAN)
-waterlogged=true (DEAD_TUBE_CORAL_WALL_FAN)
-waterlogged=true (FIRE_CORAL)
-waterlogged=true (FIRE_CORAL_FAN)
-waterlogged=true (FIRE_CORAL_WALL_FAN)
-waterlogged=true (HORN_CORAL)
-waterlogged=true (HORN_CORAL_FAN)
-waterlogged=true (HORN_CORAL_WALL_FAN)
-waterlogged=true (SEA_PICKLE)
-waterlogged=true (TUBE_CORAL)
-waterlogged=true (TUBE_CORAL_FAN)
-waterlogged=true (TUBE_CORAL_WALL_FAN)
+BRAIN\_CORAL true/false
+BRAIN\_CORAL\_FAN true/false
+BRAIN\_CORAL\_WALL\_FAN true/false
+BUBBLE\_CORAL true/false
+BUBBLE\_CORAL\_FAN true/false
+BUBBLE\_CORAL\_WALL\_FAN true/false
+CONDUIT true/false
+DEAD\_BRAIN\_CORAL true/false
+DEAD\_BRAIN\_CORAL\_FAN true/false
+DEAD\_BRAIN\_CORAL\_WALL\_FAN true/false
+DEAD\_BUBBLE\_CORAL true/false
+DEAD\_BUBBLE\_CORAL\_FAN true/false
+DEAD\_BUBBLE\_CORAL\_WALL\_FAN true/false
+DEAD\_FIRE\_CORAL true/false
+DEAD\_FIRE\_CORAL\_FAN true/false
+DEAD\_FIRE\_CORAL\_WALL\_FAN true/false
+DEAD\_HORN\_CORAL true/false
+DEAD\_HORN\_CORAL\_FAN true/false
+DEAD\_HORN\_CORAL\_WALL\_FAN true/false
+DEAD\_TUBE\_CORAL true/false
+DEAD\_TUBE\_CORAL\_FAN true/false
+DEAD\_TUBE\_CORAL\_WALL\_FAN true/false
+FIRE\_CORAL true/false
+FIRE\_CORAL\_FAN true/false
+FIRE\_CORAL\_WALL\_FAN true/false
+HORN\_CORAL true/false
+HORN\_CORAL\_FAN true/false
+HORN\_CORAL\_WALL\_FAN true/false
+SEA\_PICKLE true/false
+TUBE\_CORAL true/false
+TUBE\_CORAL\_FAN true/false
+TUBE\_CORAL\_WALL\_FAN true/false
 
 
 \subsection{Material modifiers concatenation}
@@ -1881,7 +1883,7 @@ waterlogged=true (TUBE_CORAL_WALL_FAN)
 \begin{figure}
 	\begin{rail}
 		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) \\
-		'Spigot original material name' \\
+		Material \\
 		([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
 		([age=0] () | [age!=0] '\_' AGE)
 	\end{rail}
