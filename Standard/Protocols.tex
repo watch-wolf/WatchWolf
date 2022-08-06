@@ -43,6 +43,7 @@
 	\usepackage{footnote}	% notes inside tables
 	\usepackage{float}		% place figures exactly there
 	\usepackage{longtable}	% tables that are more than one page size
+	\usepackage{pifont}
 	\usepackage[natbibapa]{apacite}	% bibliography
 	\usepackage[acronym,section=subsection]{glossaries}
 	\usepackage{rail}
@@ -65,6 +66,10 @@
 	% count figures/tables with sections
 	\counterwithin{table}{section}
 	\counterwithin{figure}{section}
+	
+	% check/cross mark
+	\newcommand{\cmark}{\ding{51}}%
+	\newcommand{\xmark}{\ding{55}}%
 	
 	% TODOs
 	\newcommand\myworries[1]{\sethlcolor{red}\hl{#1}}
@@ -1634,280 +1639,286 @@ waterlogged=false (ACACIA_FENCE)
 \subsubsection{Waterlogged}
 Denotes whether this block has fluid in it.
 
-Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL\_WALL\_FAN, BUBBLE\_CORAL, BUBBLE\_CORAL\_FAN, BUBBLE\_CORAL\_WALL\_FAN, CONDUIT, DEAD\_BRAIN\_CORAL, DEAD\_BRAIN\_CORAL\_FAN, DEAD\_BRAIN\_CORAL\_WALL\_FAN, DEAD\_BUBBLE\_CORAL, DEAD\_BUBBLE\_CORAL\_FAN, DEAD\_BUBBLE\_CORAL\_WALL\_FAN, DEAD\_FIRE\_CORAL, DEAD\_FIRE\_CORAL\_FAN, DEAD\_FIRE\_CORAL\_WALL\_FAN, DEAD\_HORN\_CORAL, DEAD\_HORN\_CORAL\_FAN, DEAD\_HORN\_CORAL\_WALL\_FAN, DEAD\_TUBE\_CORAL, DEAD\_TUBE\_CORAL\_FAN, DEAD\_TUBE\_CORAL\_WALL\_FAN, FIRE\_CORAL, FIRE\_CORAL\_FAN, FIRE\_CORAL\_WALL\_FAN, HORN\_CORAL, HORN\_CORAL\_FAN, HORN\_CORAL\_WALL\_FAN, SEA\_PICKLE, TUBE\_CORAL, TUBE\_CORAL\_FAN and TUBE\_CORAL\_WALL\_FAN} (which defaults to true), it defaults to false.
+Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL\_WALL\_FAN, BUBBLE\_CORAL, BUBBLE\_CORAL\_FAN, BUBBLE\_CORAL\_WALL\_FAN, CONDUIT, DEAD\_BRAIN\_CORAL, DEAD\_BRAIN\_CORAL\_FAN, DEAD\_BRAIN\_CORAL\_WALL\_FAN, DEAD\_BUBBLE\_CORAL, DEAD\_BUBBLE\_CORAL\_FAN, DEAD\_BUBBLE\_CORAL\_WALL\_FAN, DEAD\_FIRE\_CORAL, DEAD\_FIRE\_CORAL\_FAN, DEAD\_FIRE\_CORAL\_WALL\_FAN, DEAD\_HORN\_CORAL, DEAD\_HORN\_CORAL\_FAN, DEAD\_HORN\_CORAL\_WALL\_FAN, DEAD\_TUBE\_CORAL, DEAD\_TUBE\_CORAL\_FAN, DEAD\_TUBE\_CORAL\_WALL\_FAN, FIRE\_CORAL, FIRE\_CORAL\_FAN, FIRE\_CORAL\_WALL\_FAN, HORN\_CORAL, HORN\_CORAL\_FAN, HORN\_CORAL\_WALL\_FAN, SEA\_PICKLE, TUBE\_CORAL, TUBE\_CORAL\_FAN and TUBE\_CORAL\_WALL\_FAN} (which defaults to true), it defaults to false. All the possible options are true or false.
 
-waterlogged=false (ACACIA_LEAVES)
-waterlogged=false (ACACIA_SIGN)
-waterlogged=false (ACACIA_SLAB)
-waterlogged=false (ACACIA_STAIRS)
-waterlogged=false (ACACIA_TRAPDOOR)
-waterlogged=false (ACACIA_WALL_SIGN)
-waterlogged=false (ACTIVATOR_RAIL)
-waterlogged=false (AMETHYST_CLUSTER)
-waterlogged=false (ANDESITE_SLAB)
-waterlogged=false (ANDESITE_STAIRS)
-waterlogged=false (ANDESITE_WALL)
-waterlogged=false (AZALEA_LEAVES)
-waterlogged=false (BIG_DRIPLEAF)
-waterlogged=false (BIG_DRIPLEAF_STEM)
-waterlogged=false (BIRCH_FENCE)
-waterlogged=false (BIRCH_LEAVES)
-waterlogged=false (BIRCH_SIGN)
-waterlogged=false (BIRCH_SLAB)
-waterlogged=false (BIRCH_STAIRS)
-waterlogged=false (BIRCH_TRAPDOOR)
-waterlogged=false (BIRCH_WALL_SIGN)
-waterlogged=false (BLACKSTONE_SLAB)
-waterlogged=false (BLACKSTONE_STAIRS)
-waterlogged=false (BLACKSTONE_WALL)
-waterlogged=false (BLACK_CANDLE)
-waterlogged=false (BLACK_STAINED_GLASS_PANE)
-waterlogged=false (BLUE_CANDLE)
-waterlogged=false (BLUE_STAINED_GLASS_PANE)
-waterlogged=false (BRICK_SLAB)
-waterlogged=false (BRICK_STAIRS)
-waterlogged=false (BRICK_WALL)
-waterlogged=false (BROWN_CANDLE)
-waterlogged=false (BROWN_STAINED_GLASS_PANE)
-waterlogged=false (CAMPFIRE)
-waterlogged=false (CANDLE)
-waterlogged=false (CHAIN)
-waterlogged=false (CHEST)
-waterlogged=false (COBBLED_DEEPSLATE_SLAB)
-waterlogged=false (COBBLED_DEEPSLATE_STAIRS)
-waterlogged=false (COBBLED_DEEPSLATE_WALL)
-waterlogged=false (COBBLESTONE_SLAB)
-waterlogged=false (COBBLESTONE_STAIRS)
-waterlogged=false (COBBLESTONE_WALL)
-waterlogged=false (CRIMSON_FENCE)
-waterlogged=false (CRIMSON_SIGN)
-waterlogged=false (CRIMSON_SLAB)
-waterlogged=false (CRIMSON_STAIRS)
-waterlogged=false (CRIMSON_TRAPDOOR)
-waterlogged=false (CRIMSON_WALL_SIGN)
-waterlogged=false (CUT_COPPER_SLAB)
-waterlogged=false (CUT_COPPER_STAIRS)
-waterlogged=false (CUT_RED_SANDSTONE_SLAB)
-waterlogged=false (CUT_SANDSTONE_SLAB)
-waterlogged=false (CYAN_CANDLE)
-waterlogged=false (CYAN_STAINED_GLASS_PANE)
-waterlogged=false (DARK_OAK_FENCE)
-waterlogged=false (DARK_OAK_LEAVES)
-waterlogged=false (DARK_OAK_SIGN)
-waterlogged=false (DARK_OAK_SLAB)
-waterlogged=false (DARK_OAK_STAIRS)
-waterlogged=false (DARK_OAK_TRAPDOOR)
-waterlogged=false (DARK_OAK_WALL_SIGN)
-waterlogged=false (DARK_PRISMARINE_SLAB)
-waterlogged=false (DARK_PRISMARINE_STAIRS)
-waterlogged=false (DEEPSLATE_BRICK_SLAB)
-waterlogged=false (DEEPSLATE_BRICK_STAIRS)
-waterlogged=false (DEEPSLATE_BRICK_WALL)
-waterlogged=false (DEEPSLATE_TILE_SLAB)
-waterlogged=false (DEEPSLATE_TILE_STAIRS)
-waterlogged=false (DEEPSLATE_TILE_WALL)
-waterlogged=false (DETECTOR_RAIL)
-waterlogged=false (DIORITE_SLAB)
-waterlogged=false (DIORITE_STAIRS)
-waterlogged=false (DIORITE_WALL)
-waterlogged=false (ENDER_CHEST)
-waterlogged=false (END_STONE_BRICK_SLAB)
-waterlogged=false (END_STONE_BRICK_STAIRS)
-waterlogged=false (END_STONE_BRICK_WALL)
-waterlogged=false (EXPOSED_CUT_COPPER_SLAB)
-waterlogged=false (EXPOSED_CUT_COPPER_STAIRS)
-waterlogged=false (FLOWERING_AZALEA_LEAVES)
-waterlogged=false (GLASS_PANE)
-waterlogged=false (GLOW_LICHEN)
-waterlogged=false (GRANITE_SLAB)
-waterlogged=false (GRANITE_STAIRS)
-waterlogged=false (GRANITE_WALL)
-waterlogged=false (GRAY_CANDLE)
-waterlogged=false (GRAY_STAINED_GLASS_PANE)
-waterlogged=false (GREEN_CANDLE)
-waterlogged=false (GREEN_STAINED_GLASS_PANE)
-waterlogged=false (HANGING_ROOTS)
-waterlogged=false (IRON_BARS)
-waterlogged=false (IRON_TRAPDOOR)
-waterlogged=false (JUNGLE_FENCE)
-waterlogged=false (JUNGLE_LEAVES)
-waterlogged=false (JUNGLE_SIGN)
-waterlogged=false (JUNGLE_SLAB)
-waterlogged=false (JUNGLE_STAIRS)
-waterlogged=false (JUNGLE_TRAPDOOR)
-waterlogged=false (JUNGLE_WALL_SIGN)
-waterlogged=false (LADDER)
-waterlogged=false (LANTERN)
-waterlogged=false (LARGE_AMETHYST_BUD)
-waterlogged=false (LIGHTNING_ROD)
-waterlogged=false (LIGHT_BLUE_CANDLE)
-waterlogged=false (LIGHT_BLUE_STAINED_GLASS_PANE)
-waterlogged=false (LIGHT_GRAY_CANDLE)
-waterlogged=false (LIGHT_GRAY_STAINED_GLASS_PANE)
-waterlogged=false (LIME_CANDLE)
-waterlogged=false (LIME_STAINED_GLASS_PANE)
-waterlogged=false (MAGENTA_CANDLE)
-waterlogged=false (MAGENTA_STAINED_GLASS_PANE)
-waterlogged=false (MANGROVE_FENCE)
-waterlogged=false (MANGROVE_LEAVES)
-waterlogged=false (MANGROVE_PROPAGULE)
-waterlogged=false (MANGROVE_ROOTS)
-waterlogged=false (MANGROVE_SIGN)
-waterlogged=false (MANGROVE_SLAB)
-waterlogged=false (MANGROVE_STAIRS)
-waterlogged=false (MANGROVE_TRAPDOOR)
-waterlogged=false (MANGROVE_WALL_SIGN)
-waterlogged=false (MEDIUM_AMETHYST_BUD)
-waterlogged=false (MOSSY_COBBLESTONE_SLAB)
-waterlogged=false (MOSSY_COBBLESTONE_STAIRS)
-waterlogged=false (MOSSY_COBBLESTONE_WALL)
-waterlogged=false (MOSSY_STONE_BRICK_SLAB)
-waterlogged=false (MOSSY_STONE_BRICK_STAIRS)
-waterlogged=false (MOSSY_STONE_BRICK_WALL)
-waterlogged=false (MUD_BRICK_SLAB)
-waterlogged=false (MUD_BRICK_STAIRS)
-waterlogged=false (MUD_BRICK_WALL)
-waterlogged=false (NETHER_BRICK_FENCE)
-waterlogged=false (NETHER_BRICK_SLAB)
-waterlogged=false (NETHER_BRICK_STAIRS)
-waterlogged=false (NETHER_BRICK_WALL)
-waterlogged=false (OAK_FENCE)
-waterlogged=false (OAK_LEAVES)
-waterlogged=false (OAK_SIGN)
-waterlogged=false (OAK_SLAB)
-waterlogged=false (OAK_STAIRS)
-waterlogged=false (OAK_TRAPDOOR)
-waterlogged=false (OAK_WALL_SIGN)
-waterlogged=false (ORANGE_CANDLE)
-waterlogged=false (ORANGE_STAINED_GLASS_PANE)
-waterlogged=false (OXIDIZED_CUT_COPPER_SLAB)
-waterlogged=false (OXIDIZED_CUT_COPPER_STAIRS)
-waterlogged=false (PETRIFIED_OAK_SLAB)
-waterlogged=false (PINK_CANDLE)
-waterlogged=false (PINK_STAINED_GLASS_PANE)
-waterlogged=false (POINTED_DRIPSTONE)
-waterlogged=false (POLISHED_ANDESITE_SLAB)
-waterlogged=false (POLISHED_ANDESITE_STAIRS)
-waterlogged=false (POLISHED_BLACKSTONE_BRICK_SLAB)
-waterlogged=false (POLISHED_BLACKSTONE_BRICK_STAIRS)
-waterlogged=false (POLISHED_BLACKSTONE_BRICK_WALL)
-waterlogged=false (POLISHED_BLACKSTONE_SLAB)
-waterlogged=false (POLISHED_BLACKSTONE_STAIRS)
-waterlogged=false (POLISHED_BLACKSTONE_WALL)
-waterlogged=false (POLISHED_DEEPSLATE_SLAB)
-waterlogged=false (POLISHED_DEEPSLATE_STAIRS)
-waterlogged=false (POLISHED_DEEPSLATE_WALL)
-waterlogged=false (POLISHED_DIORITE_SLAB)
-waterlogged=false (POLISHED_DIORITE_STAIRS)
-waterlogged=false (POLISHED_GRANITE_SLAB)
-waterlogged=false (POLISHED_GRANITE_STAIRS)
-waterlogged=false (POWERED_RAIL)
-waterlogged=false (PRISMARINE_BRICK_SLAB)
-waterlogged=false (PRISMARINE_BRICK_STAIRS)
-waterlogged=false (PRISMARINE_SLAB)
-waterlogged=false (PRISMARINE_STAIRS)
-waterlogged=false (PRISMARINE_WALL)
-waterlogged=false (PURPLE_CANDLE)
-waterlogged=false (PURPLE_STAINED_GLASS_PANE)
-waterlogged=false (PURPUR_SLAB)
-waterlogged=false (PURPUR_STAIRS)
-waterlogged=false (QUARTZ_SLAB)
-waterlogged=false (QUARTZ_STAIRS)
-waterlogged=false (RAIL)
-waterlogged=false (RED_CANDLE)
-waterlogged=false (RED_NETHER_BRICK_SLAB)
-waterlogged=false (RED_NETHER_BRICK_STAIRS)
-waterlogged=false (RED_NETHER_BRICK_WALL)
-waterlogged=false (RED_SANDSTONE_SLAB)
-waterlogged=false (RED_SANDSTONE_STAIRS)
-waterlogged=false (RED_SANDSTONE_WALL)
-waterlogged=false (RED_STAINED_GLASS_PANE)
-waterlogged=false (SANDSTONE_SLAB)
-waterlogged=false (SANDSTONE_STAIRS)
-waterlogged=false (SANDSTONE_WALL)
-waterlogged=false (SCAFFOLDING)
-waterlogged=false (SCULK_SENSOR)
-waterlogged=false (SCULK_SHRIEKER)
-waterlogged=false (SCULK_VEIN)
-waterlogged=false (SMALL_AMETHYST_BUD)
-waterlogged=false (SMALL_DRIPLEAF)
-waterlogged=false (SMOOTH_QUARTZ_SLAB)
-waterlogged=false (SMOOTH_QUARTZ_STAIRS)
-waterlogged=false (SMOOTH_RED_SANDSTONE_SLAB)
-waterlogged=false (SMOOTH_RED_SANDSTONE_STAIRS)
-waterlogged=false (SMOOTH_SANDSTONE_SLAB)
-waterlogged=false (SMOOTH_SANDSTONE_STAIRS)
-waterlogged=false (SMOOTH_STONE_SLAB)
-waterlogged=false (SOUL_CAMPFIRE)
-waterlogged=false (SOUL_LANTERN)
-waterlogged=false (SPRUCE_FENCE)
-waterlogged=false (SPRUCE_LEAVES)
-waterlogged=false (SPRUCE_SIGN)
-waterlogged=false (SPRUCE_SLAB)
-waterlogged=false (SPRUCE_STAIRS)
-waterlogged=false (SPRUCE_TRAPDOOR)
-waterlogged=false (SPRUCE_WALL_SIGN)
-waterlogged=false (STONE_BRICK_SLAB)
-waterlogged=false (STONE_BRICK_STAIRS)
-waterlogged=false (STONE_BRICK_WALL)
-waterlogged=false (STONE_SLAB)
-waterlogged=false (STONE_STAIRS)
-waterlogged=false (TRAPPED_CHEST)
-waterlogged=false (WARPED_FENCE)
-waterlogged=false (WARPED_SIGN)
-waterlogged=false (WARPED_SLAB)
-waterlogged=false (WARPED_STAIRS)
-waterlogged=false (WARPED_TRAPDOOR)
-waterlogged=false (WARPED_WALL_SIGN)
-waterlogged=false (WAXED_CUT_COPPER_SLAB)
-waterlogged=false (WAXED_CUT_COPPER_STAIRS)
-waterlogged=false (WAXED_EXPOSED_CUT_COPPER_SLAB)
-waterlogged=false (WAXED_EXPOSED_CUT_COPPER_STAIRS)
-waterlogged=false (WAXED_OXIDIZED_CUT_COPPER_SLAB)
-waterlogged=false (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
-waterlogged=false (WAXED_WEATHERED_CUT_COPPER_SLAB)
-waterlogged=false (WAXED_WEATHERED_CUT_COPPER_STAIRS)
-waterlogged=false (WEATHERED_CUT_COPPER_SLAB)
-waterlogged=false (WEATHERED_CUT_COPPER_STAIRS)
-waterlogged=false (WHITE_CANDLE)
-waterlogged=false (WHITE_STAINED_GLASS_PANE)
-waterlogged=false (YELLOW_CANDLE)
-waterlogged=false (YELLOW_STAINED_GLASS_PANE)
-
-% defaults to true
-BRAIN\_CORAL true/false
-BRAIN\_CORAL\_FAN true/false
-BRAIN\_CORAL\_WALL\_FAN true/false
-BUBBLE\_CORAL true/false
-BUBBLE\_CORAL\_FAN true/false
-BUBBLE\_CORAL\_WALL\_FAN true/false
-CONDUIT true/false
-DEAD\_BRAIN\_CORAL true/false
-DEAD\_BRAIN\_CORAL\_FAN true/false
-DEAD\_BRAIN\_CORAL\_WALL\_FAN true/false
-DEAD\_BUBBLE\_CORAL true/false
-DEAD\_BUBBLE\_CORAL\_FAN true/false
-DEAD\_BUBBLE\_CORAL\_WALL\_FAN true/false
-DEAD\_FIRE\_CORAL true/false
-DEAD\_FIRE\_CORAL\_FAN true/false
-DEAD\_FIRE\_CORAL\_WALL\_FAN true/false
-DEAD\_HORN\_CORAL true/false
-DEAD\_HORN\_CORAL\_FAN true/false
-DEAD\_HORN\_CORAL\_WALL\_FAN true/false
-DEAD\_TUBE\_CORAL true/false
-DEAD\_TUBE\_CORAL\_FAN true/false
-DEAD\_TUBE\_CORAL\_WALL\_FAN true/false
-FIRE\_CORAL true/false
-FIRE\_CORAL\_FAN true/false
-FIRE\_CORAL\_WALL\_FAN true/false
-HORN\_CORAL true/false
-HORN\_CORAL\_FAN true/false
-HORN\_CORAL\_WALL\_FAN true/false
-SEA\_PICKLE true/false
-TUBE\_CORAL true/false
-TUBE\_CORAL\_FAN true/false
-TUBE\_CORAL\_WALL\_FAN true/false
-
+\begin{longtable}{ |c|c|c| }
+	\hline
+	Material & Aquatic block\footnote{If it's an underwater block (defaults to false).} \\
+	\hline
+	\endhead
+	ACACIA\_LEAVES & \xmark \\
+	ACACIA\_SIGN & \xmark \\
+	ACACIA\_SLAB & \xmark \\
+	ACACIA\_STAIRS & \xmark \\
+	ACACIA\_TRAPDOOR & \xmark \\
+	ACACIA\_WALL\_SIGN & \xmark \\
+	ACTIVATOR\_RAIL & \xmark \\
+	AMETHYST\_CLUSTER & \xmark \\
+	ANDESITE\_SLAB & \xmark \\
+	ANDESITE\_STAIRS & \xmark \\
+	ANDESITE\_WALL & \xmark \\
+	AZALEA\_LEAVES & \xmark \\
+	BIG\_DRIPLEAF & \xmark \\
+	BIG\_DRIPLEAF\_STEM & \xmark \\
+	BIRCH\_FENCE & \xmark \\
+	BIRCH\_LEAVES & \xmark \\
+	BIRCH\_SIGN & \xmark \\
+	BIRCH\_SLAB & \xmark \\
+	BIRCH\_STAIRS & \xmark \\
+	BIRCH\_TRAPDOOR & \xmark \\
+	BIRCH\_WALL\_SIGN & \xmark \\
+	BLACKSTONE\_SLAB & \xmark \\
+	BLACKSTONE\_STAIRS & \xmark \\
+	BLACKSTONE\_WALL & \xmark \\
+	BLACK\_CANDLE & \xmark \\
+	BLACK\_STAINED\_GLASS\_PANE & \xmark \\
+	BLUE\_CANDLE & \xmark \\
+	BLUE\_STAINED\_GLASS\_PANE & \xmark \\
+	BRICK\_SLAB & \xmark \\
+	BRICK\_STAIRS & \xmark \\
+	BRICK\_WALL & \xmark \\
+	BROWN\_CANDLE & \xmark \\
+	BROWN\_STAINED\_GLASS\_PANE & \xmark \\
+	CAMPFIRE & \xmark \\
+	CANDLE & \xmark \\
+	CHAIN & \xmark \\
+	CHEST & \xmark \\
+	COBBLED\_DEEPSLATE\_SLAB & \xmark \\
+	COBBLED\_DEEPSLATE\_STAIRS & \xmark \\
+	COBBLED\_DEEPSLATE\_WALL & \xmark \\
+	COBBLESTONE\_SLAB & \xmark \\
+	COBBLESTONE\_STAIRS & \xmark \\
+	COBBLESTONE\_WALL & \xmark \\
+	CRIMSON\_FENCE & \xmark \\
+	CRIMSON\_SIGN & \xmark \\
+	CRIMSON\_SLAB & \xmark \\
+	CRIMSON\_STAIRS & \xmark \\
+	CRIMSON\_TRAPDOOR & \xmark \\
+	CRIMSON\_WALL\_SIGN & \xmark \\
+	CUT\_COPPER\_SLAB & \xmark \\
+	CUT\_COPPER\_STAIRS & \xmark \\
+	CUT\_RED\_SANDSTONE\_SLAB & \xmark \\
+	CUT\_SANDSTONE\_SLAB & \xmark \\
+	CYAN\_CANDLE & \xmark \\
+	CYAN\_STAINED\_GLASS\_PANE & \xmark \\
+	DARK\_OAK\_FENCE & \xmark \\
+	DARK\_OAK\_LEAVES & \xmark \\
+	DARK\_OAK\_SIGN & \xmark \\
+	DARK\_OAK\_SLAB & \xmark \\
+	DARK\_OAK\_STAIRS & \xmark \\
+	DARK\_OAK\_TRAPDOOR & \xmark \\
+	DARK\_OAK\_WALL\_SIGN & \xmark \\
+	DARK\_PRISMARINE\_SLAB & \xmark \\
+	DARK\_PRISMARINE\_STAIRS & \xmark \\
+	DEEPSLATE\_BRICK\_SLAB & \xmark \\
+	DEEPSLATE\_BRICK\_STAIRS & \xmark \\
+	DEEPSLATE\_BRICK\_WALL & \xmark \\
+	DEEPSLATE\_TILE\_SLAB & \xmark \\
+	DEEPSLATE\_TILE\_STAIRS & \xmark \\
+	DEEPSLATE\_TILE\_WALL & \xmark \\
+	DETECTOR\_RAIL & \xmark \\
+	DIORITE\_SLAB & \xmark \\
+	DIORITE\_STAIRS & \xmark \\
+	DIORITE\_WALL & \xmark \\
+	ENDER\_CHEST & \xmark \\
+	END\_STONE\_BRICK\_SLAB & \xmark \\
+	END\_STONE\_BRICK\_STAIRS & \xmark \\
+	END\_STONE\_BRICK\_WALL & \xmark \\
+	EXPOSED\_CUT\_COPPER\_SLAB & \xmark \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & \xmark \\
+	FLOWERING\_AZALEA\_LEAVES & \xmark \\
+	GLASS\_PANE & \xmark \\
+	GLOW\_LICHEN & \xmark \\
+	GRANITE\_SLAB & \xmark \\
+	GRANITE\_STAIRS & \xmark \\
+	GRANITE\_WALL & \xmark \\
+	GRAY\_CANDLE & \xmark \\
+	GRAY\_STAINED\_GLASS\_PANE & \xmark \\
+	GREEN\_CANDLE & \xmark \\
+	GREEN\_STAINED\_GLASS\_PANE & \xmark \\
+	HANGING\_ROOTS & \xmark \\
+	IRON\_BARS & \xmark \\
+	IRON\_TRAPDOOR & \xmark \\
+	JUNGLE\_FENCE & \xmark \\
+	JUNGLE\_LEAVES & \xmark \\
+	JUNGLE\_SIGN & \xmark \\
+	JUNGLE\_SLAB & \xmark \\
+	JUNGLE\_STAIRS & \xmark \\
+	JUNGLE\_TRAPDOOR & \xmark \\
+	JUNGLE\_WALL\_SIGN & \xmark \\
+	LADDER & \xmark \\
+	LANTERN & \xmark \\
+	LARGE\_AMETHYST\_BUD & \xmark \\
+	LIGHTNING\_ROD & \xmark \\
+	LIGHT\_BLUE\_CANDLE & \xmark \\
+	LIGHT\_BLUE\_STAINED\_GLASS\_PANE & \xmark \\
+	LIGHT\_GRAY\_CANDLE & \xmark \\
+	LIGHT\_GRAY\_STAINED\_GLASS\_PANE & \xmark \\
+	LIME\_CANDLE & \xmark \\
+	LIME\_STAINED\_GLASS\_PANE & \xmark \\
+	MAGENTA\_CANDLE & \xmark \\
+	MAGENTA\_STAINED\_GLASS\_PANE & \xmark \\
+	MANGROVE\_FENCE & \xmark \\
+	MANGROVE\_LEAVES & \xmark \\
+	MANGROVE\_PROPAGULE & \xmark \\
+	MANGROVE\_ROOTS & \xmark \\
+	MANGROVE\_SIGN & \xmark \\
+	MANGROVE\_SLAB & \xmark \\
+	MANGROVE\_STAIRS & \xmark \\
+	MANGROVE\_TRAPDOOR & \xmark \\
+	MANGROVE\_WALL\_SIGN & \xmark \\
+	MEDIUM\_AMETHYST\_BUD & \xmark \\
+	MOSSY\_COBBLESTONE\_SLAB & \xmark \\
+	MOSSY\_COBBLESTONE\_STAIRS & \xmark \\
+	MOSSY\_COBBLESTONE\_WALL & \xmark \\
+	MOSSY\_STONE\_BRICK\_SLAB & \xmark \\
+	MOSSY\_STONE\_BRICK\_STAIRS & \xmark \\
+	MOSSY\_STONE\_BRICK\_WALL & \xmark \\
+	MUD\_BRICK\_SLAB & \xmark \\
+	MUD\_BRICK\_STAIRS & \xmark \\
+	MUD\_BRICK\_WALL & \xmark \\
+	NETHER\_BRICK\_FENCE & \xmark \\
+	NETHER\_BRICK\_SLAB & \xmark \\
+	NETHER\_BRICK\_STAIRS & \xmark \\
+	NETHER\_BRICK\_WALL & \xmark \\
+	OAK\_FENCE & \xmark \\
+	OAK\_LEAVES & \xmark \\
+	OAK\_SIGN & \xmark \\
+	OAK\_SLAB & \xmark \\
+	OAK\_STAIRS & \xmark \\
+	OAK\_TRAPDOOR & \xmark \\
+	OAK\_WALL\_SIGN & \xmark \\
+	ORANGE\_CANDLE & \xmark \\
+	ORANGE\_STAINED\_GLASS\_PANE & \xmark \\
+	OXIDIZED\_CUT\_COPPER\_SLAB & \xmark \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & \xmark \\
+	PETRIFIED\_OAK\_SLAB & \xmark \\
+	PINK\_CANDLE & \xmark \\
+	PINK\_STAINED\_GLASS\_PANE & \xmark \\
+	POINTED\_DRIPSTONE & \xmark \\
+	POLISHED\_ANDESITE\_SLAB & \xmark \\
+	POLISHED\_ANDESITE\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_SLAB & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & \xmark \\
+	POLISHED\_BLACKSTONE\_SLAB & \xmark \\
+	POLISHED\_BLACKSTONE\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_WALL & \xmark \\
+	POLISHED\_DEEPSLATE\_SLAB & \xmark \\
+	POLISHED\_DEEPSLATE\_STAIRS & \xmark \\
+	POLISHED\_DEEPSLATE\_WALL & \xmark \\
+	POLISHED\_DIORITE\_SLAB & \xmark \\
+	POLISHED\_DIORITE\_STAIRS & \xmark \\
+	POLISHED\_GRANITE\_SLAB & \xmark \\
+	POLISHED\_GRANITE\_STAIRS & \xmark \\
+	POWERED\_RAIL & \xmark \\
+	PRISMARINE\_BRICK\_SLAB & \xmark \\
+	PRISMARINE\_BRICK\_STAIRS & \xmark \\
+	PRISMARINE\_SLAB & \xmark \\
+	PRISMARINE\_STAIRS & \xmark \\
+	PRISMARINE\_WALL & \xmark \\
+	PURPLE\_CANDLE & \xmark \\
+	PURPLE\_STAINED\_GLASS\_PANE & \xmark \\
+	PURPUR\_SLAB & \xmark \\
+	PURPUR\_STAIRS & \xmark \\
+	QUARTZ\_SLAB & \xmark \\
+	QUARTZ\_STAIRS & \xmark \\
+	RAIL & \xmark \\
+	RED\_CANDLE & \xmark \\
+	RED\_NETHER\_BRICK\_SLAB & \xmark \\
+	RED\_NETHER\_BRICK\_STAIRS & \xmark \\
+	RED\_NETHER\_BRICK\_WALL & \xmark \\
+	RED\_SANDSTONE\_SLAB & \xmark \\
+	RED\_SANDSTONE\_STAIRS & \xmark \\
+	RED\_SANDSTONE\_WALL & \xmark \\
+	RED\_STAINED\_GLASS\_PANE & \xmark \\
+	SANDSTONE\_SLAB & \xmark \\
+	SANDSTONE\_STAIRS & \xmark \\
+	SANDSTONE\_WALL & \xmark \\
+	SCAFFOLDING & \xmark \\
+	SCULK\_SENSOR & \xmark \\
+	SCULK\_SHRIEKER & \xmark \\
+	SCULK\_VEIN & \xmark \\
+	SMALL\_AMETHYST\_BUD & \xmark \\
+	SMALL\_DRIPLEAF & \xmark \\
+	SMOOTH\_QUARTZ\_SLAB & \xmark \\
+	SMOOTH\_QUARTZ\_STAIRS & \xmark \\
+	SMOOTH\_RED\_SANDSTONE\_SLAB & \xmark \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & \xmark \\
+	SMOOTH\_SANDSTONE\_SLAB & \xmark \\
+	SMOOTH\_SANDSTONE\_STAIRS & \xmark \\
+	SMOOTH\_STONE\_SLAB & \xmark \\
+	SOUL\_CAMPFIRE & \xmark \\
+	SOUL\_LANTERN & \xmark \\
+	SPRUCE\_FENCE & \xmark \\
+	SPRUCE\_LEAVES & \xmark \\
+	SPRUCE\_SIGN & \xmark \\
+	SPRUCE\_SLAB & \xmark \\
+	SPRUCE\_STAIRS & \xmark \\
+	SPRUCE\_TRAPDOOR & \xmark \\
+	SPRUCE\_WALL\_SIGN & \xmark \\
+	STONE\_BRICK\_SLAB & \xmark \\
+	STONE\_BRICK\_STAIRS & \xmark \\
+	STONE\_BRICK\_WALL & \xmark \\
+	STONE\_SLAB & \xmark \\
+	STONE\_STAIRS & \xmark \\
+	TRAPPED\_CHEST & \xmark \\
+	WARPED\_FENCE & \xmark \\
+	WARPED\_SIGN & \xmark \\
+	WARPED\_SLAB & \xmark \\
+	WARPED\_STAIRS & \xmark \\
+	WARPED\_TRAPDOOR & \xmark \\
+	WARPED\_WALL\_SIGN & \xmark \\
+	WAXED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WEATHERED\_CUT\_COPPER\_SLAB & \xmark \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WHITE\_CANDLE & \xmark \\
+	WHITE\_STAINED\_GLASS\_PANE & \xmark \\
+	YELLOW\_CANDLE & \xmark \\
+	YELLOW\_STAINED\_GLASS\_PANE & \xmark \\
+	\hline
+	BRAIN\_CORAL & \cmark \\
+	BRAIN\_CORAL\_FAN & \cmark \\
+	BRAIN\_CORAL\_WALL\_FAN & \cmark \\
+	BUBBLE\_CORAL & \cmark \\
+	BUBBLE\_CORAL\_FAN & \cmark \\
+	BUBBLE\_CORAL\_WALL\_FAN & \cmark \\
+	CONDUIT & \cmark \\
+	DEAD\_BRAIN\_CORAL & \cmark \\
+	DEAD\_BRAIN\_CORAL\_FAN & \cmark \\
+	DEAD\_BRAIN\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_BUBBLE\_CORAL & \cmark \\
+	DEAD\_BUBBLE\_CORAL\_FAN & \cmark \\
+	DEAD\_BUBBLE\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_FIRE\_CORAL & \cmark \\
+	DEAD\_FIRE\_CORAL\_FAN & \cmark \\
+	DEAD\_FIRE\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_HORN\_CORAL & \cmark \\
+	DEAD\_HORN\_CORAL\_FAN & \cmark \\
+	DEAD\_HORN\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_TUBE\_CORAL & \cmark \\
+	DEAD\_TUBE\_CORAL\_FAN & \cmark \\
+	DEAD\_TUBE\_CORAL\_WALL\_FAN & \cmark \\
+	FIRE\_CORAL & \cmark \\
+	FIRE\_CORAL\_FAN & \cmark \\
+	FIRE\_CORAL\_WALL\_FAN & \cmark \\
+	HORN\_CORAL & \cmark \\
+	HORN\_CORAL\_FAN & \cmark \\
+	HORN\_CORAL\_WALL\_FAN & \cmark \\
+	SEA\_PICKLE & \cmark \\
+	TUBE\_CORAL & \cmark \\
+	TUBE\_CORAL\_FAN & \cmark \\
+	TUBE\_CORAL\_WALL\_FAN & \cmark \\
+	\hline
+	\caption{Waterlogged materials}
+\end{longtable}
 
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
