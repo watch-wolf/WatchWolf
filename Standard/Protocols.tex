@@ -304,6 +304,27 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 \subsubsection{Block}\label{type:block}
 \myworries{...}
 
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,29,30,31} \\
+		\bitbox{30}{enum value} & \bitbox{2}{00} \\
+	\end{bytefield}
+	\caption{Structure of a \hyperref[type:block]{Block}}
+\end{figure}
+
+\myworries{unsigned 4-bytes integer. 2MSB forced at 00 (01, 10 and 11 reserved for Complex/Basic Blocks (if made)), others as Enum value}
+
+\begin{longtable}{ |c|c|c| }
+	\hline
+	Enum value & Block name & First Minecraft version \\
+	\hline
+	\endhead
+	0 & AIR & 1.8 \\
+	\hline
+	\caption{Block enum}
+\end{longtable}
+
 \subsubsection{Item}\label{type:item}
 \myworries{...}
 
@@ -1979,6 +2000,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) \\
 		Material \\
 		([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
+		([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
 		([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 		([bites=0] () | [bites!=0] '\_' bites)
 	\end{rail}
