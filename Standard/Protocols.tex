@@ -784,7 +784,7 @@ Defaults to 0.
 \end{table}
 
 % Ageable materials' CHORUS_FLOWER footnote
-\footnotetext{\myworries{0 => 0; 5 => 1 (the other stages are the same block)}}
+\footnotetext{The block is the same from age 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
 
 \subsubsection{Attachment}
 Denotes how the bell is attached to its block.
@@ -1983,6 +1983,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 		([bites=0] () | [bites!=0] '\_' bites)
 	\end{rail}
 	\caption{Modifier concatenation}
+	\label{rail:modifier-concatenation}
 \end{figure}
 
 % Bibliography
