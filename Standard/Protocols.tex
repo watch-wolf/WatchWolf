@@ -42,6 +42,7 @@
 	\usepackage{chngcntr}	% count figures/tables with sections
 	\usepackage{footnote}	% notes inside tables
 	\usepackage{float}		% place figures exactly there
+	\usepackage{longtable}	% tables that are more than one page size
 	\usepackage[natbibapa]{apacite}	% bibliography
 	\usepackage[acronym,section=subsection]{glossaries}
 	\usepackage{rail}
@@ -767,63 +768,81 @@ Denotes how the bell is attached to its block.
 
 Defaults to floor.
 
-BELL ceiling/double\_wall/floor/single\_wall
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		Material & Options \\
+		\hline
+		BELL & ceiling/double\_wall/floor/single\_wall \\
+		\hline
+	\end{tabular}
+	\caption{Attachable materials}
+\end{table}
 
 \subsubsection{Axis}
 Represents the axis along whilst this block is oriented.
 
 Except for NETHER\_PORTAL (which defaults to x), it defaults to y.
 
-NETHER\_PORTAL x/z
-ACACIA\_LOG x/y/z
-ACACIA\_WOOD x/y/z
-BASALT x/y/z
-BIRCH\_LOG x/y/z
-BIRCH\_WOOD x/y/z
-BONE\_BLOCK x/y/z
-CHAIN x/y/z
-CRIMSON\_HYPHAE x/y/z
-CRIMSON\_STEM x/y/z
-DARK\_OAK\_LOG x/y/z
-DARK\_OAK\_WOOD x/y/z
-DEEPSLATE x/y/z
-HAY\_BLOCK x/y/z
-INFESTED\_DEEPSLATE x/y/z
-JUNGLE\_LOG x/y/z
-JUNGLE\_WOOD x/y/z
-MANGROVE\_LOG x/y/z
-MANGROVE\_WOOD x/y/z
-MUDDY\_MANGROVE\_ROOTS x/y/z
-OAK\_LOG x/y/z
-OAK\_WOOD x/y/z
-OCHRE\_FROGLIGHT x/y/z
-PEARLESCENT\_FROGLIGHT x/y/z
-POLISHED\_BASALT x/y/z
-PURPUR\_PILLAR x/y/z
-QUARTZ\_PILLAR x/y/z
-SPRUCE\_LOG x/y/z
-SPRUCE\_WOOD x/y/z
-STRIPPED\_ACACIA\_LOG x/y/z
-STRIPPED\_ACACIA\_WOOD x/y/z
-STRIPPED\_BIRCH\_LOG x/y/z
-STRIPPED\_BIRCH\_WOOD x/y/z
-STRIPPED\_CRIMSON\_HYPHAE x/y/z
-STRIPPED\_CRIMSON\_STEM x/y/z
-STRIPPED\_DARK\_OAK\_LOG x/y/z
-STRIPPED\_DARK\_OAK\_WOOD x/y/z
-STRIPPED\_JUNGLE\_LOG x/y/z
-STRIPPED\_JUNGLE\_WOOD x/y/z
-STRIPPED\_MANGROVE\_LOG x/y/z
-STRIPPED\_MANGROVE\_WOOD x/y/z
-STRIPPED\_OAK\_LOG x/y/z
-STRIPPED\_OAK\_WOOD x/y/z
-STRIPPED\_SPRUCE\_LOG x/y/z
-STRIPPED\_SPRUCE\_WOOD x/y/z
-STRIPPED\_WARPED\_HYPHAE x/y/z
-STRIPPED\_WARPED\_STEM x/y/z
-VERDANT\_FROGLIGHT x/y/z
-WARPED\_HYPHAE x/y/z
-WARPED\_STEM x/y/z
+\begin{longtable}{ |c|c|c| }
+	\hline
+	Material & Age range \\
+	\hline
+	\endhead
+	NETHER\_PORTAL & x/z \\
+	ACACIA\_LOG & x/y/z \\
+	ACACIA\_WOOD & x/y/z \\
+	BASALT & x/y/z \\
+	BIRCH\_LOG & x/y/z \\
+	BIRCH\_WOOD & x/y/z \\
+	BONE\_BLOCK & x/y/z \\
+	CHAIN & x/y/z \\
+	CRIMSON\_HYPHAE & x/y/z \\
+	CRIMSON\_STEM & x/y/z \\
+	DARK\_OAK\_LOG & x/y/z \\
+	DARK\_OAK\_WOOD & x/y/z \\
+	DEEPSLATE & x/y/z \\
+	HAY\_BLOCK & x/y/z \\
+	INFESTED\_DEEPSLATE & x/y/z \\
+	JUNGLE\_LOG & x/y/z \\
+	JUNGLE\_WOOD & x/y/z \\
+	MANGROVE\_LOG & x/y/z \\
+	MANGROVE\_WOOD & x/y/z \\
+	MUDDY\_MANGROVE\_ROOTS & x/y/z \\
+	OAK\_LOG & x/y/z \\
+	OAK\_WOOD & x/y/z \\
+	OCHRE\_FROGLIGHT & x/y/z \\
+	PEARLESCENT\_FROGLIGHT & x/y/z \\
+	POLISHED\_BASALT & x/y/z \\
+	PURPUR\_PILLAR & x/y/z \\
+	QUARTZ\_PILLAR & x/y/z \\
+	SPRUCE\_LOG & x/y/z \\
+	SPRUCE\_WOOD & x/y/z \\
+	STRIPPED\_ACACIA\_LOG & x/y/z \\
+	STRIPPED\_ACACIA\_WOOD & x/y/z \\
+	STRIPPED\_BIRCH\_LOG & x/y/z \\
+	STRIPPED\_BIRCH\_WOOD & x/y/z \\
+	STRIPPED\_CRIMSON\_HYPHAE & x/y/z \\
+	STRIPPED\_CRIMSON\_STEM & x/y/z \\
+	STRIPPED\_DARK\_OAK\_LOG & x/y/z \\
+	STRIPPED\_DARK\_OAK\_WOOD & x/y/z \\
+	STRIPPED\_JUNGLE\_LOG & x/y/z \\
+	STRIPPED\_JUNGLE\_WOOD & x/y/z \\
+	STRIPPED\_MANGROVE\_LOG & x/y/z \\
+	STRIPPED\_MANGROVE\_WOOD & x/y/z \\
+	STRIPPED\_OAK\_LOG & x/y/z \\
+	STRIPPED\_OAK\_WOOD & x/y/z \\
+	STRIPPED\_SPRUCE\_LOG & x/y/z \\
+	STRIPPED\_SPRUCE\_WOOD & x/y/z \\
+	STRIPPED\_WARPED\_HYPHAE & x/y/z \\
+	STRIPPED\_WARPED\_STEM & x/y/z \\
+	VERDANT\_FROGLIGHT & x/y/z \\
+	WARPED\_HYPHAE & x/y/z \\
+	WARPED\_STEM & x/y/z \\
+	\hline
+	\caption{Orientable materials}
+\end{longtable}
 
 \subsubsection{Berries}
 Indicates whether the block has berries. % TODO put, or just concatenate without commenting?: For similarity reasons, $berries=false$ and $berries=true$ will be considered as $age=0$ and $age=1$, respectively.
