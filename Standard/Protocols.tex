@@ -1946,7 +1946,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) \\
 		Material \\
 		([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
-		([age=0 and berries=false] () | [age!=0] '\_' age | [berries=true] '\_1') \\
+		([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 		([bites=0] () | [bites!=0] '\_' bites)
 	\end{rail}
 	\caption{Modifier concatenation}
