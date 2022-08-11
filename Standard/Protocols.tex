@@ -43,6 +43,7 @@
 	\usepackage{footnote}	% notes inside tables
 	\usepackage{float}		% place figures exactly there
 	\usepackage{longtable}	% tables that are more than one page size
+	\usepackage{subfloat}	% subfigures
 	\usepackage{pifont}
 	\usepackage[natbibapa]{apacite}	% bibliography
 	\usepackage[acronym,section=subsection]{glossaries}
@@ -708,7 +709,7 @@ Third-level headings should be in italics.
 
 \appendix
 \section{Blocks}\label{appendix:blocks}
-For generating the \hyperref[type:block]{blocks} enum Spigot 1.19 was used.
+To generate the \hyperref[type:block]{blocks enum} Spigot 1.19 was used.
 That means that all the block names \textit{should} be the exact same as \cite{spigot-material}.
 
 \subsection{Material modifiers}
@@ -1995,27 +1996,33 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
 
+If a material doesn't have the attribute that the diagram is checking it will assume that the attribute value is the default one (0 or false, in most of the cases), resulting in ignoring that property.
+
+\begin{subfigures}
 \begin{figure}
 	\begin{rail}
-		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) \\
+		([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) %\\
 		([attachment undefined or attachment=floor] () | [attachment=ceiling] 'CEILING\_' | [attachment=double\_wall] 'DWALL\_' | [attachment=single\_wall] 'SWALL\_') \\
 		Material \\
 		([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
 		([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
-		([conditional=false] () | [conditional=true] '\_CONDITIONAL') Last
+		([conditional=false] () | [conditional=true] '\_CONDITIONAL')
+		'...'
 	\end{rail}
-	\caption{Modifier concatenation}
 	\label{rail:modifier-concatenation}
+	\caption{Modifier concatenation}
 \end{figure}
 
 \begin{figure}
 	\begin{rail}
+		'...'
 		([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 		([bites=0] () | [bites!=0] '\_' bites) ([candles$<$2] () | [candles$>$1] '\_' candles) \\
 		([charges=0] () | [charges!=0] '\_' charges) ([delay$<$2] () | [delay$>$1] '\_' delay)
 	\end{rail}
-	\caption{Last modifier concatenation}
+	\caption{Integer modifier concatenation}
 \end{figure}
+\end{subfigures}
 
 % Bibliography
 \addcontentsline{toc}{section}{References}
