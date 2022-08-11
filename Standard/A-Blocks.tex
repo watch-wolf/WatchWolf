@@ -1,0 +1,1315 @@
+\section{Blocks}\label{appendix:blocks}
+To generate the \hyperref[type:block]{blocks enum} Spigot 1.19 was used.
+That means that all the block names \textit{should} be the exact same as \cite{spigot-material}.
+
+\subsection{Material modifiers}
+There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.
+
+That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, this has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces in Spigot 1.19).
+
+\subsubsection{Unused modifiers}
+There's some Spigot modifiers that beside existing it won't be imported because there aren't a distinguished block in their own. You can find those in \hyperref[fig:unused-blockdata]{Figure \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		Modifier name & Reason for discarding \\
+		\hline
+		has\_bottle\_\textit{X} & Inventory dependent \\
+		has\_record & Inventory dependent \\
+		enabled & Adjacent redstone dependent \\
+		triggered & Adjacent redstone dependent \\
+		instrument & Bottom-block dependent \\
+		occupied & Entity dependent \\
+		persistent & Admin block \\
+		unstable & Admin block \\
+		distance & Block dependent \\
+		stage & Same block \\
+		short & Tick dependent \\
+		attached & Block dependent \\
+		disarmed & Block dependent \\
+		power & Block/event dependent \\
+		tilt & Entity dependent \\
+		can\_summon & Admin block \\
+		shrieking & Entity dependent \\
+		bloom & Admin block \\
+		bottom & Bottom-block dependent \\
+		powered & Admin block / block dependent \\
+		has\_book & Inventory dependent \\
+		sculk\_sensor\_phase & Admin block \\
+		signal\_fire & Bottom-block dependent \\
+		\hline
+	\end{tabular}
+	\caption{Unused Spigot BlockData's modifiers}
+	\label{fig:unused-blockdata}
+\end{table}
+
+In addition to this, some modifiers applied to certain blocks doesn't change the block itself. Those are mentioned in \hyperref[fig:unused-blockdata-blocks]{Figure \ref{fig:unused-blockdata-blocks}, Unused Spigot BlockData's modifiers on certain blocks}.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		Block name & Modifier name \\
+		\hline
+		CAVE\_VINES & age \\
+		CACTUS & age \\
+		FIRE & age \\
+		KELP & age \\
+		SUGAR\_CANE & age \\
+		MANGROVE\_PROPAGULE & age \\
+		TWISTING\_VINES & age \\
+		WEEPING\_VINES & age \\
+		\hline
+	\end{tabular}
+	\caption{Unused Spigot BlockData's modifiers on certain blocks}
+	\label{fig:unused-blockdata-blocks}
+\end{table}
+
+\subsubsection{Age}
+Represents the different growth stages that a crop-like block can go through.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		Material & Age range \\
+		\hline
+		BEETROOTS & 0-3 \\
+		BAMBOO & 0-1 \\
+		CARROTS & 0-7 \\
+		CHORUS\_FLOWER & 0/5\footnotemark \\
+		COCOA & 0-2 \\
+		FROSTED\_ICE & 0-3 \\
+		MELON\_STEM & 0-7 \\
+		NETHER\_WART & 0-3 \\
+		POTATOES & 0-7 \\
+		PUMPKIN\_STEM & 0-7 \\
+		SWEET\_BERRY\_BUSH & 0-3 \\
+		WHEAT & 0-7 \\
+		\hline
+	\end{tabular}
+	\caption{Ageable materials}
+\end{table}
+
+% Ageable materials' CHORUS_FLOWER footnote
+\footnotetext{The block is the same from age 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
+
+\subsubsection{Attachment}
+Denotes how the bell is attached to its block.
+
+Defaults to floor.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c|c| }
+		\hline
+		Material & Options \\
+		\hline
+		BELL & ceiling/double\_wall/floor/single\_wall \\
+		\hline
+	\end{tabular}
+	\caption{Attachable materials}
+\end{table}
+
+\subsubsection{Axis}
+Represents the axis along whilst this block is oriented.
+
+Except for NETHER\_PORTAL (which defaults to x), it defaults to y.
+
+\begin{longtable}{ |c|c|c| }
+	\hline
+	Material & Age range \\
+	\hline
+	\endhead
+	NETHER\_PORTAL & x/z \\
+	ACACIA\_LOG & x/y/z \\
+	ACACIA\_WOOD & x/y/z \\
+	BASALT & x/y/z \\
+	BIRCH\_LOG & x/y/z \\
+	BIRCH\_WOOD & x/y/z \\
+	BONE\_BLOCK & x/y/z \\
+	CHAIN & x/y/z \\
+	CRIMSON\_HYPHAE & x/y/z \\
+	CRIMSON\_STEM & x/y/z \\
+	DARK\_OAK\_LOG & x/y/z \\
+	DARK\_OAK\_WOOD & x/y/z \\
+	DEEPSLATE & x/y/z \\
+	HAY\_BLOCK & x/y/z \\
+	INFESTED\_DEEPSLATE & x/y/z \\
+	JUNGLE\_LOG & x/y/z \\
+	JUNGLE\_WOOD & x/y/z \\
+	MANGROVE\_LOG & x/y/z \\
+	MANGROVE\_WOOD & x/y/z \\
+	MUDDY\_MANGROVE\_ROOTS & x/y/z \\
+	OAK\_LOG & x/y/z \\
+	OAK\_WOOD & x/y/z \\
+	OCHRE\_FROGLIGHT & x/y/z \\
+	PEARLESCENT\_FROGLIGHT & x/y/z \\
+	POLISHED\_BASALT & x/y/z \\
+	PURPUR\_PILLAR & x/y/z \\
+	QUARTZ\_PILLAR & x/y/z \\
+	SPRUCE\_LOG & x/y/z \\
+	SPRUCE\_WOOD & x/y/z \\
+	STRIPPED\_ACACIA\_LOG & x/y/z \\
+	STRIPPED\_ACACIA\_WOOD & x/y/z \\
+	STRIPPED\_BIRCH\_LOG & x/y/z \\
+	STRIPPED\_BIRCH\_WOOD & x/y/z \\
+	STRIPPED\_CRIMSON\_HYPHAE & x/y/z \\
+	STRIPPED\_CRIMSON\_STEM & x/y/z \\
+	STRIPPED\_DARK\_OAK\_LOG & x/y/z \\
+	STRIPPED\_DARK\_OAK\_WOOD & x/y/z \\
+	STRIPPED\_JUNGLE\_LOG & x/y/z \\
+	STRIPPED\_JUNGLE\_WOOD & x/y/z \\
+	STRIPPED\_MANGROVE\_LOG & x/y/z \\
+	STRIPPED\_MANGROVE\_WOOD & x/y/z \\
+	STRIPPED\_OAK\_LOG & x/y/z \\
+	STRIPPED\_OAK\_WOOD & x/y/z \\
+	STRIPPED\_SPRUCE\_LOG & x/y/z \\
+	STRIPPED\_SPRUCE\_WOOD & x/y/z \\
+	STRIPPED\_WARPED\_HYPHAE & x/y/z \\
+	STRIPPED\_WARPED\_STEM & x/y/z \\
+	VERDANT\_FROGLIGHT & x/y/z \\
+	WARPED\_HYPHAE & x/y/z \\
+	WARPED\_STEM & x/y/z \\
+	\hline
+	\caption{Orientable materials}
+\end{longtable}
+
+\subsubsection{Berries}
+Indicates whether the block has berries. % TODO put, or just concatenate without commenting?: For similarity reasons, $berries=false$ and $berries=true$ will be considered as $age=0$ and $age=1$, respectively.
+
+Defaults to false.
+
+CAVE\_VINES true/false
+CAVE\_VINES\_PLANT true/false
+
+\subsubsection{Bites}
+Represents the amount of bites which have been taken from this slice of cake.
+
+Defaults to 0.
+
+CAKE 0-6
+
+\subsubsection{Candles}
+Represents the number of candles which are present.
+
+Defaults to 1.
+
+BLACK\_CANDLE 1-4
+BLUE\_CANDLE 1-4
+BROWN\_CANDLE 1-4
+CANDLE 1-4
+CYAN\_CANDLE 1-4
+GRAY\_CANDLE 1-4
+GREEN\_CANDLE 1-4
+LIGHT\_BLUE\_CANDLE 1-4
+LIGHT\_GRAY\_CANDLE 1-4
+LIME\_CANDLE 1-4
+MAGENTA\_CANDLE 1-4
+ORANGE\_CANDLE 1-4
+PINK\_CANDLE 1-4
+PURPLE\_CANDLE 1-4
+RED\_CANDLE 1-4
+WHITE\_CANDLE 1-4
+YELLOW\_CANDLE 1-4
+
+\subsubsection{Charges}
+Represents the amount of times the anchor may still be used.
+
+Defaults to 0.
+
+RESPAWN\_ANCHOR 0-4
+
+\subsubsection{Conditional}
+Denotes whether this command block is conditional or not.
+
+Defaults to false.
+
+CHAIN\_COMMAND\_BLOCK true/false
+COMMAND\_BLOCK true/false
+REPEATING\_COMMAND\_BLOCK true/false
+
+\subsubsection{Delay}
+Propagation delay of a repeater.
+
+Defaults to 1.
+
+REPEATER 1-4
+
+\subsubsection{Down}
+Set which faces of the block textures are displayed on.
+
+Except for BROWN\_MUSHROOM\_BLOCK, MUSHROOM\_STEM and RED\_MUSHROOM\_BLOCK (which defaults to true), it defaults to false.
+
+CHORUS\_PLANT true/false
+GLOW\_LICHEN true/false
+SCULK\_VEIN true/false
+BROWN\_MUSHROOM\_BLOCK true/false
+MUSHROOM\_STEM true/false
+RED\_MUSHROOM\_BLOCK true/false
+
+\subsubsection{North, South, East and West}
+Set which faces of the block textures are displayed on.
+
+east=false (ACACIA_FENCE)
+east=false (BIRCH_FENCE)
+east=false (BLACK_STAINED_GLASS_PANE)
+east=false (BLUE_STAINED_GLASS_PANE)
+east=false (BROWN_STAINED_GLASS_PANE)
+east=false (CHORUS_PLANT)
+east=false (CRIMSON_FENCE)
+east=false (CYAN_STAINED_GLASS_PANE)
+east=false (DARK_OAK_FENCE)
+east=false (FIRE)
+east=false (GLASS_PANE)
+east=false (GLOW_LICHEN)
+east=false (GRAY_STAINED_GLASS_PANE)
+east=false (GREEN_STAINED_GLASS_PANE)
+east=false (IRON_BARS)
+east=false (JUNGLE_FENCE)
+east=false (LIGHT_BLUE_STAINED_GLASS_PANE)
+east=false (LIGHT_GRAY_STAINED_GLASS_PANE)
+east=false (LIME_STAINED_GLASS_PANE)
+east=false (MAGENTA_STAINED_GLASS_PANE)
+east=false (MANGROVE_FENCE)
+east=false (NETHER_BRICK_FENCE)
+east=false (OAK_FENCE)
+east=false (ORANGE_STAINED_GLASS_PANE)
+east=false (PINK_STAINED_GLASS_PANE)
+east=false (PURPLE_STAINED_GLASS_PANE)
+east=false (RED_STAINED_GLASS_PANE)
+east=false (SCULK_VEIN)
+east=false (SPRUCE_FENCE)
+east=false (TRIPWIRE)
+east=false (VINE)
+east=false (WARPED_FENCE)
+east=false (WHITE_STAINED_GLASS_PANE)
+east=false (YELLOW_STAINED_GLASS_PANE)
+east=none (ANDESITE_WALL)
+east=none (BLACKSTONE_WALL)
+east=none (BRICK_WALL)
+east=none (COBBLED_DEEPSLATE_WALL)
+east=none (COBBLESTONE_WALL)
+east=none (DEEPSLATE_BRICK_WALL)
+east=none (DEEPSLATE_TILE_WALL)
+east=none (DIORITE_WALL)
+east=none (END_STONE_BRICK_WALL)
+east=none (GRANITE_WALL)
+east=none (MOSSY_COBBLESTONE_WALL)
+east=none (MOSSY_STONE_BRICK_WALL)
+east=none (MUD_BRICK_WALL)
+east=none (NETHER_BRICK_WALL)
+east=none (POLISHED_BLACKSTONE_BRICK_WALL)
+east=none (POLISHED_BLACKSTONE_WALL)
+east=none (POLISHED_DEEPSLATE_WALL)
+east=none (PRISMARINE_WALL)
+east=none (REDSTONE_WIRE)
+east=none (RED_NETHER_BRICK_WALL)
+east=none (RED_SANDSTONE_WALL)
+east=none (SANDSTONE_WALL)
+east=none (STONE_BRICK_WALL)
+east=true (BROWN_MUSHROOM_BLOCK)
+east=true (MUSHROOM_STEM)
+east=true (RED_MUSHROOM_BLOCK)
+
+\subsubsection{Up}
+Set which faces of the block textures are displayed on.
+
+Except for CHORUS\_PLANT, FIRE, GLOW\_LICHEN, SCULK\_VEIN and VINE (which defaults to false), it defaults to true.
+
+up=false (CHORUS_PLANT)
+up=false (FIRE)
+up=false (GLOW_LICHEN)
+up=false (SCULK_VEIN)
+up=false (VINE)
+up=true (ANDESITE_WALL)
+up=true (BLACKSTONE_WALL)
+up=true (BRICK_WALL)
+up=true (BROWN_MUSHROOM_BLOCK)
+up=true (COBBLED_DEEPSLATE_WALL)
+up=true (COBBLESTONE_WALL)
+up=true (DEEPSLATE_BRICK_WALL)
+up=true (DEEPSLATE_TILE_WALL)
+up=true (DIORITE_WALL)
+up=true (END_STONE_BRICK_WALL)
+up=true (GRANITE_WALL)
+up=true (MOSSY_COBBLESTONE_WALL)
+up=true (MOSSY_STONE_BRICK_WALL)
+up=true (MUD_BRICK_WALL)
+up=true (MUSHROOM_STEM)
+up=true (NETHER_BRICK_WALL)
+up=true (POLISHED_BLACKSTONE_BRICK_WALL)
+up=true (POLISHED_BLACKSTONE_WALL)
+up=true (POLISHED_DEEPSLATE_WALL)
+up=true (PRISMARINE_WALL)
+up=true (RED_MUSHROOM_BLOCK)
+up=true (RED_NETHER_BRICK_WALL)
+up=true (RED_SANDSTONE_WALL)
+up=true (SANDSTONE_WALL)
+up=true (STONE_BRICK_WALL)
+
+\subsubsection{Eggs}
+
+Defaults to 1.
+
+TURTLE_EGG 1-4
+
+\subsubsection{Extended}
+Defaults to false.
+
+extended=false (PISTON)
+extended=false (STICKY_PISTON)
+
+eye=false (END_PORTAL_FRAME)
+
+face=wall (ACACIA_BUTTON)
+face=wall (BIRCH_BUTTON)
+face=wall (CRIMSON_BUTTON)
+face=wall (DARK_OAK_BUTTON)
+face=wall (GRINDSTONE)
+face=wall (JUNGLE_BUTTON)
+face=wall (LEVER)
+face=wall (MANGROVE_BUTTON)
+face=wall (OAK_BUTTON)
+face=wall (POLISHED_BLACKSTONE_BUTTON)
+face=wall (SPRUCE_BUTTON)
+face=wall (STONE_BUTTON)
+face=wall (WARPED_BUTTON)
+
+facing=down (HOPPER)
+facing=north (ACACIA_BUTTON)
+facing=north (ACACIA_DOOR)
+facing=north (ACACIA_FENCE_GATE)
+facing=north (ACACIA_STAIRS)
+facing=north (ACACIA_TRAPDOOR)
+facing=north (ACACIA_WALL_SIGN)
+facing=north (ANDESITE_STAIRS)
+facing=north (ANVIL)
+facing=north (ATTACHED_MELON_STEM)
+facing=north (ATTACHED_PUMPKIN_STEM)
+facing=north (BARREL)
+facing=north (BEEHIVE)
+facing=north (BEE_NEST)
+facing=north (BELL)
+facing=north (BIG_DRIPLEAF)
+facing=north (BIG_DRIPLEAF_STEM)
+facing=north (BIRCH_BUTTON)
+facing=north (BIRCH_DOOR)
+facing=north (BIRCH_FENCE_GATE)
+facing=north (BIRCH_STAIRS)
+facing=north (BIRCH_TRAPDOOR)
+facing=north (BIRCH_WALL_SIGN)
+facing=north (BLACKSTONE_STAIRS)
+facing=north (BLACK_BED)
+facing=north (BLACK_GLAZED_TERRACOTTA)
+facing=north (BLACK_WALL_BANNER)
+facing=north (BLAST_FURNACE)
+facing=north (BLUE_BED)
+facing=north (BLUE_GLAZED_TERRACOTTA)
+facing=north (BLUE_WALL_BANNER)
+facing=north (BRAIN_CORAL_WALL_FAN)
+facing=north (BRICK_STAIRS)
+facing=north (BROWN_BED)
+facing=north (BROWN_GLAZED_TERRACOTTA)
+facing=north (BROWN_WALL_BANNER)
+facing=north (BUBBLE_CORAL_WALL_FAN)
+facing=north (CAMPFIRE)
+facing=north (CARVED_PUMPKIN)
+facing=north (CHAIN_COMMAND_BLOCK)
+facing=north (CHEST)
+facing=north (CHIPPED_ANVIL)
+facing=north (COBBLED_DEEPSLATE_STAIRS)
+facing=north (COBBLESTONE_STAIRS)
+facing=north (COCOA)
+facing=north (COMMAND_BLOCK)
+facing=north (COMPARATOR)
+facing=north (CREEPER_WALL_HEAD)
+facing=north (CRIMSON_BUTTON)
+facing=north (CRIMSON_DOOR)
+facing=north (CRIMSON_FENCE_GATE)
+facing=north (CRIMSON_STAIRS)
+facing=north (CRIMSON_TRAPDOOR)
+facing=north (CRIMSON_WALL_SIGN)
+facing=north (CUT_COPPER_STAIRS)
+facing=north (CYAN_BED)
+facing=north (CYAN_GLAZED_TERRACOTTA)
+facing=north (CYAN_WALL_BANNER)
+facing=north (DAMAGED_ANVIL)
+facing=north (DARK_OAK_BUTTON)
+facing=north (DARK_OAK_DOOR)
+facing=north (DARK_OAK_FENCE_GATE)
+facing=north (DARK_OAK_STAIRS)
+facing=north (DARK_OAK_TRAPDOOR)
+facing=north (DARK_OAK_WALL_SIGN)
+facing=north (DARK_PRISMARINE_STAIRS)
+facing=north (DEAD_BRAIN_CORAL_WALL_FAN)
+facing=north (DEAD_BUBBLE_CORAL_WALL_FAN)
+facing=north (DEAD_FIRE_CORAL_WALL_FAN)
+facing=north (DEAD_HORN_CORAL_WALL_FAN)
+facing=north (DEAD_TUBE_CORAL_WALL_FAN)
+facing=north (DEEPSLATE_BRICK_STAIRS)
+facing=north (DEEPSLATE_TILE_STAIRS)
+facing=north (DIORITE_STAIRS)
+facing=north (DISPENSER)
+facing=north (DRAGON_WALL_HEAD)
+facing=north (DROPPER)
+facing=north (ENDER_CHEST)
+facing=north (END_PORTAL_FRAME)
+facing=north (END_STONE_BRICK_STAIRS)
+facing=north (EXPOSED_CUT_COPPER_STAIRS)
+facing=north (FIRE_CORAL_WALL_FAN)
+facing=north (FURNACE)
+facing=north (GRANITE_STAIRS)
+facing=north (GRAY_BED)
+facing=north (GRAY_GLAZED_TERRACOTTA)
+facing=north (GRAY_WALL_BANNER)
+facing=north (GREEN_BED)
+facing=north (GREEN_GLAZED_TERRACOTTA)
+facing=north (GREEN_WALL_BANNER)
+facing=north (GRINDSTONE)
+facing=north (HORN_CORAL_WALL_FAN)
+facing=north (IRON_DOOR)
+facing=north (IRON_TRAPDOOR)
+facing=north (JACK_O_LANTERN)
+facing=north (JUNGLE_BUTTON)
+facing=north (JUNGLE_DOOR)
+facing=north (JUNGLE_FENCE_GATE)
+facing=north (JUNGLE_STAIRS)
+facing=north (JUNGLE_TRAPDOOR)
+facing=north (JUNGLE_WALL_SIGN)
+facing=north (LADDER)
+facing=north (LECTERN)
+facing=north (LEVER)
+facing=north (LIGHT_BLUE_BED)
+facing=north (LIGHT_BLUE_GLAZED_TERRACOTTA)
+facing=north (LIGHT_BLUE_WALL_BANNER)
+facing=north (LIGHT_GRAY_BED)
+facing=north (LIGHT_GRAY_GLAZED_TERRACOTTA)
+facing=north (LIGHT_GRAY_WALL_BANNER)
+facing=north (LIME_BED)
+facing=north (LIME_GLAZED_TERRACOTTA)
+facing=north (LIME_WALL_BANNER)
+facing=north (LOOM)
+facing=north (MAGENTA_BED)
+facing=north (MAGENTA_GLAZED_TERRACOTTA)
+facing=north (MAGENTA_WALL_BANNER)
+facing=north (MANGROVE_BUTTON)
+facing=north (MANGROVE_DOOR)
+facing=north (MANGROVE_FENCE_GATE)
+facing=north (MANGROVE_STAIRS)
+facing=north (MANGROVE_TRAPDOOR)
+facing=north (MANGROVE_WALL_SIGN)
+facing=north (MOSSY_COBBLESTONE_STAIRS)
+facing=north (MOSSY_STONE_BRICK_STAIRS)
+facing=north (MOVING_PISTON)
+facing=north (MUD_BRICK_STAIRS)
+facing=north (NETHER_BRICK_STAIRS)
+facing=north (OAK_BUTTON)
+facing=north (OAK_DOOR)
+facing=north (OAK_FENCE_GATE)
+facing=north (OAK_STAIRS)
+facing=north (OAK_TRAPDOOR)
+facing=north (OAK_WALL_SIGN)
+facing=north (ORANGE_BED)
+facing=north (ORANGE_GLAZED_TERRACOTTA)
+facing=north (ORANGE_WALL_BANNER)
+facing=north (OXIDIZED_CUT_COPPER_STAIRS)
+facing=north (PINK_BED)
+facing=north (PINK_GLAZED_TERRACOTTA)
+facing=north (PINK_WALL_BANNER)
+facing=north (PISTON)
+facing=north (PISTON_HEAD)
+facing=north (PLAYER_WALL_HEAD)
+facing=north (POLISHED_ANDESITE_STAIRS)
+facing=north (POLISHED_BLACKSTONE_BRICK_STAIRS)
+facing=north (POLISHED_BLACKSTONE_BUTTON)
+facing=north (POLISHED_BLACKSTONE_STAIRS)
+facing=north (POLISHED_DEEPSLATE_STAIRS)
+facing=north (POLISHED_DIORITE_STAIRS)
+facing=north (POLISHED_GRANITE_STAIRS)
+facing=north (PRISMARINE_BRICK_STAIRS)
+facing=north (PRISMARINE_STAIRS)
+facing=north (PURPLE_BED)
+facing=north (PURPLE_GLAZED_TERRACOTTA)
+facing=north (PURPLE_WALL_BANNER)
+facing=north (PURPUR_STAIRS)
+facing=north (QUARTZ_STAIRS)
+facing=north (REDSTONE_WALL_TORCH)
+facing=north (RED_BED)
+facing=north (RED_GLAZED_TERRACOTTA)
+facing=north (RED_NETHER_BRICK_STAIRS)
+facing=north (RED_SANDSTONE_STAIRS)
+facing=north (RED_WALL_BANNER)
+facing=north (REPEATER)
+facing=north (REPEATING_COMMAND_BLOCK)
+facing=north (SANDSTONE_STAIRS)
+facing=north (SKELETON_WALL_SKULL)
+facing=north (SMALL_DRIPLEAF)
+facing=north (SMOKER)
+facing=north (SMOOTH_QUARTZ_STAIRS)
+facing=north (SMOOTH_RED_SANDSTONE_STAIRS)
+facing=north (SMOOTH_SANDSTONE_STAIRS)
+facing=north (SOUL_CAMPFIRE)
+facing=north (SOUL_WALL_TORCH)
+facing=north (SPRUCE_BUTTON)
+facing=north (SPRUCE_DOOR)
+facing=north (SPRUCE_FENCE_GATE)
+facing=north (SPRUCE_STAIRS)
+facing=north (SPRUCE_TRAPDOOR)
+facing=north (SPRUCE_WALL_SIGN)
+facing=north (STICKY_PISTON)
+facing=north (STONECUTTER)
+facing=north (STONE_BRICK_STAIRS)
+facing=north (STONE_BUTTON)
+facing=north (STONE_STAIRS)
+facing=north (TRAPPED_CHEST)
+facing=north (TRIPWIRE_HOOK)
+facing=north (TUBE_CORAL_WALL_FAN)
+facing=north (WALL_TORCH)
+facing=north (WARPED_BUTTON)
+facing=north (WARPED_DOOR)
+facing=north (WARPED_FENCE_GATE)
+facing=north (WARPED_STAIRS)
+facing=north (WARPED_TRAPDOOR)
+facing=north (WARPED_WALL_SIGN)
+facing=north (WAXED_CUT_COPPER_STAIRS)
+facing=north (WAXED_EXPOSED_CUT_COPPER_STAIRS)
+facing=north (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
+facing=north (WAXED_WEATHERED_CUT_COPPER_STAIRS)
+facing=north (WEATHERED_CUT_COPPER_STAIRS)
+facing=north (WHITE_BED)
+facing=north (WHITE_GLAZED_TERRACOTTA)
+facing=north (WHITE_WALL_BANNER)
+facing=north (WITHER_SKELETON_WALL_SKULL)
+facing=north (YELLOW_BED)
+facing=north (YELLOW_GLAZED_TERRACOTTA)
+facing=north (YELLOW_WALL_BANNER)
+facing=north (ZOMBIE_WALL_HEAD)
+facing=south (OBSERVER)
+facing=up (AMETHYST_CLUSTER)
+facing=up (BLACK_SHULKER_BOX)
+facing=up (BLUE_SHULKER_BOX)
+facing=up (BROWN_SHULKER_BOX)
+facing=up (CYAN_SHULKER_BOX)
+facing=up (END_ROD)
+facing=up (GRAY_SHULKER_BOX)
+facing=up (GREEN_SHULKER_BOX)
+facing=up (LARGE_AMETHYST_BUD)
+facing=up (LIGHTNING_ROD)
+facing=up (LIGHT_BLUE_SHULKER_BOX)
+facing=up (LIGHT_GRAY_SHULKER_BOX)
+facing=up (LIME_SHULKER_BOX)
+facing=up (MAGENTA_SHULKER_BOX)
+facing=up (MEDIUM_AMETHYST_BUD)
+facing=up (ORANGE_SHULKER_BOX)
+facing=up (PINK_SHULKER_BOX)
+facing=up (PURPLE_SHULKER_BOX)
+facing=up (RED_SHULKER_BOX)
+facing=up (SHULKER_BOX)
+facing=up (SMALL_AMETHYST_BUD)
+facing=up (WHITE_SHULKER_BOX)
+facing=up (YELLOW_SHULKER_BOX)
+
+half=bottom (ACACIA_STAIRS)
+half=bottom (ACACIA_TRAPDOOR)
+half=bottom (ANDESITE_STAIRS)
+half=bottom (BIRCH_STAIRS)
+half=bottom (BIRCH_TRAPDOOR)
+half=bottom (BLACKSTONE_STAIRS)
+half=bottom (BRICK_STAIRS)
+half=bottom (COBBLED_DEEPSLATE_STAIRS)
+half=bottom (COBBLESTONE_STAIRS)
+half=bottom (CRIMSON_STAIRS)
+half=bottom (CRIMSON_TRAPDOOR)
+half=bottom (CUT_COPPER_STAIRS)
+half=bottom (DARK_OAK_STAIRS)
+half=bottom (DARK_OAK_TRAPDOOR)
+half=bottom (DARK_PRISMARINE_STAIRS)
+half=bottom (DEEPSLATE_BRICK_STAIRS)
+half=bottom (DEEPSLATE_TILE_STAIRS)
+half=bottom (DIORITE_STAIRS)
+half=bottom (END_STONE_BRICK_STAIRS)
+half=bottom (EXPOSED_CUT_COPPER_STAIRS)
+half=bottom (GRANITE_STAIRS)
+half=bottom (IRON_TRAPDOOR)
+half=bottom (JUNGLE_STAIRS)
+half=bottom (JUNGLE_TRAPDOOR)
+half=bottom (MANGROVE_STAIRS)
+half=bottom (MANGROVE_TRAPDOOR)
+half=bottom (MOSSY_COBBLESTONE_STAIRS)
+half=bottom (MOSSY_STONE_BRICK_STAIRS)
+half=bottom (MUD_BRICK_STAIRS)
+half=bottom (NETHER_BRICK_STAIRS)
+half=bottom (OAK_STAIRS)
+half=bottom (OAK_TRAPDOOR)
+half=bottom (OXIDIZED_CUT_COPPER_STAIRS)
+half=bottom (POLISHED_ANDESITE_STAIRS)
+half=bottom (POLISHED_BLACKSTONE_BRICK_STAIRS)
+half=bottom (POLISHED_BLACKSTONE_STAIRS)
+half=bottom (POLISHED_DEEPSLATE_STAIRS)
+half=bottom (POLISHED_DIORITE_STAIRS)
+half=bottom (POLISHED_GRANITE_STAIRS)
+half=bottom (PRISMARINE_BRICK_STAIRS)
+half=bottom (PRISMARINE_STAIRS)
+half=bottom (PURPUR_STAIRS)
+half=bottom (QUARTZ_STAIRS)
+half=bottom (RED_NETHER_BRICK_STAIRS)
+half=bottom (RED_SANDSTONE_STAIRS)
+half=bottom (SANDSTONE_STAIRS)
+half=bottom (SMOOTH_QUARTZ_STAIRS)
+half=bottom (SMOOTH_RED_SANDSTONE_STAIRS)
+half=bottom (SMOOTH_SANDSTONE_STAIRS)
+half=bottom (SPRUCE_STAIRS)
+half=bottom (SPRUCE_TRAPDOOR)
+half=bottom (STONE_BRICK_STAIRS)
+half=bottom (STONE_STAIRS)
+half=bottom (WARPED_STAIRS)
+half=bottom (WARPED_TRAPDOOR)
+half=bottom (WAXED_CUT_COPPER_STAIRS)
+half=bottom (WAXED_EXPOSED_CUT_COPPER_STAIRS)
+half=bottom (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
+half=bottom (WAXED_WEATHERED_CUT_COPPER_STAIRS)
+half=bottom (WEATHERED_CUT_COPPER_STAIRS)
+half=lower (ACACIA_DOOR)
+half=lower (BIRCH_DOOR)
+half=lower (CRIMSON_DOOR)
+half=lower (DARK_OAK_DOOR)
+half=lower (IRON_DOOR)
+half=lower (JUNGLE_DOOR)
+half=lower (LARGE_FERN)
+half=lower (LILAC)
+half=lower (MANGROVE_DOOR)
+half=lower (OAK_DOOR)
+half=lower (PEONY)
+half=lower (ROSE_BUSH)
+half=lower (SMALL_DRIPLEAF)
+half=lower (SPRUCE_DOOR)
+half=lower (SUNFLOWER)
+half=lower (TALL_GRASS)
+half=lower (TALL_SEAGRASS)
+half=lower (WARPED_DOOR)
+
+hanging=false (LANTERN)
+hanging=false (MANGROVE_PROPAGULE)
+hanging=false (SOUL_LANTERN)
+
+hatch=0 (TURTLE_EGG)
+
+hinge=left (ACACIA_DOOR)
+hinge=left (BIRCH_DOOR)
+hinge=left (CRIMSON_DOOR)
+hinge=left (DARK_OAK_DOOR)
+hinge=left (IRON_DOOR)
+hinge=left (JUNGLE_DOOR)
+hinge=left (MANGROVE_DOOR)
+hinge=left (OAK_DOOR)
+hinge=left (SPRUCE_DOOR)
+hinge=left (WARPED_DOOR)
+
+honey_level=0 (BEEHIVE)
+honey_level=0 (BEE_NEST)
+
+in_wall=false (ACACIA_FENCE_GATE)
+in_wall=false (BIRCH_FENCE_GATE)
+in_wall=false (CRIMSON_FENCE_GATE)
+in_wall=false (DARK_OAK_FENCE_GATE)
+in_wall=false (JUNGLE_FENCE_GATE)
+in_wall=false (MANGROVE_FENCE_GATE)
+in_wall=false (OAK_FENCE_GATE)
+in_wall=false (SPRUCE_FENCE_GATE)
+in_wall=false (WARPED_FENCE_GATE)
+
+inverted=false (DAYLIGHT_DETECTOR)
+
+layers=1 (SNOW)
+
+leaves=none (BAMBOO)
+
+level=0 (COMPOSTER)
+level=0 (LAVA)
+level=0 (WATER)
+level=1 (POWDER_SNOW_CAULDRON)
+level=1 (WATER_CAULDRON)
+
+lit=false (BLACK_CANDLE)
+lit=false (BLACK_CANDLE_CAKE)
+lit=false (BLAST_FURNACE)
+lit=false (BLUE_CANDLE)
+lit=false (BLUE_CANDLE_CAKE)
+lit=false (BROWN_CANDLE)
+lit=false (BROWN_CANDLE_CAKE)
+lit=false (CANDLE)
+lit=false (CANDLE_CAKE)
+lit=false (CYAN_CANDLE)
+lit=false (CYAN_CANDLE_CAKE)
+lit=false (DEEPSLATE_REDSTONE_ORE)
+lit=false (FURNACE)
+lit=false (GRAY_CANDLE)
+lit=false (GRAY_CANDLE_CAKE)
+lit=false (GREEN_CANDLE)
+lit=false (GREEN_CANDLE_CAKE)
+lit=false (LIGHT_BLUE_CANDLE)
+lit=false (LIGHT_BLUE_CANDLE_CAKE)
+lit=false (LIGHT_GRAY_CANDLE)
+lit=false (LIGHT_GRAY_CANDLE_CAKE)
+lit=false (LIME_CANDLE)
+lit=false (LIME_CANDLE_CAKE)
+lit=false (MAGENTA_CANDLE)
+lit=false (MAGENTA_CANDLE_CAKE)
+lit=false (ORANGE_CANDLE)
+lit=false (ORANGE_CANDLE_CAKE)
+lit=false (PINK_CANDLE)
+lit=false (PINK_CANDLE_CAKE)
+lit=false (PURPLE_CANDLE)
+lit=false (PURPLE_CANDLE_CAKE)
+lit=false (REDSTONE_LAMP)
+lit=false (REDSTONE_ORE)
+lit=false (RED_CANDLE)
+lit=false (RED_CANDLE_CAKE)
+lit=false (SMOKER)
+lit=false (WHITE_CANDLE)
+lit=false (WHITE_CANDLE_CAKE)
+lit=false (YELLOW_CANDLE)
+lit=false (YELLOW_CANDLE_CAKE)
+lit=true (CAMPFIRE)
+lit=true (REDSTONE_TORCH)
+lit=true (REDSTONE_WALL_TORCH)
+lit=true (SOUL_CAMPFIRE)
+
+locked=false (REPEATER)
+
+mode=compare (COMPARATOR)
+mode=load (STRUCTURE_BLOCK)
+
+moisture=0 (FARMLAND)
+
+note=0 (NOTE_BLOCK)
+
+open=false (ACACIA_DOOR)
+open=false (ACACIA_FENCE_GATE)
+open=false (ACACIA_TRAPDOOR)
+open=false (BARREL)
+open=false (BIRCH_DOOR)
+open=false (BIRCH_FENCE_GATE)
+open=false (BIRCH_TRAPDOOR)
+open=false (CRIMSON_DOOR)
+open=false (CRIMSON_FENCE_GATE)
+open=false (CRIMSON_TRAPDOOR)
+open=false (DARK_OAK_DOOR)
+open=false (DARK_OAK_FENCE_GATE)
+open=false (DARK_OAK_TRAPDOOR)
+open=false (IRON_DOOR)
+open=false (IRON_TRAPDOOR)
+open=false (JUNGLE_DOOR)
+open=false (JUNGLE_FENCE_GATE)
+open=false (JUNGLE_TRAPDOOR)
+open=false (MANGROVE_DOOR)
+open=false (MANGROVE_FENCE_GATE)
+open=false (MANGROVE_TRAPDOOR)
+open=false (OAK_DOOR)
+open=false (OAK_FENCE_GATE)
+open=false (OAK_TRAPDOOR)
+open=false (SPRUCE_DOOR)
+open=false (SPRUCE_FENCE_GATE)
+open=false (SPRUCE_TRAPDOOR)
+open=false (WARPED_DOOR)
+open=false (WARPED_FENCE_GATE)
+open=false (WARPED_TRAPDOOR)
+
+orientation=north_up (JIGSAW)
+
+part=foot (BLACK_BED)
+part=foot (BLUE_BED)
+part=foot (BROWN_BED)
+part=foot (CYAN_BED)
+part=foot (GRAY_BED)
+part=foot (GREEN_BED)
+part=foot (LIGHT_BLUE_BED)
+part=foot (LIGHT_GRAY_BED)
+part=foot (LIME_BED)
+part=foot (MAGENTA_BED)
+part=foot (ORANGE_BED)
+part=foot (PINK_BED)
+part=foot (PURPLE_BED)
+part=foot (RED_BED)
+part=foot (WHITE_BED)
+part=foot (YELLOW_BED)
+
+pickles=1 (SEA_PICKLE)
+
+rotation=0 (ACACIA_SIGN)
+rotation=0 (BIRCH_SIGN)
+rotation=0 (BLACK_BANNER)
+rotation=0 (BLUE_BANNER)
+rotation=0 (BROWN_BANNER)
+rotation=0 (CREEPER_HEAD)
+rotation=0 (CRIMSON_SIGN)
+rotation=0 (CYAN_BANNER)
+rotation=0 (DARK_OAK_SIGN)
+rotation=0 (DRAGON_HEAD)
+rotation=0 (GRAY_BANNER)
+rotation=0 (GREEN_BANNER)
+rotation=0 (JUNGLE_SIGN)
+rotation=0 (LIGHT_BLUE_BANNER)
+rotation=0 (LIGHT_GRAY_BANNER)
+rotation=0 (LIME_BANNER)
+rotation=0 (MAGENTA_BANNER)
+rotation=0 (MANGROVE_SIGN)
+rotation=0 (OAK_SIGN)
+rotation=0 (ORANGE_BANNER)
+rotation=0 (PINK_BANNER)
+rotation=0 (PLAYER_HEAD)
+rotation=0 (PURPLE_BANNER)
+rotation=0 (RED_BANNER)
+rotation=0 (SKELETON_SKULL)
+rotation=0 (SPRUCE_SIGN)
+rotation=0 (WARPED_SIGN)
+rotation=0 (WHITE_BANNER)
+rotation=0 (WITHER_SKELETON_SKULL)
+rotation=0 (YELLOW_BANNER)
+rotation=0 (ZOMBIE_HEAD)
+
+shape=north_south (ACTIVATOR_RAIL)
+shape=north_south (DETECTOR_RAIL)
+shape=north_south (POWERED_RAIL)
+shape=north_south (RAIL)
+shape=straight (ACACIA_STAIRS)
+shape=straight (ANDESITE_STAIRS)
+shape=straight (BIRCH_STAIRS)
+shape=straight (BLACKSTONE_STAIRS)
+shape=straight (BRICK_STAIRS)
+shape=straight (COBBLED_DEEPSLATE_STAIRS)
+shape=straight (COBBLESTONE_STAIRS)
+shape=straight (CRIMSON_STAIRS)
+shape=straight (CUT_COPPER_STAIRS)
+shape=straight (DARK_OAK_STAIRS)
+shape=straight (DARK_PRISMARINE_STAIRS)
+shape=straight (DEEPSLATE_BRICK_STAIRS)
+shape=straight (DEEPSLATE_TILE_STAIRS)
+shape=straight (DIORITE_STAIRS)
+shape=straight (END_STONE_BRICK_STAIRS)
+shape=straight (EXPOSED_CUT_COPPER_STAIRS)
+shape=straight (GRANITE_STAIRS)
+shape=straight (JUNGLE_STAIRS)
+shape=straight (MANGROVE_STAIRS)
+shape=straight (MOSSY_COBBLESTONE_STAIRS)
+shape=straight (MOSSY_STONE_BRICK_STAIRS)
+shape=straight (MUD_BRICK_STAIRS)
+shape=straight (NETHER_BRICK_STAIRS)
+shape=straight (OAK_STAIRS)
+shape=straight (OXIDIZED_CUT_COPPER_STAIRS)
+shape=straight (POLISHED_ANDESITE_STAIRS)
+shape=straight (POLISHED_BLACKSTONE_BRICK_STAIRS)
+shape=straight (POLISHED_BLACKSTONE_STAIRS)
+shape=straight (POLISHED_DEEPSLATE_STAIRS)
+shape=straight (POLISHED_DIORITE_STAIRS)
+shape=straight (POLISHED_GRANITE_STAIRS)
+shape=straight (PRISMARINE_BRICK_STAIRS)
+shape=straight (PRISMARINE_STAIRS)
+shape=straight (PURPUR_STAIRS)
+shape=straight (QUARTZ_STAIRS)
+shape=straight (RED_NETHER_BRICK_STAIRS)
+shape=straight (RED_SANDSTONE_STAIRS)
+shape=straight (SANDSTONE_STAIRS)
+shape=straight (SMOOTH_QUARTZ_STAIRS)
+shape=straight (SMOOTH_RED_SANDSTONE_STAIRS)
+shape=straight (SMOOTH_SANDSTONE_STAIRS)
+shape=straight (SPRUCE_STAIRS)
+shape=straight (STONE_BRICK_STAIRS)
+shape=straight (STONE_STAIRS)
+shape=straight (WARPED_STAIRS)
+shape=straight (WAXED_CUT_COPPER_STAIRS)
+shape=straight (WAXED_EXPOSED_CUT_COPPER_STAIRS)
+shape=straight (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
+shape=straight (WAXED_WEATHERED_CUT_COPPER_STAIRS)
+shape=straight (WEATHERED_CUT_COPPER_STAIRS)
+
+snowy=false (GRASS_BLOCK)
+snowy=false (MYCELIUM)
+snowy=false (PODZOL)
+
+thickness=tip (POINTED_DRIPSTONE)
+
+type=bottom (ACACIA_SLAB)
+type=bottom (ANDESITE_SLAB)
+type=bottom (BIRCH_SLAB)
+type=bottom (BLACKSTONE_SLAB)
+type=bottom (BRICK_SLAB)
+type=bottom (COBBLED_DEEPSLATE_SLAB)
+type=bottom (COBBLESTONE_SLAB)
+type=bottom (CRIMSON_SLAB)
+type=bottom (CUT_COPPER_SLAB)
+type=bottom (CUT_RED_SANDSTONE_SLAB)
+type=bottom (CUT_SANDSTONE_SLAB)
+type=bottom (DARK_OAK_SLAB)
+type=bottom (DARK_PRISMARINE_SLAB)
+type=bottom (DEEPSLATE_BRICK_SLAB)
+type=bottom (DEEPSLATE_TILE_SLAB)
+type=bottom (DIORITE_SLAB)
+type=bottom (END_STONE_BRICK_SLAB)
+type=bottom (EXPOSED_CUT_COPPER_SLAB)
+type=bottom (GRANITE_SLAB)
+type=bottom (JUNGLE_SLAB)
+type=bottom (MANGROVE_SLAB)
+type=bottom (MOSSY_COBBLESTONE_SLAB)
+type=bottom (MOSSY_STONE_BRICK_SLAB)
+type=bottom (MUD_BRICK_SLAB)
+type=bottom (NETHER_BRICK_SLAB)
+type=bottom (OAK_SLAB)
+type=bottom (OXIDIZED_CUT_COPPER_SLAB)
+type=bottom (PETRIFIED_OAK_SLAB)
+type=bottom (POLISHED_ANDESITE_SLAB)
+type=bottom (POLISHED_BLACKSTONE_BRICK_SLAB)
+type=bottom (POLISHED_BLACKSTONE_SLAB)
+type=bottom (POLISHED_DEEPSLATE_SLAB)
+type=bottom (POLISHED_DIORITE_SLAB)
+type=bottom (POLISHED_GRANITE_SLAB)
+type=bottom (PRISMARINE_BRICK_SLAB)
+type=bottom (PRISMARINE_SLAB)
+type=bottom (PURPUR_SLAB)
+type=bottom (QUARTZ_SLAB)
+type=bottom (RED_NETHER_BRICK_SLAB)
+type=bottom (RED_SANDSTONE_SLAB)
+type=bottom (SANDSTONE_SLAB)
+type=bottom (SMOOTH_QUARTZ_SLAB)
+type=bottom (SMOOTH_RED_SANDSTONE_SLAB)
+type=bottom (SMOOTH_SANDSTONE_SLAB)
+type=bottom (SMOOTH_STONE_SLAB)
+type=bottom (SPRUCE_SLAB)
+type=bottom (STONE_BRICK_SLAB)
+type=bottom (STONE_SLAB)
+type=bottom (WARPED_SLAB)
+type=bottom (WAXED_CUT_COPPER_SLAB)
+type=bottom (WAXED_EXPOSED_CUT_COPPER_SLAB)
+type=bottom (WAXED_OXIDIZED_CUT_COPPER_SLAB)
+type=bottom (WAXED_WEATHERED_CUT_COPPER_SLAB)
+type=bottom (WEATHERED_CUT_COPPER_SLAB)
+type=normal (MOVING_PISTON)
+type=normal (PISTON_HEAD)
+type=single (CHEST)
+type=single (TRAPPED_CHEST)
+
+vertical_direction=up (POINTED_DRIPSTONE)
+
+\subsubsection{Waterlogged}
+Denotes whether this block has fluid in it.
+
+Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL\_WALL\_FAN, BUBBLE\_CORAL, BUBBLE\_CORAL\_FAN, BUBBLE\_CORAL\_WALL\_FAN, CONDUIT, DEAD\_BRAIN\_CORAL, DEAD\_BRAIN\_CORAL\_FAN, DEAD\_BRAIN\_CORAL\_WALL\_FAN, DEAD\_BUBBLE\_CORAL, DEAD\_BUBBLE\_CORAL\_FAN, DEAD\_BUBBLE\_CORAL\_WALL\_FAN, DEAD\_FIRE\_CORAL, DEAD\_FIRE\_CORAL\_FAN, DEAD\_FIRE\_CORAL\_WALL\_FAN, DEAD\_HORN\_CORAL, DEAD\_HORN\_CORAL\_FAN, DEAD\_HORN\_CORAL\_WALL\_FAN, DEAD\_TUBE\_CORAL, DEAD\_TUBE\_CORAL\_FAN, DEAD\_TUBE\_CORAL\_WALL\_FAN, FIRE\_CORAL, FIRE\_CORAL\_FAN, FIRE\_CORAL\_WALL\_FAN, HORN\_CORAL, HORN\_CORAL\_FAN, HORN\_CORAL\_WALL\_FAN, SEA\_PICKLE, TUBE\_CORAL, TUBE\_CORAL\_FAN and TUBE\_CORAL\_WALL\_FAN} (which defaults to true), it defaults to false. All the possible options are true or false.
+
+\begin{longtable}{ |c|c|c| }
+	\hline
+	Material & Aquatic block\footnotemark \\
+	\hline
+	\endhead
+	ACACIA\_FENCE & \xmark \\
+	ACACIA\_LEAVES & \xmark \\
+	ACACIA\_SIGN & \xmark \\
+	ACACIA\_SLAB & \xmark \\
+	ACACIA\_STAIRS & \xmark \\
+	ACACIA\_TRAPDOOR & \xmark \\
+	ACACIA\_WALL\_SIGN & \xmark \\
+	ACTIVATOR\_RAIL & \xmark \\
+	AMETHYST\_CLUSTER & \xmark \\
+	ANDESITE\_SLAB & \xmark \\
+	ANDESITE\_STAIRS & \xmark \\
+	ANDESITE\_WALL & \xmark \\
+	AZALEA\_LEAVES & \xmark \\
+	BIG\_DRIPLEAF & \xmark \\
+	BIG\_DRIPLEAF\_STEM & \xmark \\
+	BIRCH\_FENCE & \xmark \\
+	BIRCH\_LEAVES & \xmark \\
+	BIRCH\_SIGN & \xmark \\
+	BIRCH\_SLAB & \xmark \\
+	BIRCH\_STAIRS & \xmark \\
+	BIRCH\_TRAPDOOR & \xmark \\
+	BIRCH\_WALL\_SIGN & \xmark \\
+	BLACKSTONE\_SLAB & \xmark \\
+	BLACKSTONE\_STAIRS & \xmark \\
+	BLACKSTONE\_WALL & \xmark \\
+	BLACK\_CANDLE & \xmark \\
+	BLACK\_STAINED\_GLASS\_PANE & \xmark \\
+	BLUE\_CANDLE & \xmark \\
+	BLUE\_STAINED\_GLASS\_PANE & \xmark \\
+	BRICK\_SLAB & \xmark \\
+	BRICK\_STAIRS & \xmark \\
+	BRICK\_WALL & \xmark \\
+	BROWN\_CANDLE & \xmark \\
+	BROWN\_STAINED\_GLASS\_PANE & \xmark \\
+	CAMPFIRE & \xmark \\
+	CANDLE & \xmark \\
+	CHAIN & \xmark \\
+	CHEST & \xmark \\
+	COBBLED\_DEEPSLATE\_SLAB & \xmark \\
+	COBBLED\_DEEPSLATE\_STAIRS & \xmark \\
+	COBBLED\_DEEPSLATE\_WALL & \xmark \\
+	COBBLESTONE\_SLAB & \xmark \\
+	COBBLESTONE\_STAIRS & \xmark \\
+	COBBLESTONE\_WALL & \xmark \\
+	CRIMSON\_FENCE & \xmark \\
+	CRIMSON\_SIGN & \xmark \\
+	CRIMSON\_SLAB & \xmark \\
+	CRIMSON\_STAIRS & \xmark \\
+	CRIMSON\_TRAPDOOR & \xmark \\
+	CRIMSON\_WALL\_SIGN & \xmark \\
+	CUT\_COPPER\_SLAB & \xmark \\
+	CUT\_COPPER\_STAIRS & \xmark \\
+	CUT\_RED\_SANDSTONE\_SLAB & \xmark \\
+	CUT\_SANDSTONE\_SLAB & \xmark \\
+	CYAN\_CANDLE & \xmark \\
+	CYAN\_STAINED\_GLASS\_PANE & \xmark \\
+	DARK\_OAK\_FENCE & \xmark \\
+	DARK\_OAK\_LEAVES & \xmark \\
+	DARK\_OAK\_SIGN & \xmark \\
+	DARK\_OAK\_SLAB & \xmark \\
+	DARK\_OAK\_STAIRS & \xmark \\
+	DARK\_OAK\_TRAPDOOR & \xmark \\
+	DARK\_OAK\_WALL\_SIGN & \xmark \\
+	DARK\_PRISMARINE\_SLAB & \xmark \\
+	DARK\_PRISMARINE\_STAIRS & \xmark \\
+	DEEPSLATE\_BRICK\_SLAB & \xmark \\
+	DEEPSLATE\_BRICK\_STAIRS & \xmark \\
+	DEEPSLATE\_BRICK\_WALL & \xmark \\
+	DEEPSLATE\_TILE\_SLAB & \xmark \\
+	DEEPSLATE\_TILE\_STAIRS & \xmark \\
+	DEEPSLATE\_TILE\_WALL & \xmark \\
+	DETECTOR\_RAIL & \xmark \\
+	DIORITE\_SLAB & \xmark \\
+	DIORITE\_STAIRS & \xmark \\
+	DIORITE\_WALL & \xmark \\
+	ENDER\_CHEST & \xmark \\
+	END\_STONE\_BRICK\_SLAB & \xmark \\
+	END\_STONE\_BRICK\_STAIRS & \xmark \\
+	END\_STONE\_BRICK\_WALL & \xmark \\
+	EXPOSED\_CUT\_COPPER\_SLAB & \xmark \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & \xmark \\
+	FLOWERING\_AZALEA\_LEAVES & \xmark \\
+	GLASS\_PANE & \xmark \\
+	GLOW\_LICHEN & \xmark \\
+	GRANITE\_SLAB & \xmark \\
+	GRANITE\_STAIRS & \xmark \\
+	GRANITE\_WALL & \xmark \\
+	GRAY\_CANDLE & \xmark \\
+	GRAY\_STAINED\_GLASS\_PANE & \xmark \\
+	GREEN\_CANDLE & \xmark \\
+	GREEN\_STAINED\_GLASS\_PANE & \xmark \\
+	HANGING\_ROOTS & \xmark \\
+	IRON\_BARS & \xmark \\
+	IRON\_TRAPDOOR & \xmark \\
+	JUNGLE\_FENCE & \xmark \\
+	JUNGLE\_LEAVES & \xmark \\
+	JUNGLE\_SIGN & \xmark \\
+	JUNGLE\_SLAB & \xmark \\
+	JUNGLE\_STAIRS & \xmark \\
+	JUNGLE\_TRAPDOOR & \xmark \\
+	JUNGLE\_WALL\_SIGN & \xmark \\
+	LADDER & \xmark \\
+	LANTERN & \xmark \\
+	LARGE\_AMETHYST\_BUD & \xmark \\
+	LIGHTNING\_ROD & \xmark \\
+	LIGHT\_BLUE\_CANDLE & \xmark \\
+	LIGHT\_BLUE\_STAINED\_GLASS\_PANE & \xmark \\
+	LIGHT\_GRAY\_CANDLE & \xmark \\
+	LIGHT\_GRAY\_STAINED\_GLASS\_PANE & \xmark \\
+	LIME\_CANDLE & \xmark \\
+	LIME\_STAINED\_GLASS\_PANE & \xmark \\
+	MAGENTA\_CANDLE & \xmark \\
+	MAGENTA\_STAINED\_GLASS\_PANE & \xmark \\
+	MANGROVE\_FENCE & \xmark \\
+	MANGROVE\_LEAVES & \xmark \\
+	MANGROVE\_PROPAGULE & \xmark \\
+	MANGROVE\_ROOTS & \xmark \\
+	MANGROVE\_SIGN & \xmark \\
+	MANGROVE\_SLAB & \xmark \\
+	MANGROVE\_STAIRS & \xmark \\
+	MANGROVE\_TRAPDOOR & \xmark \\
+	MANGROVE\_WALL\_SIGN & \xmark \\
+	MEDIUM\_AMETHYST\_BUD & \xmark \\
+	MOSSY\_COBBLESTONE\_SLAB & \xmark \\
+	MOSSY\_COBBLESTONE\_STAIRS & \xmark \\
+	MOSSY\_COBBLESTONE\_WALL & \xmark \\
+	MOSSY\_STONE\_BRICK\_SLAB & \xmark \\
+	MOSSY\_STONE\_BRICK\_STAIRS & \xmark \\
+	MOSSY\_STONE\_BRICK\_WALL & \xmark \\
+	MUD\_BRICK\_SLAB & \xmark \\
+	MUD\_BRICK\_STAIRS & \xmark \\
+	MUD\_BRICK\_WALL & \xmark \\
+	NETHER\_BRICK\_FENCE & \xmark \\
+	NETHER\_BRICK\_SLAB & \xmark \\
+	NETHER\_BRICK\_STAIRS & \xmark \\
+	NETHER\_BRICK\_WALL & \xmark \\
+	OAK\_FENCE & \xmark \\
+	OAK\_LEAVES & \xmark \\
+	OAK\_SIGN & \xmark \\
+	OAK\_SLAB & \xmark \\
+	OAK\_STAIRS & \xmark \\
+	OAK\_TRAPDOOR & \xmark \\
+	OAK\_WALL\_SIGN & \xmark \\
+	ORANGE\_CANDLE & \xmark \\
+	ORANGE\_STAINED\_GLASS\_PANE & \xmark \\
+	OXIDIZED\_CUT\_COPPER\_SLAB & \xmark \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & \xmark \\
+	PETRIFIED\_OAK\_SLAB & \xmark \\
+	PINK\_CANDLE & \xmark \\
+	PINK\_STAINED\_GLASS\_PANE & \xmark \\
+	POINTED\_DRIPSTONE & \xmark \\
+	POLISHED\_ANDESITE\_SLAB & \xmark \\
+	POLISHED\_ANDESITE\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_SLAB & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & \xmark \\
+	POLISHED\_BLACKSTONE\_SLAB & \xmark \\
+	POLISHED\_BLACKSTONE\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_WALL & \xmark \\
+	POLISHED\_DEEPSLATE\_SLAB & \xmark \\
+	POLISHED\_DEEPSLATE\_STAIRS & \xmark \\
+	POLISHED\_DEEPSLATE\_WALL & \xmark \\
+	POLISHED\_DIORITE\_SLAB & \xmark \\
+	POLISHED\_DIORITE\_STAIRS & \xmark \\
+	POLISHED\_GRANITE\_SLAB & \xmark \\
+	POLISHED\_GRANITE\_STAIRS & \xmark \\
+	POWERED\_RAIL & \xmark \\
+	PRISMARINE\_BRICK\_SLAB & \xmark \\
+	PRISMARINE\_BRICK\_STAIRS & \xmark \\
+	PRISMARINE\_SLAB & \xmark \\
+	PRISMARINE\_STAIRS & \xmark \\
+	PRISMARINE\_WALL & \xmark \\
+	PURPLE\_CANDLE & \xmark \\
+	PURPLE\_STAINED\_GLASS\_PANE & \xmark \\
+	PURPUR\_SLAB & \xmark \\
+	PURPUR\_STAIRS & \xmark \\
+	QUARTZ\_SLAB & \xmark \\
+	QUARTZ\_STAIRS & \xmark \\
+	RAIL & \xmark \\
+	RED\_CANDLE & \xmark \\
+	RED\_NETHER\_BRICK\_SLAB & \xmark \\
+	RED\_NETHER\_BRICK\_STAIRS & \xmark \\
+	RED\_NETHER\_BRICK\_WALL & \xmark \\
+	RED\_SANDSTONE\_SLAB & \xmark \\
+	RED\_SANDSTONE\_STAIRS & \xmark \\
+	RED\_SANDSTONE\_WALL & \xmark \\
+	RED\_STAINED\_GLASS\_PANE & \xmark \\
+	SANDSTONE\_SLAB & \xmark \\
+	SANDSTONE\_STAIRS & \xmark \\
+	SANDSTONE\_WALL & \xmark \\
+	SCAFFOLDING & \xmark \\
+	SCULK\_SENSOR & \xmark \\
+	SCULK\_SHRIEKER & \xmark \\
+	SCULK\_VEIN & \xmark \\
+	SMALL\_AMETHYST\_BUD & \xmark \\
+	SMALL\_DRIPLEAF & \xmark \\
+	SMOOTH\_QUARTZ\_SLAB & \xmark \\
+	SMOOTH\_QUARTZ\_STAIRS & \xmark \\
+	SMOOTH\_RED\_SANDSTONE\_SLAB & \xmark \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & \xmark \\
+	SMOOTH\_SANDSTONE\_SLAB & \xmark \\
+	SMOOTH\_SANDSTONE\_STAIRS & \xmark \\
+	SMOOTH\_STONE\_SLAB & \xmark \\
+	SOUL\_CAMPFIRE & \xmark \\
+	SOUL\_LANTERN & \xmark \\
+	SPRUCE\_FENCE & \xmark \\
+	SPRUCE\_LEAVES & \xmark \\
+	SPRUCE\_SIGN & \xmark \\
+	SPRUCE\_SLAB & \xmark \\
+	SPRUCE\_STAIRS & \xmark \\
+	SPRUCE\_TRAPDOOR & \xmark \\
+	SPRUCE\_WALL\_SIGN & \xmark \\
+	STONE\_BRICK\_SLAB & \xmark \\
+	STONE\_BRICK\_STAIRS & \xmark \\
+	STONE\_BRICK\_WALL & \xmark \\
+	STONE\_SLAB & \xmark \\
+	STONE\_STAIRS & \xmark \\
+	TRAPPED\_CHEST & \xmark \\
+	WARPED\_FENCE & \xmark \\
+	WARPED\_SIGN & \xmark \\
+	WARPED\_SLAB & \xmark \\
+	WARPED\_STAIRS & \xmark \\
+	WARPED\_TRAPDOOR & \xmark \\
+	WARPED\_WALL\_SIGN & \xmark \\
+	WAXED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WEATHERED\_CUT\_COPPER\_SLAB & \xmark \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WHITE\_CANDLE & \xmark \\
+	WHITE\_STAINED\_GLASS\_PANE & \xmark \\
+	YELLOW\_CANDLE & \xmark \\
+	YELLOW\_STAINED\_GLASS\_PANE & \xmark \\
+	\hline
+	BRAIN\_CORAL & \cmark \\
+	BRAIN\_CORAL\_FAN & \cmark \\
+	BRAIN\_CORAL\_WALL\_FAN & \cmark \\
+	BUBBLE\_CORAL & \cmark \\
+	BUBBLE\_CORAL\_FAN & \cmark \\
+	BUBBLE\_CORAL\_WALL\_FAN & \cmark \\
+	CONDUIT & \cmark \\
+	DEAD\_BRAIN\_CORAL & \cmark \\
+	DEAD\_BRAIN\_CORAL\_FAN & \cmark \\
+	DEAD\_BRAIN\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_BUBBLE\_CORAL & \cmark \\
+	DEAD\_BUBBLE\_CORAL\_FAN & \cmark \\
+	DEAD\_BUBBLE\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_FIRE\_CORAL & \cmark \\
+	DEAD\_FIRE\_CORAL\_FAN & \cmark \\
+	DEAD\_FIRE\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_HORN\_CORAL & \cmark \\
+	DEAD\_HORN\_CORAL\_FAN & \cmark \\
+	DEAD\_HORN\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_TUBE\_CORAL & \cmark \\
+	DEAD\_TUBE\_CORAL\_FAN & \cmark \\
+	DEAD\_TUBE\_CORAL\_WALL\_FAN & \cmark \\
+	FIRE\_CORAL & \cmark \\
+	FIRE\_CORAL\_FAN & \cmark \\
+	FIRE\_CORAL\_WALL\_FAN & \cmark \\
+	HORN\_CORAL & \cmark \\
+	HORN\_CORAL\_FAN & \cmark \\
+	HORN\_CORAL\_WALL\_FAN & \cmark \\
+	SEA\_PICKLE & \cmark \\
+	TUBE\_CORAL & \cmark \\
+	TUBE\_CORAL\_FAN & \cmark \\
+	TUBE\_CORAL\_WALL\_FAN & \cmark \\
+	\hline
+	\caption{Waterlogged materials}
+\end{longtable}
+
+% Aquatic block's footnote
+\footnotetext{If it's an underwater block (defaults to false).}
+
+\subsection{Material modifiers concatenation}
+\myworries{... (how to join modifiers)}
+
+If a material doesn't have the attribute that the diagram is checking it will assume that the attribute value is the default one (0 or false, in most of the cases), resulting in ignoring that property.
+
+\begin{subfigures}
+	\begin{figure}
+		\begin{rail}
+			([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) %\\
+			([attachment undefined or attachment=floor] () | [attachment=ceiling] 'CEILING\_' | [attachment=double\_wall] 'DWALL\_' | [attachment=single\_wall] 'SWALL\_') \\
+			Material \\
+			([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
+			([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
+			([conditional=false] () | [conditional=true] '\_CONDITIONAL')
+			'...'
+		\end{rail}
+		\label{rail:modifier-concatenation}
+		\caption{Modifier concatenation}
+	\end{figure}
+	
+	\begin{figure}
+		\begin{rail}
+			'...'
+			([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
+			([bites=0] () | [bites!=0] '\_' bites) ([candles$<$2] () | [candles$>$1] '\_' candles) \\
+			([charges=0] () | [charges!=0] '\_' charges) ([delay$<$2] () | [delay$>$1] '\_' delay)
+		\end{rail}
+		\caption{Integer modifier concatenation}
+	\end{figure}
+\end{subfigures}
