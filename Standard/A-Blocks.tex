@@ -12,7 +12,7 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c|c|c| }
+	\begin{tabular}{ |c|c| }
 		\hline
 		Modifier name & Reason for discarding \\
 		\hline
@@ -39,6 +39,10 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 		has\_book & Inventory dependent \\
 		sculk\_sensor\_phase & Admin block \\
 		signal\_fire & Bottom-block dependent \\
+		north=tall & Top-block dependent \\
+		south=tall & Top-block dependent \\
+		east=tall & Top-block dependent \\
+		west=tall & Top-block dependent \\
 		\hline
 	\end{tabular}
 	\caption{Unused Spigot BlockData's modifiers}
@@ -49,7 +53,7 @@ In addition to this, some modifiers applied to certain blocks doesn't change the
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c|c|c| }
+	\begin{tabular}{ |c|c| }
 		\hline
 		Block name & Modifier name \\
 		\hline
@@ -74,7 +78,7 @@ Defaults to 0.
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c|c|c| }
+	\begin{tabular}{ |c|c| }
 		\hline
 		Material & Age range \\
 		\hline
@@ -105,7 +109,7 @@ Defaults to floor.
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c|c|c| }
+	\begin{tabular}{ |c|c| }
 		\hline
 		Material & Options \\
 		\hline
@@ -120,7 +124,7 @@ Represents the axis along whilst this block is oriented.
 
 Except for NETHER\_PORTAL (which defaults to x), it defaults to y.
 
-\begin{longtable}{ |c|c|c| }
+\begin{longtable}{ |c|c| }
 	\hline
 	Material & Age range \\
 	\hline
@@ -255,66 +259,78 @@ RED\_MUSHROOM\_BLOCK true/false
 \subsubsection{North, South, East and West}
 Set which faces of the block textures are displayed on.
 
-east=false (ACACIA_FENCE)
-east=false (BIRCH_FENCE)
-east=false (BLACK_STAINED_GLASS_PANE)
-east=false (BLUE_STAINED_GLASS_PANE)
-east=false (BROWN_STAINED_GLASS_PANE)
-east=false (CHORUS_PLANT)
-east=false (CRIMSON_FENCE)
-east=false (CYAN_STAINED_GLASS_PANE)
-east=false (DARK_OAK_FENCE)
-east=false (FIRE)
-east=false (GLASS_PANE)
-east=false (GLOW_LICHEN)
-east=false (GRAY_STAINED_GLASS_PANE)
-east=false (GREEN_STAINED_GLASS_PANE)
-east=false (IRON_BARS)
-east=false (JUNGLE_FENCE)
-east=false (LIGHT_BLUE_STAINED_GLASS_PANE)
-east=false (LIGHT_GRAY_STAINED_GLASS_PANE)
-east=false (LIME_STAINED_GLASS_PANE)
-east=false (MAGENTA_STAINED_GLASS_PANE)
-east=false (MANGROVE_FENCE)
-east=false (NETHER_BRICK_FENCE)
-east=false (OAK_FENCE)
-east=false (ORANGE_STAINED_GLASS_PANE)
-east=false (PINK_STAINED_GLASS_PANE)
-east=false (PURPLE_STAINED_GLASS_PANE)
-east=false (RED_STAINED_GLASS_PANE)
-east=false (SCULK_VEIN)
-east=false (SPRUCE_FENCE)
-east=false (TRIPWIRE)
-east=false (VINE)
-east=false (WARPED_FENCE)
-east=false (WHITE_STAINED_GLASS_PANE)
-east=false (YELLOW_STAINED_GLASS_PANE)
-east=none (ANDESITE_WALL)
-east=none (BLACKSTONE_WALL)
-east=none (BRICK_WALL)
-east=none (COBBLED_DEEPSLATE_WALL)
-east=none (COBBLESTONE_WALL)
-east=none (DEEPSLATE_BRICK_WALL)
-east=none (DEEPSLATE_TILE_WALL)
-east=none (DIORITE_WALL)
-east=none (END_STONE_BRICK_WALL)
-east=none (GRANITE_WALL)
-east=none (MOSSY_COBBLESTONE_WALL)
-east=none (MOSSY_STONE_BRICK_WALL)
-east=none (MUD_BRICK_WALL)
-east=none (NETHER_BRICK_WALL)
-east=none (POLISHED_BLACKSTONE_BRICK_WALL)
-east=none (POLISHED_BLACKSTONE_WALL)
-east=none (POLISHED_DEEPSLATE_WALL)
-east=none (PRISMARINE_WALL)
-east=none (REDSTONE_WIRE)
-east=none (RED_NETHER_BRICK_WALL)
-east=none (RED_SANDSTONE_WALL)
-east=none (SANDSTONE_WALL)
-east=none (STONE_BRICK_WALL)
-east=true (BROWN_MUSHROOM_BLOCK)
-east=true (MUSHROOM_STEM)
-east=true (RED_MUSHROOM_BLOCK)
+As the \textit{tall} option is unused (check \hyperref[fig:unused-blockdata]{Table \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}), \textit{none} and \textit{low} will be considered as \textit{false} and \textit{true}, respectively.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	ACACIA\_FENCE & true/\textbf{false} \\
+	BIRCH\_FENCE & true/\textbf{false} \\
+	BLACK\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	BLUE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	BROWN\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	CHORUS\_PLANT & true/\textbf{false} \\
+	CRIMSON\_FENCE & true/\textbf{false} \\
+	CYAN\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	DARK\_OAK\_FENCE & true/\textbf{false} \\
+	FIRE & true/\textbf{false} \\
+	GLASS\_PANE & true/\textbf{false} \\
+	GLOW\_LICHEN & true/\textbf{false} \\
+	GRAY\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	GREEN\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	IRON\_BARS & true/\textbf{false} \\
+	JUNGLE\_FENCE & true/\textbf{false} \\
+	LIGHT\_BLUE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	LIGHT\_GRAY\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	LIME\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	MAGENTA\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	MANGROVE\_FENCE & true/\textbf{false} \\
+	NETHER\_BRICK\_FENCE & true/\textbf{false} \\
+	OAK\_FENCE & true/\textbf{false} \\
+	ORANGE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	PINK\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	PURPLE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	RED\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	SCULK\_VEIN & true/\textbf{false} \\
+	SPRUCE\_FENCE & true/\textbf{false} \\
+	TRIPWIRE & true/\textbf{false} \\
+	VINE & true/\textbf{false} \\
+	WARPED\_FENCE & true/\textbf{false} \\
+	WHITE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	YELLOW\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	\hline
+	BROWN\_MUSHROOM\_BLOCK & \textbf{true}/false \\
+	MUSHROOM\_STEM & \textbf{true}/false \\
+	RED\_MUSHROOM\_BLOCK & \textbf{true}/false \\
+	\hline
+	ANDESITE\_WALL & \textbf{none}/low/tall \\
+	BLACKSTONE\_WALL & \textbf{none}/low/tall \\
+	BRICK\_WALL & \textbf{none}/low/tall \\
+	COBBLED\_DEEPSLATE\_WALL & \textbf{none}/low/tall \\
+	COBBLESTONE\_WALL & \textbf{none}/low/tall \\
+	DEEPSLATE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	DEEPSLATE\_TILE\_WALL & \textbf{none}/low/tall \\
+	DIORITE\_WALL & \textbf{none}/low/tall \\
+	END\_STONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	GRANITE\_WALL & \textbf{none}/low/tall \\
+	MOSSY\_COBBLESTONE\_WALL & \textbf{none}/low/tall \\
+	MOSSY\_STONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	MUD\_BRICK\_WALL & \textbf{none}/low/tall \\
+	NETHER\_BRICK\_WALL & \textbf{none}/low/tall \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	POLISHED\_BLACKSTONE\_WALL & \textbf{none}/low/tall \\
+	POLISHED\_DEEPSLATE\_WALL & \textbf{none}/low/tall \\
+	PRISMARINE\_WALL & \textbf{none}/low/tall \\
+	REDSTONE\_WIRE & \textbf{none}/low/tall \\
+	RED\_NETHER\_BRICK\_WALL & \textbf{none}/low/tall \\
+	RED\_SANDSTONE\_WALL & \textbf{none}/low/tall \\
+	SANDSTONE\_WALL & \textbf{none}/low/tall \\
+	STONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	\hline
+	\caption{Orientable materials}
+\end{longtable}
 
 \subsubsection{Up}
 Set which faces of the block textures are displayed on.
