@@ -10,66 +10,87 @@ That's why there's some prefixes and suffixes (that will be discussed in the fol
 \subsubsection{Unused modifiers}
 There's some Spigot modifiers that beside existing it won't be imported because there aren't a distinguished block in their own. You can find those in \hyperref[fig:unused-blockdata]{Figure \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}.
 
-\begin{table}[H]
-	\centering
-	\begin{tabular}{ |c|c| }
-		\hline
-		Modifier name & Reason for discarding \\
-		\hline
-		has\_bottle\_\textit{X} & Inventory dependent \\
-		has\_record & Inventory dependent \\
-		enabled & Adjacent redstone dependent \\
-		triggered & Adjacent redstone dependent \\
-		instrument & Bottom-block dependent \\
-		occupied & Entity dependent \\
-		persistent & Admin block \\
-		unstable & Admin block \\
-		distance & Block dependent \\
-		stage & Same block \\
-		short & Tick dependent \\
-		attached & Block dependent \\
-		disarmed & Block dependent \\
-		power & Block/event dependent \\
-		tilt & Entity dependent \\
-		can\_summon & Admin block \\
-		shrieking & Entity dependent \\
-		bloom & Admin block \\
-		bottom & Bottom-block dependent \\
-		powered & Admin block / block dependent \\
-		has\_book & Inventory dependent \\
-		sculk\_sensor\_phase & Admin block \\
-		signal\_fire & Bottom-block dependent \\
-		north=tall & Top-block dependent \\
-		south=tall & Top-block dependent \\
-		east=tall & Top-block dependent \\
-		west=tall & Top-block dependent \\
-		\hline
-	\end{tabular}
+\begin{longtable}{ |c|c| }
+	\hline
+	Modifier name & Reason for discarding \\
+	\hline
+	\endhead
+	has\_bottle\_\textit{X} & Inventory dependent \\
+	has\_record & Inventory dependent \\
+	enabled & Adjacent redstone dependent \\
+	triggered & Adjacent redstone dependent \\
+	instrument & Bottom-block dependent \\
+	occupied & Entity dependent \\
+	persistent & Admin block \\
+	unstable & Admin block \\
+	distance & Block dependent \\
+	stage & Same block \\
+	short & Tick dependent \\
+	attached & Block dependent \\
+	disarmed & Block dependent \\
+	power & Block/event dependent \\
+	tilt & Entity dependent \\
+	can\_summon & Admin block \\
+	shrieking & Entity dependent \\
+	bloom & Admin block \\
+	bottom & Bottom-block dependent \\
+	powered & Admin block / block dependent \\
+	has\_book & Inventory dependent \\
+	sculk\_sensor\_phase & Admin block \\
+	signal\_fire & Bottom-block dependent \\
+	north=tall & Top-block dependent \\
+	south=tall & Top-block dependent \\
+	east=tall & Top-block dependent \\
+	west=tall & Top-block dependent \\
+	\hline
+	
 	\caption{Unused Spigot BlockData's modifiers}
 	\label{fig:unused-blockdata}
-\end{table}
+\end{longtable}
 
 In addition to this, some modifiers applied to certain blocks doesn't change the block itself. Those are mentioned in \hyperref[fig:unused-blockdata-blocks]{Figure \ref{fig:unused-blockdata-blocks}, Unused Spigot BlockData's modifiers on certain blocks}.
 
-\begin{table}[H]
-	\centering
-	\begin{tabular}{ |c|c| }
-		\hline
-		Block name & Modifier name \\
-		\hline
-		CAVE\_VINES & age \\
-		CACTUS & age \\
-		FIRE & age \\
-		KELP & age \\
-		SUGAR\_CANE & age \\
-		MANGROVE\_PROPAGULE & age \\
-		TWISTING\_VINES & age \\
-		WEEPING\_VINES & age \\
-		\hline
-	\end{tabular}
+\begin{longtable}{ |c|c| }
+	\hline
+	Block name & Modifier name \\
+	\hline
+	\endhead
+	CAVE\_VINES & age \\
+	CACTUS & age \\
+	FIRE & age \\
+	KELP & age \\
+	SUGAR\_CANE & age \\
+	MANGROVE\_PROPAGULE & age \\
+	TWISTING\_VINES & age \\
+	WEEPING\_VINES & age \\
+	\hline
+	ANDESITE\_WALL & up \\
+	BLACKSTONE\_WALL & up \\
+	BRICK\_WALL & up \\
+	COBBLED\_DEEPSLATE\_WALL & up \\
+	COBBLESTONE\_WALL & up \\
+	DEEPSLATE\_BRICK\_WALL & up \\
+	DEEPSLATE\_TILE\_WALL & up \\
+	DIORITE\_WALL & up \\
+	END\_STONE\_BRICK\_WALL & up \\
+	GRANITE\_WALL & up \\
+	MOSSY\_COBBLESTONE\_WALL & up \\
+	MOSSY\_STONE\_BRICK\_WALL & up \\
+	MUD\_BRICK\_WALL & up \\
+	NETHER\_BRICK\_WALL & up \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & up \\
+	POLISHED\_BLACKSTONE\_WALL & up \\
+	POLISHED\_DEEPSLATE\_WALL & up \\
+	PRISMARINE\_WALL & up \\
+	RED\_NETHER\_BRICK\_WALL & up \\
+	RED\_SANDSTONE\_WALL & up \\
+	SANDSTONE\_WALL & up \\
+	STONE\_BRICK\_WALL & up \\
+	\hline
+	
 	\caption{Unused Spigot BlockData's modifiers on certain blocks}
 	\label{fig:unused-blockdata-blocks}
-\end{table}
+\end{longtable}
 
 \subsubsection{Age}
 Represents the different growth stages that a crop-like block can go through.
@@ -348,31 +369,9 @@ Except for CHORUS\_PLANT, FIRE, GLOW\_LICHEN, SCULK\_VEIN and VINE (which defaul
 	SCULK\_VEIN & true/false \\
 	VINE & true/false \\
 	\hline
-	ANDESITE\_WALL & true/false \\
-	BLACKSTONE\_WALL & true/false \\
-	BRICK\_WALL & true/false \\
 	BROWN\_MUSHROOM\_BLOCK & true/false \\
-	COBBLED\_DEEPSLATE\_WALL & true/false \\
-	COBBLESTONE\_WALL & true/false \\
-	DEEPSLATE\_BRICK\_WALL & true/false \\
-	DEEPSLATE\_TILE\_WALL & true/false \\
-	DIORITE\_WALL & true/false \\
-	END\_STONE\_BRICK\_WALL & true/false \\
-	GRANITE\_WALL & true/false \\
-	MOSSY\_COBBLESTONE\_WALL & true/false \\
-	MOSSY\_STONE\_BRICK\_WALL & true/false \\
-	MUD\_BRICK\_WALL & true/false \\
 	MUSHROOM\_STEM & true/false \\
-	NETHER\_BRICK\_WALL & true/false \\
-	POLISHED\_BLACKSTONE\_BRICK\_WALL & true/false \\
-	POLISHED\_BLACKSTONE\_WALL & true/false \\
-	POLISHED\_DEEPSLATE\_WALL & true/false \\
-	PRISMARINE\_WALL & true/false \\
 	RED\_MUSHROOM\_BLOCK & true/false \\
-	RED\_NETHER\_BRICK\_WALL & true/false \\
-	RED\_SANDSTONE\_WALL & true/false \\
-	SANDSTONE\_WALL & true/false \\
-	STONE\_BRICK\_WALL & true/false \\
 	\hline
 	\caption{Materials with up option}
 \end{longtable}
@@ -387,7 +386,7 @@ TURTLE\_EGG 1-4
 Defaults to false.
 
 extended=false (PISTON)
-extended=false (STICKY_PISTON)
+extended=false (STICKY\_PISTON)
 
 eye=false (END\_PORTAL\_FRAME)
 
@@ -1306,7 +1305,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 \end{longtable}
 
 % Aquatic block's footnote
-\footnotetext{If it's an underwater block (defaults to false).}
+\footnotetext{If it's an underwater block (defaults to true).}
 
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
