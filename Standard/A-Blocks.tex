@@ -5,7 +5,7 @@ That means that all the block names \textit{should} be the exact same as \cite{s
 \subsection{Material modifiers}
 There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.
 
-That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, this has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces in Spigot 1.19).
+That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, all the block modifiers has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces).
 
 \subsubsection{Unused modifiers}
 There's some Spigot modifiers that beside existing it won't be imported because there aren't a distinguished block in their own. You can find those in \hyperref[fig:unused-blockdata]{Figure \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}.
@@ -337,42 +337,51 @@ Set which faces of the block textures are displayed on.
 
 Except for CHORUS\_PLANT, FIRE, GLOW\_LICHEN, SCULK\_VEIN and VINE (which defaults to false), it defaults to true.
 
-up=false (CHORUS_PLANT)
-up=false (FIRE)
-up=false (GLOW_LICHEN)
-up=false (SCULK_VEIN)
-up=false (VINE)
-up=true (ANDESITE_WALL)
-up=true (BLACKSTONE_WALL)
-up=true (BRICK_WALL)
-up=true (BROWN_MUSHROOM_BLOCK)
-up=true (COBBLED_DEEPSLATE_WALL)
-up=true (COBBLESTONE_WALL)
-up=true (DEEPSLATE_BRICK_WALL)
-up=true (DEEPSLATE_TILE_WALL)
-up=true (DIORITE_WALL)
-up=true (END_STONE_BRICK_WALL)
-up=true (GRANITE_WALL)
-up=true (MOSSY_COBBLESTONE_WALL)
-up=true (MOSSY_STONE_BRICK_WALL)
-up=true (MUD_BRICK_WALL)
-up=true (MUSHROOM_STEM)
-up=true (NETHER_BRICK_WALL)
-up=true (POLISHED_BLACKSTONE_BRICK_WALL)
-up=true (POLISHED_BLACKSTONE_WALL)
-up=true (POLISHED_DEEPSLATE_WALL)
-up=true (PRISMARINE_WALL)
-up=true (RED_MUSHROOM_BLOCK)
-up=true (RED_NETHER_BRICK_WALL)
-up=true (RED_SANDSTONE_WALL)
-up=true (SANDSTONE_WALL)
-up=true (STONE_BRICK_WALL)
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options \\
+	\hline
+	\endhead
+	CHORUS\_PLANT & true/false \\
+	FIRE & true/false \\
+	GLOW\_LICHEN & true/false \\
+	SCULK\_VEIN & true/false \\
+	VINE & true/false \\
+	\hline
+	ANDESITE\_WALL & true/false \\
+	BLACKSTONE\_WALL & true/false \\
+	BRICK\_WALL & true/false \\
+	BROWN\_MUSHROOM\_BLOCK & true/false \\
+	COBBLED\_DEEPSLATE\_WALL & true/false \\
+	COBBLESTONE\_WALL & true/false \\
+	DEEPSLATE\_BRICK\_WALL & true/false \\
+	DEEPSLATE\_TILE\_WALL & true/false \\
+	DIORITE\_WALL & true/false \\
+	END\_STONE\_BRICK\_WALL & true/false \\
+	GRANITE\_WALL & true/false \\
+	MOSSY\_COBBLESTONE\_WALL & true/false \\
+	MOSSY\_STONE\_BRICK\_WALL & true/false \\
+	MUD\_BRICK\_WALL & true/false \\
+	MUSHROOM\_STEM & true/false \\
+	NETHER\_BRICK\_WALL & true/false \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & true/false \\
+	POLISHED\_BLACKSTONE\_WALL & true/false \\
+	POLISHED\_DEEPSLATE\_WALL & true/false \\
+	PRISMARINE\_WALL & true/false \\
+	RED\_MUSHROOM\_BLOCK & true/false \\
+	RED\_NETHER\_BRICK\_WALL & true/false \\
+	RED\_SANDSTONE\_WALL & true/false \\
+	SANDSTONE\_WALL & true/false \\
+	STONE\_BRICK\_WALL & true/false \\
+	\hline
+	\caption{Materials with up option}
+\end{longtable}
 
 \subsubsection{Eggs}
 
 Defaults to 1.
 
-TURTLE_EGG 1-4
+TURTLE\_EGG 1-4
 
 \subsubsection{Extended}
 Defaults to false.
@@ -380,7 +389,7 @@ Defaults to false.
 extended=false (PISTON)
 extended=false (STICKY_PISTON)
 
-eye=false (END_PORTAL_FRAME)
+eye=false (END\_PORTAL\_FRAME)
 
 face=wall (ACACIA_BUTTON)
 face=wall (BIRCH_BUTTON)
