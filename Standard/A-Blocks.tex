@@ -1031,9 +1031,21 @@ part=foot (WHITE_BED)
 part=foot (YELLOW_BED)
 
 \subsubsection{Pickles}
+Indicates the number of pickles in this block.
+
 Defaults to 1.
 
-pickles=1 (SEA_PICKLE)
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		SEA\_PICKLE & 1-4 \\
+		\hline
+	\end{tabular}
+	\caption{Materials with pickles}
+\end{table}
 
 
 \subsubsection{Powered}
@@ -1241,7 +1253,7 @@ Denotes whether this block has fluid in it.
 
 Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL\_WALL\_FAN, BUBBLE\_CORAL, BUBBLE\_CORAL\_FAN, BUBBLE\_CORAL\_WALL\_FAN, CONDUIT, DEAD\_BRAIN\_CORAL, DEAD\_BRAIN\_CORAL\_FAN, DEAD\_BRAIN\_CORAL\_WALL\_FAN, DEAD\_BUBBLE\_CORAL, DEAD\_BUBBLE\_CORAL\_FAN, DEAD\_BUBBLE\_CORAL\_WALL\_FAN, DEAD\_FIRE\_CORAL, DEAD\_FIRE\_CORAL\_FAN, DEAD\_FIRE\_CORAL\_WALL\_FAN, DEAD\_HORN\_CORAL, DEAD\_HORN\_CORAL\_FAN, DEAD\_HORN\_CORAL\_WALL\_FAN, DEAD\_TUBE\_CORAL, DEAD\_TUBE\_CORAL\_FAN, DEAD\_TUBE\_CORAL\_WALL\_FAN, FIRE\_CORAL, FIRE\_CORAL\_FAN, FIRE\_CORAL\_WALL\_FAN, HORN\_CORAL, HORN\_CORAL\_FAN, HORN\_CORAL\_WALL\_FAN, SEA\_PICKLE, TUBE\_CORAL, TUBE\_CORAL\_FAN and TUBE\_CORAL\_WALL\_FAN} (which defaults to true), it defaults to false. All the possible options are true or false.
 
-\begin{longtable}{ |c|c|c| }
+\begin{longtable}{ |c|c| }
 	\hline
 	Material & Aquatic block\footnotemark \\
 	\hline
@@ -1561,7 +1573,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 			([bites=0] () | [bites!=0] '\_' bites) ([candles$<$2] () | [candles$>$1] '\_' candles) \\
 			([charges=0] () | [charges!=0] '\_' charges) ([delay$<$2] () | [delay$>$1] '\_' delay) \\
-			([eggs$<$2]() | [eggs$>$1] '\_' eggs)
+			([eggs$<$2]() | [eggs$>$1] '\_' eggs) ([pickles$<$2]() | [pickles$>$1] '\_' pickles)
 		\end{rail}
 		\caption{Integer modifier concatenation}
 	\end{figure}
