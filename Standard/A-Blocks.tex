@@ -34,7 +34,6 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 	shrieking & Entity dependent \\
 	bloom & Admin block \\
 	bottom & Bottom-block dependent \\
-	powered & Admin block / block dependent \\
 	has\_book & Inventory dependent \\
 	sculk\_sensor\_phase & Admin block \\
 	signal\_fire & Bottom-block dependent \\
@@ -1417,6 +1416,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\begin{rail}
 			([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) %\\
 			([attachment undefined or attachment=floor] () | [attachment=ceiling] 'CEILING\_' | [attachment=double\_wall] 'DWALL\_' | [attachment=single\_wall] 'SWALL\_') \\
+			([powered=false]() | [powered=true] 'POWERED\_') \\
 			Material \\
 			([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
 			([conditional=false] () | [conditional=true] '\_CONDITIONAL')
