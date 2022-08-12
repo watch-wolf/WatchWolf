@@ -87,6 +87,42 @@ In addition to this, some modifiers applied to certain blocks doesn't change the
 	SANDSTONE\_WALL & up \\
 	STONE\_BRICK\_WALL & up \\
 	\hline
+	ACACIA\_DOOR & powered \\
+	ACACIA\_FENCE\_GATE & powered \\
+	ACACIA\_TRAPDOOR & powered \\
+	ACTIVATOR\_RAIL & powered \\
+	BELL & powered \\
+	BIRCH\_DOOR & powered \\
+	BIRCH\_FENCE\_GATE & powered \\
+	BIRCH\_TRAPDOOR & powered \\
+	CRIMSON\_DOOR & powered \\
+	CRIMSON\_FENCE\_GATE & powered \\
+	CRIMSON\_TRAPDOOR & powered \\
+	DARK\_OAK\_DOOR & powered \\
+	DARK\_OAK\_FENCE\_GATE & powered \\
+	DARK\_OAK\_TRAPDOOR & powered \\
+	IRON\_DOOR & powered \\
+	IRON\_TRAPDOOR & powered \\
+	JUNGLE\_DOOR & powered \\
+	JUNGLE\_FENCE\_GATE & powered \\
+	JUNGLE\_TRAPDOOR & powered \\
+	LECTERN & powered \\
+	MANGROVE\_DOOR & powered \\
+	MANGROVE\_FENCE\_GATE & powered \\
+	MANGROVE\_TRAPDOOR & powered \\
+	NOTE\_BLOCK & powered \\
+	OAK\_DOOR & powered \\
+	OAK\_FENCE\_GATE & powered \\
+	OAK\_TRAPDOOR & powered \\
+	POWERED\_RAIL & powered \\
+	SPRUCE\_DOOR & powered \\
+	SPRUCE\_FENCE\_GATE & powered \\
+	SPRUCE\_TRAPDOOR & powered \\
+	TRIPWIRE & powered \\
+	WARPED\_DOOR & powered \\
+	WARPED\_FENCE\_GATE & powered \\
+	WARPED\_TRAPDOOR & powered \\
+	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers on certain blocks}
 	\label{fig:unused-blockdata-blocks}
@@ -388,255 +424,285 @@ Defaults to false.
 extended=false (PISTON)
 extended=false (STICKY\_PISTON)
 
+\subsubsection{Eye}
+Defaults to false.
+
 eye=false (END\_PORTAL\_FRAME)
 
-face=wall (ACACIA_BUTTON)
-face=wall (BIRCH_BUTTON)
-face=wall (CRIMSON_BUTTON)
-face=wall (DARK_OAK_BUTTON)
-face=wall (GRINDSTONE)
-face=wall (JUNGLE_BUTTON)
-face=wall (LEVER)
-face=wall (MANGROVE_BUTTON)
-face=wall (OAK_BUTTON)
-face=wall (POLISHED_BLACKSTONE_BUTTON)
-face=wall (SPRUCE_BUTTON)
-face=wall (STONE_BUTTON)
-face=wall (WARPED_BUTTON)
+\subsubsection{Face}
+Represents the face to which a lever or button is stuck.
 
-facing=down (HOPPER)
-facing=north (ACACIA_BUTTON)
-facing=north (ACACIA_DOOR)
-facing=north (ACACIA_FENCE_GATE)
-facing=north (ACACIA_STAIRS)
-facing=north (ACACIA_TRAPDOOR)
-facing=north (ACACIA_WALL_SIGN)
-facing=north (ANDESITE_STAIRS)
-facing=north (ANVIL)
-facing=north (ATTACHED_MELON_STEM)
-facing=north (ATTACHED_PUMPKIN_STEM)
-facing=north (BARREL)
-facing=north (BEEHIVE)
-facing=north (BEE_NEST)
-facing=north (BELL)
-facing=north (BIG_DRIPLEAF)
-facing=north (BIG_DRIPLEAF_STEM)
-facing=north (BIRCH_BUTTON)
-facing=north (BIRCH_DOOR)
-facing=north (BIRCH_FENCE_GATE)
-facing=north (BIRCH_STAIRS)
-facing=north (BIRCH_TRAPDOOR)
-facing=north (BIRCH_WALL_SIGN)
-facing=north (BLACKSTONE_STAIRS)
-facing=north (BLACK_BED)
-facing=north (BLACK_GLAZED_TERRACOTTA)
-facing=north (BLACK_WALL_BANNER)
-facing=north (BLAST_FURNACE)
-facing=north (BLUE_BED)
-facing=north (BLUE_GLAZED_TERRACOTTA)
-facing=north (BLUE_WALL_BANNER)
-facing=north (BRAIN_CORAL_WALL_FAN)
-facing=north (BRICK_STAIRS)
-facing=north (BROWN_BED)
-facing=north (BROWN_GLAZED_TERRACOTTA)
-facing=north (BROWN_WALL_BANNER)
-facing=north (BUBBLE_CORAL_WALL_FAN)
-facing=north (CAMPFIRE)
-facing=north (CARVED_PUMPKIN)
-facing=north (CHAIN_COMMAND_BLOCK)
-facing=north (CHEST)
-facing=north (CHIPPED_ANVIL)
-facing=north (COBBLED_DEEPSLATE_STAIRS)
-facing=north (COBBLESTONE_STAIRS)
-facing=north (COCOA)
-facing=north (COMMAND_BLOCK)
-facing=north (COMPARATOR)
-facing=north (CREEPER_WALL_HEAD)
-facing=north (CRIMSON_BUTTON)
-facing=north (CRIMSON_DOOR)
-facing=north (CRIMSON_FENCE_GATE)
-facing=north (CRIMSON_STAIRS)
-facing=north (CRIMSON_TRAPDOOR)
-facing=north (CRIMSON_WALL_SIGN)
-facing=north (CUT_COPPER_STAIRS)
-facing=north (CYAN_BED)
-facing=north (CYAN_GLAZED_TERRACOTTA)
-facing=north (CYAN_WALL_BANNER)
-facing=north (DAMAGED_ANVIL)
-facing=north (DARK_OAK_BUTTON)
-facing=north (DARK_OAK_DOOR)
-facing=north (DARK_OAK_FENCE_GATE)
-facing=north (DARK_OAK_STAIRS)
-facing=north (DARK_OAK_TRAPDOOR)
-facing=north (DARK_OAK_WALL_SIGN)
-facing=north (DARK_PRISMARINE_STAIRS)
-facing=north (DEAD_BRAIN_CORAL_WALL_FAN)
-facing=north (DEAD_BUBBLE_CORAL_WALL_FAN)
-facing=north (DEAD_FIRE_CORAL_WALL_FAN)
-facing=north (DEAD_HORN_CORAL_WALL_FAN)
-facing=north (DEAD_TUBE_CORAL_WALL_FAN)
-facing=north (DEEPSLATE_BRICK_STAIRS)
-facing=north (DEEPSLATE_TILE_STAIRS)
-facing=north (DIORITE_STAIRS)
-facing=north (DISPENSER)
-facing=north (DRAGON_WALL_HEAD)
-facing=north (DROPPER)
-facing=north (ENDER_CHEST)
-facing=north (END_PORTAL_FRAME)
-facing=north (END_STONE_BRICK_STAIRS)
-facing=north (EXPOSED_CUT_COPPER_STAIRS)
-facing=north (FIRE_CORAL_WALL_FAN)
-facing=north (FURNACE)
-facing=north (GRANITE_STAIRS)
-facing=north (GRAY_BED)
-facing=north (GRAY_GLAZED_TERRACOTTA)
-facing=north (GRAY_WALL_BANNER)
-facing=north (GREEN_BED)
-facing=north (GREEN_GLAZED_TERRACOTTA)
-facing=north (GREEN_WALL_BANNER)
-facing=north (GRINDSTONE)
-facing=north (HORN_CORAL_WALL_FAN)
-facing=north (IRON_DOOR)
-facing=north (IRON_TRAPDOOR)
-facing=north (JACK_O_LANTERN)
-facing=north (JUNGLE_BUTTON)
-facing=north (JUNGLE_DOOR)
-facing=north (JUNGLE_FENCE_GATE)
-facing=north (JUNGLE_STAIRS)
-facing=north (JUNGLE_TRAPDOOR)
-facing=north (JUNGLE_WALL_SIGN)
-facing=north (LADDER)
-facing=north (LECTERN)
-facing=north (LEVER)
-facing=north (LIGHT_BLUE_BED)
-facing=north (LIGHT_BLUE_GLAZED_TERRACOTTA)
-facing=north (LIGHT_BLUE_WALL_BANNER)
-facing=north (LIGHT_GRAY_BED)
-facing=north (LIGHT_GRAY_GLAZED_TERRACOTTA)
-facing=north (LIGHT_GRAY_WALL_BANNER)
-facing=north (LIME_BED)
-facing=north (LIME_GLAZED_TERRACOTTA)
-facing=north (LIME_WALL_BANNER)
-facing=north (LOOM)
-facing=north (MAGENTA_BED)
-facing=north (MAGENTA_GLAZED_TERRACOTTA)
-facing=north (MAGENTA_WALL_BANNER)
-facing=north (MANGROVE_BUTTON)
-facing=north (MANGROVE_DOOR)
-facing=north (MANGROVE_FENCE_GATE)
-facing=north (MANGROVE_STAIRS)
-facing=north (MANGROVE_TRAPDOOR)
-facing=north (MANGROVE_WALL_SIGN)
-facing=north (MOSSY_COBBLESTONE_STAIRS)
-facing=north (MOSSY_STONE_BRICK_STAIRS)
-facing=north (MOVING_PISTON)
-facing=north (MUD_BRICK_STAIRS)
-facing=north (NETHER_BRICK_STAIRS)
-facing=north (OAK_BUTTON)
-facing=north (OAK_DOOR)
-facing=north (OAK_FENCE_GATE)
-facing=north (OAK_STAIRS)
-facing=north (OAK_TRAPDOOR)
-facing=north (OAK_WALL_SIGN)
-facing=north (ORANGE_BED)
-facing=north (ORANGE_GLAZED_TERRACOTTA)
-facing=north (ORANGE_WALL_BANNER)
-facing=north (OXIDIZED_CUT_COPPER_STAIRS)
-facing=north (PINK_BED)
-facing=north (PINK_GLAZED_TERRACOTTA)
-facing=north (PINK_WALL_BANNER)
-facing=north (PISTON)
-facing=north (PISTON_HEAD)
-facing=north (PLAYER_WALL_HEAD)
-facing=north (POLISHED_ANDESITE_STAIRS)
-facing=north (POLISHED_BLACKSTONE_BRICK_STAIRS)
-facing=north (POLISHED_BLACKSTONE_BUTTON)
-facing=north (POLISHED_BLACKSTONE_STAIRS)
-facing=north (POLISHED_DEEPSLATE_STAIRS)
-facing=north (POLISHED_DIORITE_STAIRS)
-facing=north (POLISHED_GRANITE_STAIRS)
-facing=north (PRISMARINE_BRICK_STAIRS)
-facing=north (PRISMARINE_STAIRS)
-facing=north (PURPLE_BED)
-facing=north (PURPLE_GLAZED_TERRACOTTA)
-facing=north (PURPLE_WALL_BANNER)
-facing=north (PURPUR_STAIRS)
-facing=north (QUARTZ_STAIRS)
-facing=north (REDSTONE_WALL_TORCH)
-facing=north (RED_BED)
-facing=north (RED_GLAZED_TERRACOTTA)
-facing=north (RED_NETHER_BRICK_STAIRS)
-facing=north (RED_SANDSTONE_STAIRS)
-facing=north (RED_WALL_BANNER)
-facing=north (REPEATER)
-facing=north (REPEATING_COMMAND_BLOCK)
-facing=north (SANDSTONE_STAIRS)
-facing=north (SKELETON_WALL_SKULL)
-facing=north (SMALL_DRIPLEAF)
-facing=north (SMOKER)
-facing=north (SMOOTH_QUARTZ_STAIRS)
-facing=north (SMOOTH_RED_SANDSTONE_STAIRS)
-facing=north (SMOOTH_SANDSTONE_STAIRS)
-facing=north (SOUL_CAMPFIRE)
-facing=north (SOUL_WALL_TORCH)
-facing=north (SPRUCE_BUTTON)
-facing=north (SPRUCE_DOOR)
-facing=north (SPRUCE_FENCE_GATE)
-facing=north (SPRUCE_STAIRS)
-facing=north (SPRUCE_TRAPDOOR)
-facing=north (SPRUCE_WALL_SIGN)
-facing=north (STICKY_PISTON)
-facing=north (STONECUTTER)
-facing=north (STONE_BRICK_STAIRS)
-facing=north (STONE_BUTTON)
-facing=north (STONE_STAIRS)
-facing=north (TRAPPED_CHEST)
-facing=north (TRIPWIRE_HOOK)
-facing=north (TUBE_CORAL_WALL_FAN)
-facing=north (WALL_TORCH)
-facing=north (WARPED_BUTTON)
-facing=north (WARPED_DOOR)
-facing=north (WARPED_FENCE_GATE)
-facing=north (WARPED_STAIRS)
-facing=north (WARPED_TRAPDOOR)
-facing=north (WARPED_WALL_SIGN)
-facing=north (WAXED_CUT_COPPER_STAIRS)
-facing=north (WAXED_EXPOSED_CUT_COPPER_STAIRS)
-facing=north (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
-facing=north (WAXED_WEATHERED_CUT_COPPER_STAIRS)
-facing=north (WEATHERED_CUT_COPPER_STAIRS)
-facing=north (WHITE_BED)
-facing=north (WHITE_GLAZED_TERRACOTTA)
-facing=north (WHITE_WALL_BANNER)
-facing=north (WITHER_SKELETON_WALL_SKULL)
-facing=north (YELLOW_BED)
-facing=north (YELLOW_GLAZED_TERRACOTTA)
-facing=north (YELLOW_WALL_BANNER)
-facing=north (ZOMBIE_WALL_HEAD)
-facing=south (OBSERVER)
-facing=up (AMETHYST_CLUSTER)
-facing=up (BLACK_SHULKER_BOX)
-facing=up (BLUE_SHULKER_BOX)
-facing=up (BROWN_SHULKER_BOX)
-facing=up (CYAN_SHULKER_BOX)
-facing=up (END_ROD)
-facing=up (GRAY_SHULKER_BOX)
-facing=up (GREEN_SHULKER_BOX)
-facing=up (LARGE_AMETHYST_BUD)
-facing=up (LIGHTNING_ROD)
-facing=up (LIGHT_BLUE_SHULKER_BOX)
-facing=up (LIGHT_GRAY_SHULKER_BOX)
-facing=up (LIME_SHULKER_BOX)
-facing=up (MAGENTA_SHULKER_BOX)
-facing=up (MEDIUM_AMETHYST_BUD)
-facing=up (ORANGE_SHULKER_BOX)
-facing=up (PINK_SHULKER_BOX)
-facing=up (PURPLE_SHULKER_BOX)
-facing=up (RED_SHULKER_BOX)
-facing=up (SHULKER_BOX)
-facing=up (SMALL_AMETHYST_BUD)
-facing=up (WHITE_SHULKER_BOX)
-facing=up (YELLOW_SHULKER_BOX)
+Defaults to wall.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Directions \\
+	\hline
+	\endhead
+	ACACIA\_BUTTON & wall/floor/ceiling \\
+	BIRCH\_BUTTON & wall/floor/ceiling \\
+	CRIMSON\_BUTTON & wall/floor/ceiling \\
+	DARK\_OAK\_BUTTON & wall/floor/ceiling \\
+	GRINDSTONE & wall/floor/ceiling \\
+	JUNGLE\_BUTTON & wall/floor/ceiling \\
+	LEVER & wall/floor/ceiling \\
+	MANGROVE\_BUTTON & wall/floor/ceiling \\
+	OAK\_BUTTON & wall/floor/ceiling \\
+	POLISHED\_BLACKSTONE\_BUTTON & wall/floor/ceiling \\
+	SPRUCE\_BUTTON & wall/floor/ceiling \\
+	STONE\_BUTTON & wall/floor/ceiling \\
+	WARPED\_BUTTON & wall/floor/ceiling \\
+	\hline
+	\caption{Directional materials}
+\end{longtable}
+
+\subsubsection{Facing}
+Represents the face towards which the block is pointing.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	HOPPER & \textbf{down}/north/south/east/west \\
+	OBSERVER & up/down/north/\textbf{south}/east/west \\
+	\hline
+	BARREL & up/down/\textbf{north}/south/east/west \\
+	CHAIN\_COMMAND\_BLOCK & up/down/\textbf{north}/south/east/west \\
+	COMMAND\_BLOCK & up/down/\textbf{north}/south/east/west \\
+	DISPENSER & up/down/\textbf{north}/south/east/west \\
+	DROPPER & up/down/\textbf{north}/south/east/west \\
+	PISTON & up/down/\textbf{north}/south/east/west \\
+	PISTON\_HEAD & up/down/\textbf{north}/south/east/west \\
+	REPEATING\_COMMAND\_BLOCK & up/down/\textbf{north}/south/east/west \\
+	STICKY\_PISTON & up/down/\textbf{north}/south/east/west \\
+	\hline
+	ACACIA\_BUTTON & \textbf{north}/south/east/west \\
+	ACACIA\_DOOR & \textbf{north}/south/east/west \\
+	ACACIA\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	ACACIA\_STAIRS & \textbf{north}/south/east/west \\
+	ACACIA\_TRAPDOOR & \textbf{north}/south/east/west \\
+	ACACIA\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	ANDESITE\_STAIRS & \textbf{north}/south/east/west \\
+	ANVIL & \textbf{north}/south/east/west \\
+	ATTACHED\_MELON\_STEM & \textbf{north}/south/east/west \\
+	ATTACHED\_PUMPKIN\_STEM & \textbf{north}/south/east/west \\
+	BEEHIVE & \textbf{north}/south/east/west \\
+	BEE\_NEST & \textbf{north}/south/east/west \\
+	BELL & \textbf{north}/south/east/west \\
+	BIG\_DRIPLEAF & \textbf{north}/south/east/west \\
+	BIG\_DRIPLEAF\_STEM & \textbf{north}/south/east/west \\
+	BIRCH\_BUTTON & \textbf{north}/south/east/west \\
+	BIRCH\_DOOR & \textbf{north}/south/east/west \\
+	BIRCH\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	BIRCH\_STAIRS & \textbf{north}/south/east/west \\
+	BIRCH\_TRAPDOOR & \textbf{north}/south/east/west \\
+	BIRCH\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	BLACKSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	BLACK\_BED & \textbf{north}/south/east/west \\
+	BLACK\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	BLACK\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	BLAST\_FURNACE & \textbf{north}/south/east/west \\
+	BLUE\_BED & \textbf{north}/south/east/west \\
+	BLUE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	BLUE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	BRAIN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	BROWN\_BED & \textbf{north}/south/east/west \\
+	BROWN\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	BROWN\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	BUBBLE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	CAMPFIRE & \textbf{north}/south/east/west \\
+	CARVED\_PUMPKIN & \textbf{north}/south/east/west \\
+	CHEST & \textbf{north}/south/east/west \\
+	CHIPPED\_ANVIL & \textbf{north}/south/east/west \\
+	COBBLED\_DEEPSLATE\_STAIRS & \textbf{north}/south/east/west \\
+	COBBLESTONE\_STAIRS & \textbf{north}/south/east/west \\
+	COCOA & \textbf{north}/south/east/west \\
+	COMPARATOR & \textbf{north}/south/east/west \\
+	CREEPER\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	CRIMSON\_BUTTON & \textbf{north}/south/east/west \\
+	CRIMSON\_DOOR & \textbf{north}/south/east/west \\
+	CRIMSON\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	CRIMSON\_STAIRS & \textbf{north}/south/east/west \\
+	CRIMSON\_TRAPDOOR & \textbf{north}/south/east/west \\
+	CRIMSON\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	CYAN\_BED & \textbf{north}/south/east/west \\
+	CYAN\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	CYAN\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	DAMAGED\_ANVIL & \textbf{north}/south/east/west \\
+	DARK\_OAK\_BUTTON & \textbf{north}/south/east/west \\
+	DARK\_OAK\_DOOR & \textbf{north}/south/east/west \\
+	DARK\_OAK\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	DARK\_OAK\_STAIRS & \textbf{north}/south/east/west \\
+	DARK\_OAK\_TRAPDOOR & \textbf{north}/south/east/west \\
+	DARK\_OAK\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	DARK\_PRISMARINE\_STAIRS & \textbf{north}/south/east/west \\
+	DEAD\_BRAIN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_BUBBLE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_FIRE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_HORN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_TUBE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEEPSLATE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	DEEPSLATE\_TILE\_STAIRS & \textbf{north}/south/east/west \\
+	DIORITE\_STAIRS & \textbf{north}/south/east/west \\
+	DRAGON\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	ENDER\_CHEST & \textbf{north}/south/east/west \\
+	END\_PORTAL\_FRAME & \textbf{north}/south/east/west \\
+	END\_STONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	FIRE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	FURNACE & \textbf{north}/south/east/west \\
+	GRANITE\_STAIRS & \textbf{north}/south/east/west \\
+	GRAY\_BED & \textbf{north}/south/east/west \\
+	GRAY\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	GRAY\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	GREEN\_BED & \textbf{north}/south/east/west \\
+	GREEN\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	GREEN\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	GRINDSTONE & \textbf{north}/south/east/west \\
+	HORN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	IRON\_DOOR & \textbf{north}/south/east/west \\
+	IRON\_TRAPDOOR & \textbf{north}/south/east/west \\
+	JACK\_O\_LANTERN & \textbf{north}/south/east/west \\
+	JUNGLE\_BUTTON & \textbf{north}/south/east/west \\
+	JUNGLE\_DOOR & \textbf{north}/south/east/west \\
+	JUNGLE\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	JUNGLE\_STAIRS & \textbf{north}/south/east/west \\
+	JUNGLE\_TRAPDOOR & \textbf{north}/south/east/west \\
+	JUNGLE\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	LADDER & \textbf{north}/south/east/west \\
+	LECTERN & \textbf{north}/south/east/west \\
+	LEVER & \textbf{north}/south/east/west \\
+	LIGHT\_BLUE\_BED & \textbf{north}/south/east/west \\
+	LIGHT\_BLUE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	LIGHT\_BLUE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	LIGHT\_GRAY\_BED & \textbf{north}/south/east/west \\
+	LIGHT\_GRAY\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	LIGHT\_GRAY\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	LIME\_BED & \textbf{north}/south/east/west \\
+	LIME\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	LIME\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	LOOM & \textbf{north}/south/east/west \\
+	MAGENTA\_BED & \textbf{north}/south/east/west \\
+	MAGENTA\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	MAGENTA\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	MANGROVE\_BUTTON & \textbf{north}/south/east/west \\
+	MANGROVE\_DOOR & \textbf{north}/south/east/west \\
+	MANGROVE\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	MANGROVE\_STAIRS & \textbf{north}/south/east/west \\
+	MANGROVE\_TRAPDOOR & \textbf{north}/south/east/west \\
+	MANGROVE\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	MOSSY\_COBBLESTONE\_STAIRS & \textbf{north}/south/east/west \\
+	MOSSY\_STONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	MUD\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	NETHER\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	OAK\_BUTTON & \textbf{north}/south/east/west \\
+	OAK\_DOOR & \textbf{north}/south/east/west \\
+	OAK\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	OAK\_STAIRS & \textbf{north}/south/east/west \\
+	OAK\_TRAPDOOR & \textbf{north}/south/east/west \\
+	OAK\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	ORANGE\_BED & \textbf{north}/south/east/west \\
+	ORANGE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	ORANGE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	PINK\_BED & \textbf{north}/south/east/west \\
+	PINK\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	PINK\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	PLAYER\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	POLISHED\_ANDESITE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_BLACKSTONE\_BUTTON & \textbf{north}/south/east/west \\
+	POLISHED\_BLACKSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_DEEPSLATE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_DIORITE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_GRANITE\_STAIRS & \textbf{north}/south/east/west \\
+	PRISMARINE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	PRISMARINE\_STAIRS & \textbf{north}/south/east/west \\
+	PURPLE\_BED & \textbf{north}/south/east/west \\
+	PURPLE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	PURPLE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	PURPUR\_STAIRS & \textbf{north}/south/east/west \\
+	QUARTZ\_STAIRS & \textbf{north}/south/east/west \\
+	REDSTONE\_WALL\_TORCH & \textbf{north}/south/east/west \\
+	RED\_BED & \textbf{north}/south/east/west \\
+	RED\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	RED\_NETHER\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	RED\_SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	RED\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	REPEATER & \textbf{north}/south/east/west \\
+	SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	SKELETON\_WALL\_SKULL & \textbf{north}/south/east/west \\
+	SMALL\_DRIPLEAF & \textbf{north}/south/east/west \\
+	SMOKER & \textbf{north}/south/east/west \\
+	SMOOTH\_QUARTZ\_STAIRS & \textbf{north}/south/east/west \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	SMOOTH\_SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	SOUL\_CAMPFIRE & \textbf{north}/south/east/west \\
+	SOUL\_WALL\_TORCH & \textbf{north}/south/east/west \\
+	SPRUCE\_BUTTON & \textbf{north}/south/east/west \\
+	SPRUCE\_DOOR & \textbf{north}/south/east/west \\
+	SPRUCE\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	SPRUCE\_STAIRS & \textbf{north}/south/east/west \\
+	SPRUCE\_TRAPDOOR & \textbf{north}/south/east/west \\
+	SPRUCE\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	STONECUTTER & \textbf{north}/south/east/west \\
+	STONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	STONE\_BUTTON & \textbf{north}/south/east/west \\
+	STONE\_STAIRS & \textbf{north}/south/east/west \\
+	TRAPPED\_CHEST & \textbf{north}/south/east/west \\
+	TRIPWIRE\_HOOK & \textbf{north}/south/east/west \\
+	TUBE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	WALL\_TORCH & \textbf{north}/south/east/west \\
+	WARPED\_BUTTON & \textbf{north}/south/east/west \\
+	WARPED\_DOOR & \textbf{north}/south/east/west \\
+	WARPED\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	WARPED\_STAIRS & \textbf{north}/south/east/west \\
+	WARPED\_TRAPDOOR & \textbf{north}/south/east/west \\
+	WARPED\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	WAXED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WHITE\_BED & \textbf{north}/south/east/west \\
+	WHITE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	WHITE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	WITHER\_SKELETON\_WALL\_SKULL & \textbf{north}/south/east/west \\
+	YELLOW\_BED & \textbf{north}/south/east/west \\
+	YELLOW\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	YELLOW\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	ZOMBIE\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	\hline
+	AMETHYST\_CLUSTER & \textbf{up}/down/north/south/east/west \\
+	BLACK\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	BLUE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	BROWN\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	CYAN\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	END\_ROD & \textbf{up}/down/north/south/east/west \\
+	GRAY\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	GREEN\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	LARGE\_AMETHYST\_BUD & \textbf{up}/down/north/south/east/west \\
+	LIGHTNING\_ROD & \textbf{up}/down/north/south/east/west \\
+	LIGHT\_BLUE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	LIGHT\_GRAY\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	LIME\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	MAGENTA\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	MEDIUM\_AMETHYST\_BUD & \textbf{up}/down/north/south/east/west \\
+	ORANGE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	PINK\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	PURPLE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	RED\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	SMALL\_AMETHYST\_BUD & \textbf{up}/down/north/south/east/west \\
+	WHITE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	YELLOW\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	\hline
+	\caption{Directional materials}
+\end{longtable}
+
 
 half=bottom (ACACIA_STAIRS)
 half=bottom (ACACIA_TRAPDOOR)
@@ -864,6 +930,40 @@ part=foot (WHITE_BED)
 part=foot (YELLOW_BED)
 
 pickles=1 (SEA_PICKLE)
+
+
+powered=false (ACACIA_BUTTON)
+powered=false (ACACIA_PRESSURE_PLATE)
+powered=false (BIRCH_BUTTON)
+powered=false (BIRCH_PRESSURE_PLATE)
+powered=false (COMPARATOR)
+powered=false (CRIMSON_BUTTON)
+powered=false (CRIMSON_PRESSURE_PLATE)
+powered=false (DARK_OAK_BUTTON)
+powered=false (DARK_OAK_PRESSURE_PLATE)
+powered=false (DETECTOR_RAIL)
+powered=false (JUNGLE_BUTTON)
+powered=false (JUNGLE_PRESSURE_PLATE)
+powered=false (LEVER)
+powered=false (LIGHTNING_ROD)
+powered=false (MANGROVE_BUTTON)
+powered=false (MANGROVE_PRESSURE_PLATE)
+powered=false (OAK_BUTTON)
+powered=false (OAK_PRESSURE_PLATE)
+powered=false (OBSERVER)
+powered=false (POLISHED_BLACKSTONE_BUTTON)
+powered=false (POLISHED_BLACKSTONE_PRESSURE_PLATE)
+powered=false (REPEATER)
+powered=false (SPRUCE_BUTTON)
+powered=false (SPRUCE_PRESSURE_PLATE)
+powered=false (STONE_BUTTON)
+powered=false (STONE_PRESSURE_PLATE)
+powered=false (TRIPWIRE_HOOK)
+powered=false (WARPED_BUTTON)
+powered=false (WARPED_PRESSURE_PLATE)
+
+
+
 
 rotation=0 (ACACIA_SIGN)
 rotation=0 (BIRCH_SIGN)
@@ -1319,12 +1419,22 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			([attachment undefined or attachment=floor] () | [attachment=ceiling] 'CEILING\_' | [attachment=double\_wall] 'DWALL\_' | [attachment=single\_wall] 'SWALL\_') \\
 			Material \\
 			([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
-			([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
 			([conditional=false] () | [conditional=true] '\_CONDITIONAL')
 			'...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
 		\caption{Modifier concatenation}
+	\end{figure}
+
+	\begin{figure}
+		\begin{rail}
+			'...' \\
+			([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
+			([(face undefined or face=wall) and (facing undefined or facing=north)]() | [face!=wall or facing!=north]('\_' ([face!=ceiling and facing!=up]() | [face=ceiling or facing=up]'U') \\ ([face!=floor and facing!=down]() | [face=floor or facing=down]'D') ([facing!=north]() | [facing=north]'N') \\ ([facing!=south]() | [facing=south]'S') ([facing!=east]() | [facing=east]'E') ([facing!=west]() | [facing=west]'W'))) \\
+			'...'
+		\end{rail}
+		\label{rail:modifier-concatenation}
+		\caption{Direction modifier concatenation}
 	\end{figure}
 	
 	\begin{figure}
