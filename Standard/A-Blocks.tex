@@ -240,77 +240,146 @@ Except for NETHER\_PORTAL (which defaults to x), it defaults to y.
 \end{longtable}
 
 \subsubsection{Berries}
-Indicates whether the block has berries. % TODO put, or just concatenate without commenting?: For similarity reasons, $berries=false$ and $berries=true$ will be considered as $age=0$ and $age=1$, respectively.
+Indicates whether the block has berries.
 
 Defaults to false.
 
-CAVE\_VINES true/false
-CAVE\_VINES\_PLANT true/false
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CAVE\_VINES & true/false \\
+		CAVE\_VINES\_PLANT & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Materials with berries}
+\end{table}
 
 \subsubsection{Bites}
 Represents the amount of bites which have been taken from this slice of cake.
 
 Defaults to 0.
 
-CAKE 0-6
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CAKE & 0-6 \\
+		\hline
+	\end{tabular}
+	\caption{Cake}
+\end{table}
 
 \subsubsection{Candles}
 Represents the number of candles which are present.
 
 Defaults to 1.
 
-BLACK\_CANDLE 1-4
-BLUE\_CANDLE 1-4
-BROWN\_CANDLE 1-4
-CANDLE 1-4
-CYAN\_CANDLE 1-4
-GRAY\_CANDLE 1-4
-GREEN\_CANDLE 1-4
-LIGHT\_BLUE\_CANDLE 1-4
-LIGHT\_GRAY\_CANDLE 1-4
-LIME\_CANDLE 1-4
-MAGENTA\_CANDLE 1-4
-ORANGE\_CANDLE 1-4
-PINK\_CANDLE 1-4
-PURPLE\_CANDLE 1-4
-RED\_CANDLE 1-4
-WHITE\_CANDLE 1-4
-YELLOW\_CANDLE 1-4
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	\endhead
+	BLACK\_CANDLE & 1-4 \\
+	BLUE\_CANDLE & 1-4 \\
+	BROWN\_CANDLE & 1-4 \\
+	CANDLE & 1-4 \\
+	CYAN\_CANDLE & 1-4 \\
+	GRAY\_CANDLE & 1-4 \\
+	GREEN\_CANDLE & 1-4 \\
+	LIGHT\_BLUE\_CANDLE & 1-4 \\
+	LIGHT\_GRAY\_CANDLE & 1-4 \\
+	LIME\_CANDLE & 1-4 \\
+	MAGENTA\_CANDLE & 1-4 \\
+	ORANGE\_CANDLE & 1-4 \\
+	PINK\_CANDLE & 1-4 \\
+	PURPLE\_CANDLE & 1-4 \\
+	RED\_CANDLE & 1-4 \\
+	WHITE\_CANDLE & 1-4 \\
+	YELLOW\_CANDLE & 1-4 \\
+	\hline
+	\caption{Materials with candles}
+\end{longtable}
 
 \subsubsection{Charges}
 Represents the amount of times the anchor may still be used.
 
 Defaults to 0.
 
-RESPAWN\_ANCHOR 0-4
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		RESPAWN\_ANCHOR & 0-4 \\
+		\hline
+	\end{tabular}
+	\caption{Charged materials}
+\end{table}
 
 \subsubsection{Conditional}
 Denotes whether this command block is conditional or not.
 
 Defaults to false.
 
-CHAIN\_COMMAND\_BLOCK true/false
-COMMAND\_BLOCK true/false
-REPEATING\_COMMAND\_BLOCK true/false
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CHAIN\_COMMAND\_BLOCK & true/false \\
+		COMMAND\_BLOCK & true/false \\
+		REPEATING\_COMMAND\_BLOCK & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Conditionable materials}
+\end{table}
 
 \subsubsection{Delay}
 Propagation delay of a repeater.
 
 Defaults to 1.
 
-REPEATER 1-4
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		REPEATER & 1-4 \\
+		\hline
+	\end{tabular}
+	\caption{Delayable materials}
+\end{table}
 
 \subsubsection{Down}
 Set which faces of the block textures are displayed on.
 
 Except for BROWN\_MUSHROOM\_BLOCK, MUSHROOM\_STEM and RED\_MUSHROOM\_BLOCK (which defaults to true), it defaults to false.
 
-CHORUS\_PLANT true/false
-GLOW\_LICHEN true/false
-SCULK\_VEIN true/false
-BROWN\_MUSHROOM\_BLOCK true/false
-MUSHROOM\_STEM true/false
-RED\_MUSHROOM\_BLOCK true/false
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CHORUS\_PLANT & true/false \\
+		GLOW\_LICHEN & true/false \\
+		SCULK\_VEIN & true/false \\
+		BROWN\_MUSHROOM\_BLOCK & true/false \\
+		MUSHROOM\_STEM & true/false \\
+		RED\_MUSHROOM\_BLOCK & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Materials with down option}
+\end{table}
 
 \subsubsection{North, South, East and West}
 Set which faces of the block textures are displayed on.
@@ -412,21 +481,54 @@ Except for CHORUS\_PLANT, FIRE, GLOW\_LICHEN, SCULK\_VEIN and VINE (which defaul
 \end{longtable}
 
 \subsubsection{Eggs}
+Number of eggs which appear in the block.
 
 Defaults to 1.
 
-TURTLE\_EGG 1-4
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		TURTLE\_EGG & 1-4 \\
+		\hline
+	\end{tabular}
+	\caption{Materials with eggs}
+\end{table}
 
 \subsubsection{Extended}
+Denotes whether the piston head is currently extended or not.
+
 Defaults to false.
 
-extended=false (PISTON)
-extended=false (STICKY\_PISTON)
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		PISTON & true/false \\
+		STICKY\_PISTON & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Extendable materials}
+\end{table}
 
 \subsubsection{Eye}
 Defaults to false.
 
-eye=false (END\_PORTAL\_FRAME)
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		END\_PORTAL\_FRAME & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Materials with eye}
+\end{table}
 
 \subsubsection{Face}
 Represents the face to which a lever or button is stuck.
@@ -702,7 +804,7 @@ Represents the face towards which the block is pointing.
 	\caption{Directional materials}
 \end{longtable}
 
-
+\subsubsection{Half}
 half=bottom (ACACIA_STAIRS)
 half=bottom (ACACIA_TRAPDOOR)
 half=bottom (ANDESITE_STAIRS)
@@ -928,41 +1030,57 @@ part=foot (RED_BED)
 part=foot (WHITE_BED)
 part=foot (YELLOW_BED)
 
+\subsubsection{Pickles}
+Defaults to 1.
+
 pickles=1 (SEA_PICKLE)
 
 
-powered=false (ACACIA_BUTTON)
-powered=false (ACACIA_PRESSURE_PLATE)
-powered=false (BIRCH_BUTTON)
-powered=false (BIRCH_PRESSURE_PLATE)
-powered=false (COMPARATOR)
-powered=false (CRIMSON_BUTTON)
-powered=false (CRIMSON_PRESSURE_PLATE)
-powered=false (DARK_OAK_BUTTON)
-powered=false (DARK_OAK_PRESSURE_PLATE)
-powered=false (DETECTOR_RAIL)
-powered=false (JUNGLE_BUTTON)
-powered=false (JUNGLE_PRESSURE_PLATE)
-powered=false (LEVER)
-powered=false (LIGHTNING_ROD)
-powered=false (MANGROVE_BUTTON)
-powered=false (MANGROVE_PRESSURE_PLATE)
-powered=false (OAK_BUTTON)
-powered=false (OAK_PRESSURE_PLATE)
-powered=false (OBSERVER)
-powered=false (POLISHED_BLACKSTONE_BUTTON)
-powered=false (POLISHED_BLACKSTONE_PRESSURE_PLATE)
-powered=false (REPEATER)
-powered=false (SPRUCE_BUTTON)
-powered=false (SPRUCE_PRESSURE_PLATE)
-powered=false (STONE_BUTTON)
-powered=false (STONE_PRESSURE_PLATE)
-powered=false (TRIPWIRE_HOOK)
-powered=false (WARPED_BUTTON)
-powered=false (WARPED_PRESSURE_PLATE)
+\subsubsection{Powered}
+Indicates whether this block is in the powered state or not (emitting current).
 
+Defaults to false.
 
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Powered value \\
+	\hline
+	\endhead
+	ACACIA\_BUTTON & true/false \\
+	ACACIA\_PRESSURE\_PLATE & true/false \\
+	BIRCH\_BUTTON & true/false \\
+	BIRCH\_PRESSURE\_PLATE & true/false \\
+	COMPARATOR & true/false \\
+	CRIMSON\_BUTTON & true/false \\
+	CRIMSON\_PRESSURE\_PLATE & true/false \\
+	DARK\_OAK\_BUTTON & true/false \\
+	DARK\_OAK\_PRESSURE\_PLATE & true/false \\
+	DETECTOR\_RAIL & true/false \\
+	JUNGLE\_BUTTON & true/false \\
+	JUNGLE\_PRESSURE\_PLATE & true/false \\
+	LEVER & true/false \\
+	LIGHTNING\_ROD & true/false \\
+	MANGROVE\_BUTTON & true/false \\
+	MANGROVE\_PRESSURE\_PLATE & true/false \\
+	OAK\_BUTTON & true/false \\
+	OAK\_PRESSURE\_PLATE & true/false \\
+	OBSERVER & true/false \\
+	POLISHED\_BLACKSTONE\_BUTTON & true/false \\
+	POLISHED\_BLACKSTONE\_PRESSURE\_PLATE & true/false \\
+	REPEATER & true/false \\
+	SPRUCE\_BUTTON & true/false \\
+	SPRUCE\_PRESSURE\_PLATE & true/false \\
+	STONE\_BUTTON & true/false \\
+	STONE\_PRESSURE\_PLATE & true/false \\
+	TRIPWIRE\_HOOK & true/false \\
+	WARPED\_BUTTON & true/false \\
+	WARPED\_PRESSURE\_PLATE & true/false \\
+	\hline
+	\caption{Powerabled materials}
+\end{longtable}
 
+\subsubsection{Rotation}
+Defaults to 0.
 
 rotation=0 (ACACIA_SIGN)
 rotation=0 (BIRCH_SIGN)
@@ -1416,7 +1534,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\begin{rail}
 			([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) %\\
 			([attachment undefined or attachment=floor] () | [attachment=ceiling] 'CEILING\_' | [attachment=double\_wall] 'DWALL\_' | [attachment=single\_wall] 'SWALL\_') \\
-			([powered=false]() | [powered=true] 'POWERED\_') \\
+			([powered=false] () | [powered=true] 'TRIGGERED\_') ([eye=false] () | [eye=true] 'EYED\_') \\
 			Material \\
 			([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
 			([conditional=false] () | [conditional=true] '\_CONDITIONAL')
@@ -1442,7 +1560,8 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			'...'
 			([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 			([bites=0] () | [bites!=0] '\_' bites) ([candles$<$2] () | [candles$>$1] '\_' candles) \\
-			([charges=0] () | [charges!=0] '\_' charges) ([delay$<$2] () | [delay$>$1] '\_' delay)
+			([charges=0] () | [charges!=0] '\_' charges) ([delay$<$2] () | [delay$>$1] '\_' delay) \\
+			([eggs$<$2]() | [eggs$>$1] '\_' eggs)
 		\end{rail}
 		\caption{Integer modifier concatenation}
 	\end{figure}
