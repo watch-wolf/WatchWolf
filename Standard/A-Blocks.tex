@@ -41,6 +41,7 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 	south=tall & Top-block dependent \\
 	east=tall & Top-block dependent \\
 	west=tall & Top-block dependent \\
+	hatch & Unable to concatenate \\
 	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers}
@@ -901,8 +902,6 @@ hanging=false (LANTERN)
 hanging=false (MANGROVE_PROPAGULE)
 hanging=false (SOUL_LANTERN)
 
-hatch=0 (TURTLE_EGG)
-
 hinge=left (ACACIA_DOOR)
 hinge=left (BIRCH_DOOR)
 hinge=left (CRIMSON_DOOR)
@@ -1105,39 +1104,65 @@ Defaults to false.
 \end{longtable}
 
 \subsubsection{Rotation}
-Defaults to 0.
+Denotes where the block is looking.
 
-rotation=0 (ACACIA_SIGN)
-rotation=0 (BIRCH_SIGN)
-rotation=0 (BLACK_BANNER)
-rotation=0 (BLUE_BANNER)
-rotation=0 (BROWN_BANNER)
-rotation=0 (CREEPER_HEAD)
-rotation=0 (CRIMSON_SIGN)
-rotation=0 (CYAN_BANNER)
-rotation=0 (DARK_OAK_SIGN)
-rotation=0 (DRAGON_HEAD)
-rotation=0 (GRAY_BANNER)
-rotation=0 (GREEN_BANNER)
-rotation=0 (JUNGLE_SIGN)
-rotation=0 (LIGHT_BLUE_BANNER)
-rotation=0 (LIGHT_GRAY_BANNER)
-rotation=0 (LIME_BANNER)
-rotation=0 (MAGENTA_BANNER)
-rotation=0 (MANGROVE_SIGN)
-rotation=0 (OAK_SIGN)
-rotation=0 (ORANGE_BANNER)
-rotation=0 (PINK_BANNER)
-rotation=0 (PLAYER_HEAD)
-rotation=0 (PURPLE_BANNER)
-rotation=0 (RED_BANNER)
-rotation=0 (SKELETON_SKULL)
-rotation=0 (SPRUCE_SIGN)
-rotation=0 (WARPED_SIGN)
-rotation=0 (WHITE_BANNER)
-rotation=0 (WITHER_SKELETON_SKULL)
-rotation=0 (YELLOW_BANNER)
-rotation=0 (ZOMBIE_HEAD)
+Defaults to 0 and goes up to 15.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Rotation value & Direction \\
+		\hline
+		0 & South \\
+		4 & West \\
+		8 & North \\
+		12 & East \\
+		\hline
+	\end{tabular}
+	\caption{Relation between rotation and where is looking}
+\end{table}
+
+\begin{longtable}{ |c| }
+	\hline
+	Material \\
+	\hline
+	\endhead
+	ACACIA\_SIGN \\
+	BIRCH\_SIGN \\
+	BLACK\_BANNER \\
+	BLUE\_BANNER \\
+	BROWN\_BANNER \\
+	CREEPER\_HEAD \\
+	CRIMSON\_SIGN \\
+	CYAN\_BANNER \\
+	DARK\_OAK\_SIGN \\
+	DRAGON\_HEAD \\
+	GRAY\_BANNER \\
+	GREEN\_BANNER \\
+	JUNGLE\_SIGN \\
+	LIGHT\_BLUE\_BANNER \\
+	LIGHT\_GRAY\_BANNER \\
+	LIME\_BANNER \\
+	MAGENTA\_BANNER \\
+	MANGROVE\_SIGN \\
+	OAK\_SIGN \\
+	ORANGE\_BANNER \\
+	PINK\_BANNER \\
+	PLAYER\_HEAD \\
+	PURPLE\_BANNER \\
+	RED\_BANNER \\
+	SKELETON\_SKULL \\
+	SPRUCE\_SIGN \\
+	WARPED\_SIGN \\
+	WHITE\_BANNER \\
+	WITHER\_SKELETON\_SKULL \\
+	YELLOW\_BANNER \\
+	ZOMBIE\_HEAD \\
+	\hline
+	\caption{Directional materials}
+\end{longtable}
+
 
 shape=north_south (ACTIVATOR_RAIL)
 shape=north_south (DETECTOR_RAIL)
@@ -1574,7 +1599,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
 			([(face undefined or face=wall) and (facing undefined or facing=north) and half!=top]() | [face!=wall or facing!=north or half=top]('\_' \\
 			([face!=ceiling and facing!=up and half!=top]() | [face=ceiling or facing=up or half=top]'U') \\ ([face!=floor and facing!=down]() | [face=floor or facing=down]'D') ([facing!=north]() | [facing=north]'N') \\ ([facing!=south]() | [facing=south]'S') ([facing!=east]() | [facing=east]'E') ([facing!=west]() | [facing=west]'W'))) \\
-			'...'
+			([rotation undefined or rotation=0] () | [rotation$>$0] '\_R' rotation) '...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
 		\caption{Direction modifier concatenation}
