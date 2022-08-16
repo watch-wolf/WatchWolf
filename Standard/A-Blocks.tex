@@ -42,6 +42,7 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 	east=tall & Top-block dependent \\
 	west=tall & Top-block dependent \\
 	hatch & Unable to concatenate \\
+	thickness & Block dependent \\
 	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers}
@@ -1163,11 +1164,12 @@ Defaults to 0 and goes up to 15.
 	\caption{Directional materials}
 \end{longtable}
 
-
+\subsubsection{Shape}
 shape=north_south (ACTIVATOR_RAIL)
 shape=north_south (DETECTOR_RAIL)
 shape=north_south (POWERED_RAIL)
 shape=north_south (RAIL)
+
 shape=straight (ACACIA_STAIRS)
 shape=straight (ANDESITE_STAIRS)
 shape=straight (BIRCH_STAIRS)
@@ -1219,12 +1221,26 @@ shape=straight (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
 shape=straight (WAXED_WEATHERED_CUT_COPPER_STAIRS)
 shape=straight (WEATHERED_CUT_COPPER_STAIRS)
 
-snowy=false (GRASS_BLOCK)
-snowy=false (MYCELIUM)
-snowy=false (PODZOL)
+\subsubsection{Snowy}
+Denotes whether this block is covered in snow.
 
-thickness=tip (POINTED_DRIPSTONE)
+Defaults to false.
 
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		GRASS\_BLOCK & true/false \\
+		MYCELIUM & true/false \\
+		PODZOL & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Snowy blocks}
+\end{table}
+
+\subsubsection{Type}
 type=bottom (ACACIA_SLAB)
 type=bottom (ANDESITE_SLAB)
 type=bottom (BIRCH_SLAB)
@@ -1284,7 +1300,22 @@ type=normal (PISTON_HEAD)
 type=single (CHEST)
 type=single (TRAPPED_CHEST)
 
-vertical_direction=up (POINTED_DRIPSTONE)
+\subsubsection{Vertical direction}
+Represents the dripstone orientation.
+
+Defaults to up.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		POINTED\_DRIPSTONE & up/down \\
+		\hline
+	\end{tabular}
+	\caption{Dripstone}
+\end{table}
 
 \subsubsection{Waterlogged}
 Denotes whether this block has fluid in it.
@@ -1599,15 +1630,26 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
 			([(face undefined or face=wall) and (facing undefined or facing=north) and half!=top]() | [face!=wall or facing!=north or half=top]('\_' \\
 			([face!=ceiling and facing!=up and half!=top]() | [face=ceiling or facing=up or half=top]'U') \\ ([face!=floor and facing!=down]() | [face=floor or facing=down]'D') ([facing!=north]() | [facing=north]'N') \\ ([facing!=south]() | [facing=south]'S') ([facing!=east]() | [facing=east]'E') ([facing!=west]() | [facing=west]'W'))) \\
-			([rotation undefined or rotation=0] () | [rotation$>$0] '\_R' rotation) '...'
+			'...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
 		\caption{Direction modifier concatenation}
+	\end{figure}
+
+	\begin{figure}
+		\begin{rail}
+			'...' \\
+			([vertical-direction!=down]() | [vertical-direction=down]('\_D'))
+			'...'
+		\end{rail}
+		\label{rail:modifier-concatenation}
+		\caption{Direction modifier concatenation 2}
 	\end{figure}
 	
 	\begin{figure}
 		\begin{rail}
 			'...'
+			([rotation undefined or rotation=0] () | [rotation$>$0] '\_R' rotation) \\
 			([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 			([bites=0] () | [bites!=0] '\_' bites) ([candles$<$2] () | [candles$>$1] '\_' candles) \\
 			([charges=0] () | [charges!=0] '\_' charges) ([delay$<$2] () | [delay$>$1] '\_' delay) \\
