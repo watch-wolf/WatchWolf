@@ -43,6 +43,7 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 	west=tall & Top-block dependent \\
 	hatch & Unable to concatenate \\
 	thickness & Block dependent \\
+	snowy & Block dependent \\
 	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers}
@@ -809,7 +810,6 @@ Represents the face towards which the block is pointing.
 \subsubsection{Half}
 Denotes which half of a two block tall material this block is.
 
-
 \begin{longtable}{ |c|c| }
 	\hline
 	Material & Options (default on bold) \\
@@ -898,25 +898,71 @@ Denotes which half of a two block tall material this block is.
 	\caption{Two-blocks materials}
 \end{longtable}
 
+\subsubsection{Hanging}
+Denotes whether the block is hanging.
 
-hanging=false (LANTERN)
-hanging=false (MANGROVE_PROPAGULE)
-hanging=false (SOUL_LANTERN)
+Defaults to false.
 
-hinge=left (ACACIA_DOOR)
-hinge=left (BIRCH_DOOR)
-hinge=left (CRIMSON_DOOR)
-hinge=left (DARK_OAK_DOOR)
-hinge=left (IRON_DOOR)
-hinge=left (JUNGLE_DOOR)
-hinge=left (MANGROVE_DOOR)
-hinge=left (OAK_DOOR)
-hinge=left (SPRUCE_DOOR)
-hinge=left (WARPED_DOOR)
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		LANTERN & true/false \\
+		MANGROVE\_PROPAGULE & true/false \\
+		SOUL\_LANTERN & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Hangable materials}
+\end{table}
 
-honey_level=0 (BEEHIVE)
-honey_level=0 (BEE_NEST)
+\subsubsection{Hinge}
+Indicates which hinge this door is attached to and will rotate around when opened.
 
+Defaults to left.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options \\
+	\hline
+	\endhead
+	ACACIA\_DOOR & left/right \\
+	BIRCH\_DOOR & left/right \\
+	CRIMSON\_DOOR & left/right \\
+	DARK\_OAK\_DOOR & left/right \\
+	IRON\_DOOR & left/right \\
+	JUNGLE\_DOOR & left/right \\
+	MANGROVE\_DOOR & left/right \\
+	OAK\_DOOR & left/right \\
+	SPRUCE\_DOOR & left/right \\
+	WARPED\_DOOR & left/right \\
+	\hline
+	\caption{Doors}
+\end{longtable}
+
+\subsubsection{Honey level}
+Represents the amount of honey stored in the hive.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		BEEHIVE & 0/5\footnotemark \\
+		BEE\_NEST & 0/5\footnotemark[\value{footnote}] \\ % refear to top footnote
+		\hline
+	\end{tabular}
+	\caption{Hives}
+\end{table}
+
+% Hives' footnotes
+\footnotetext{The block is the same from honey-level 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
+
+\subsubsection{In wall}
 in_wall=false (ACACIA_FENCE_GATE)
 in_wall=false (BIRCH_FENCE_GATE)
 in_wall=false (CRIMSON_FENCE_GATE)
@@ -1220,25 +1266,6 @@ shape=straight (WAXED_EXPOSED_CUT_COPPER_STAIRS)
 shape=straight (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
 shape=straight (WAXED_WEATHERED_CUT_COPPER_STAIRS)
 shape=straight (WEATHERED_CUT_COPPER_STAIRS)
-
-\subsubsection{Snowy}
-Denotes whether this block is covered in snow.
-
-Defaults to false.
-
-\begin{table}[H]
-	\centering
-	\begin{tabular}{ |c|c| }
-		\hline
-		Material & Values \\
-		\hline
-		GRASS\_BLOCK & true/false \\
-		MYCELIUM & true/false \\
-		PODZOL & true/false \\
-		\hline
-	\end{tabular}
-	\caption{Snowy blocks}
-\end{table}
 
 \subsubsection{Type}
 type=bottom (ACACIA_SLAB)
