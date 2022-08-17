@@ -44,6 +44,8 @@ There's some Spigot modifiers that beside existing it won't be imported because 
 	hatch & Unable to concatenate \\
 	thickness & Block dependent \\
 	snowy & Block dependent \\
+	in\_wall & Same block \\
+	moisture & Block dependent \\
 	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers}
@@ -124,6 +126,9 @@ In addition to this, some modifiers applied to certain blocks doesn't change the
 	WARPED\_DOOR & powered \\
 	WARPED\_FENCE\_GATE & powered \\
 	WARPED\_TRAPDOOR & powered \\
+	\hline
+	SMOKER & lit \\
+	FURNACE & lit \\
 	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers on certain blocks}
@@ -962,83 +967,161 @@ Defaults to 0.
 % Hives' footnotes
 \footnotetext{The block is the same from honey-level 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
 
-\subsubsection{In wall}
-in_wall=false (ACACIA_FENCE_GATE)
-in_wall=false (BIRCH_FENCE_GATE)
-in_wall=false (CRIMSON_FENCE_GATE)
-in_wall=false (DARK_OAK_FENCE_GATE)
-in_wall=false (JUNGLE_FENCE_GATE)
-in_wall=false (MANGROVE_FENCE_GATE)
-in_wall=false (OAK_FENCE_GATE)
-in_wall=false (SPRUCE_FENCE_GATE)
-in_wall=false (WARPED_FENCE_GATE)
+\subsubsection{Inverted}
+Denotes whether this daylight detector is in the inverted mode.
 
-inverted=false (DAYLIGHT_DETECTOR)
+Defaults to false.
 
-layers=1 (SNOW)
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		DAYLIGHT\_DETECTOR & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Invertible blocks}
+\end{table}
 
-leaves=none (BAMBOO)
+\subsubsection{Layers}
+Represents the amount of layers of snow which are present in this block.
 
-level=0 (COMPOSTER)
-level=0 (LAVA)
-level=0 (WATER)
-level=1 (POWDER_SNOW_CAULDRON)
-level=1 (WATER_CAULDRON)
+Defaults to 1.
 
-lit=false (BLACK_CANDLE)
-lit=false (BLACK_CANDLE_CAKE)
-lit=false (BLAST_FURNACE)
-lit=false (BLUE_CANDLE)
-lit=false (BLUE_CANDLE_CAKE)
-lit=false (BROWN_CANDLE)
-lit=false (BROWN_CANDLE_CAKE)
-lit=false (CANDLE)
-lit=false (CANDLE_CAKE)
-lit=false (CYAN_CANDLE)
-lit=false (CYAN_CANDLE_CAKE)
-lit=false (DEEPSLATE_REDSTONE_ORE)
-lit=false (FURNACE)
-lit=false (GRAY_CANDLE)
-lit=false (GRAY_CANDLE_CAKE)
-lit=false (GREEN_CANDLE)
-lit=false (GREEN_CANDLE_CAKE)
-lit=false (LIGHT_BLUE_CANDLE)
-lit=false (LIGHT_BLUE_CANDLE_CAKE)
-lit=false (LIGHT_GRAY_CANDLE)
-lit=false (LIGHT_GRAY_CANDLE_CAKE)
-lit=false (LIME_CANDLE)
-lit=false (LIME_CANDLE_CAKE)
-lit=false (MAGENTA_CANDLE)
-lit=false (MAGENTA_CANDLE_CAKE)
-lit=false (ORANGE_CANDLE)
-lit=false (ORANGE_CANDLE_CAKE)
-lit=false (PINK_CANDLE)
-lit=false (PINK_CANDLE_CAKE)
-lit=false (PURPLE_CANDLE)
-lit=false (PURPLE_CANDLE_CAKE)
-lit=false (REDSTONE_LAMP)
-lit=false (REDSTONE_ORE)
-lit=false (RED_CANDLE)
-lit=false (RED_CANDLE_CAKE)
-lit=false (SMOKER)
-lit=false (WHITE_CANDLE)
-lit=false (WHITE_CANDLE_CAKE)
-lit=false (YELLOW_CANDLE)
-lit=false (YELLOW_CANDLE_CAKE)
-lit=true (CAMPFIRE)
-lit=true (REDSTONE_TORCH)
-lit=true (REDSTONE_WALL_TORCH)
-lit=true (SOUL_CAMPFIRE)
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		SNOW & 1-8 \\
+		\hline
+	\end{tabular}
+	\caption{Snow}
+\end{table}
 
-locked=false (REPEATER)
+\subsubsection{Leaves}
+Represents the size of the leaves of the bamboo block.
 
-mode=compare (COMPARATOR)
-mode=load (STRUCTURE_BLOCK)
+Defaults to none.
 
-moisture=0 (FARMLAND)
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		BAMBOO & none/small/large \\
+		\hline
+	\end{tabular}
+	\caption{Bamboo}
+\end{table}
 
-note=0 (NOTE_BLOCK)
+\subsubsection{Level}
+Represents the amount of fluid contained within this block, either by itself or inside a cauldron.
 
+Defaults on 0 except for POWDER\_SNOW\_CAULDRON and WATER\_CAULDRON (which defaults on 1).
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		COMPOSTER & 0-8 \\
+		LAVA & 0-7 \\
+		WATER & 0-7 \\
+		POWDER\_SNOW\_CAULDRON & 1-3 \\
+		WATER\_CAULDRON & 1-3 \\
+		\hline
+	\end{tabular}
+	\caption{Levelled materials}
+\end{table}
+
+\subsubsection{Lit}
+Denotes whether this block is currently lit.
+
+Except for CAMPFIRE, REDSTONE\_TORCH, REDSTONE\_WALL\_TORCH and SOUL\_CAMPFIRE (which defaults to true), it defaults to false.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options \\
+	\hline
+	\endhead
+	BLACK\_CANDLE & true/false \\
+	BLACK\_CANDLE\_CAKE & true/false \\
+	BLAST\_FURNACE & true/false \\
+	BLUE\_CANDLE & true/false \\
+	BLUE\_CANDLE\_CAKE & true/false \\
+	BROWN\_CANDLE & true/false \\
+	BROWN\_CANDLE\_CAKE & true/false \\
+	CANDLE & true/false \\
+	CANDLE\_CAKE & true/false \\
+	CYAN\_CANDLE & true/false \\
+	CYAN\_CANDLE\_CAKE & true/false \\
+	DEEPSLATE\_REDSTONE\_ORE & true/false \\
+	GRAY\_CANDLE & true/false \\
+	GRAY\_CANDLE\_CAKE & true/false \\
+	GREEN\_CANDLE & true/false \\
+	GREEN\_CANDLE\_CAKE & true/false \\
+	LIGHT\_BLUE\_CANDLE & true/false \\
+	LIGHT\_BLUE\_CANDLE\_CAKE & true/false \\
+	LIGHT\_GRAY\_CANDLE & true/false \\
+	LIGHT\_GRAY\_CANDLE\_CAKE & true/false \\
+	LIME\_CANDLE & true/false \\
+	LIME\_CANDLE\_CAKE & true/false \\
+	MAGENTA\_CANDLE & true/false \\
+	MAGENTA\_CANDLE\_CAKE & true/false \\
+	ORANGE\_CANDLE & true/false \\
+	ORANGE\_CANDLE\_CAKE & true/false \\
+	PINK\_CANDLE & true/false \\
+	PINK\_CANDLE\_CAKE & true/false \\
+	PURPLE\_CANDLE & true/false \\
+	PURPLE\_CANDLE\_CAKE & true/false \\
+	REDSTONE\_LAMP & true/false \\
+	REDSTONE\_ORE & true/false \\
+	RED\_CANDLE & true/false \\
+	RED\_CANDLE\_CAKE & true/false \\
+	WHITE\_CANDLE & true/false \\
+	WHITE\_CANDLE\_CAKE & true/false \\
+	YELLOW\_CANDLE & true/false \\
+	YELLOW\_CANDLE\_CAKE & true/false \\
+	\hline
+	CAMPFIRE & true/false \\
+	REDSTONE\_TORCH & true/false \\
+	REDSTONE\_WALL\_TORCH & true/false \\
+	SOUL\_CAMPFIRE & true/false \\
+	\hline
+	\caption{Lightable materials}
+\end{longtable}
+
+
+\subsubsection{Locked}
+Denotes whether the repeater is in the locked state or not.
+
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		REPEATER & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Repeater}
+\end{table}
+
+\subsubsection{Mode}
+COMPARATOR & compare/subtract
+STRUCTURE\_BLOCK & load/corner/save
+
+\subsubsection{Note}
+NOTE\_BLOCK & 0-24
+
+\subsubsection{Open}
 open=false (ACACIA_DOOR)
 open=false (ACACIA_FENCE_GATE)
 open=false (ACACIA_TRAPDOOR)
@@ -1070,9 +1153,49 @@ open=false (WARPED_DOOR)
 open=false (WARPED_FENCE_GATE)
 open=false (WARPED_TRAPDOOR)
 
-orientation=north_up (JIGSAW)
+\subsubsection{Orientation}
+Direction the block is facing.
 
-part=foot (BLACK_BED)
+Defaults to north\_up, and can take any of the values shown in \hyperref[ab:jigsaw]{Table \ref{ab:jigsaw}, Jigsaw orientations}.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Orientation \\
+	\hline
+	\endhead
+	north\_up \\
+	south\_up \\
+	east\_up \\
+	west\_up \\
+	\hline
+	up\_north \\
+	up\_south \\
+	up\_east \\
+	up\_west \\
+	\hline
+	down\_north \\
+	down\_south \\
+	down\_east \\
+	down\_west \\
+	\hline
+	\caption{Jigsaw orientations}
+	\label{ab:jigsaw}
+\end{longtable}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material \\
+		\hline
+		JIGSAW \\
+		\hline
+	\end{tabular}
+	\caption{Jigsaw}
+\end{table}
+
+\subsubsection{Part}
+BLACK\_BED foot/head
 part=foot (BLUE_BED)
 part=foot (BROWN_BED)
 part=foot (CYAN_BED)
@@ -1666,7 +1789,8 @@ If a material doesn't have the attribute that the diagram is checking it will as
 	\begin{figure}
 		\begin{rail}
 			'...' \\
-			([vertical-direction!=down]() | [vertical-direction=down]('\_D'))
+			([vertical-direction!=down]() | [vertical-direction=down]('\_D')) \\
+			([orientation undefined or orientation=north\_up]() | [orientation=south\_up]('\_S') | [orientation=east\_up]('\_E') | [orientation=west\_up]('\_W') | [orientation=up\_north]('\_UN') | [orientation=up\_south]('\_US') | [orientation=up\_east]('\_UE') | [orientation=up\_west]('\_UW') | [orientation=down\_north]('\_DN') | [orientation=down\_south]('\_DS') | [orientation=down\_east]('\_DE') | [orientation=down\_west]('\_DW')) \\
 			'...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
