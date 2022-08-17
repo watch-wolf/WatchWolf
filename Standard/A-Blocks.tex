@@ -1115,50 +1115,88 @@ Defaults to false.
 \end{table}
 
 \subsubsection{Mode}
-COMPARATOR & compare/subtract
-STRUCTURE\_BLOCK & load/corner/save
+Indicates what mode the block will operate in.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Options (default on bold) \\
+		\hline
+		COMPARATOR & \textbf{compare}/subtract \\
+		STRUCTURE\_BLOCK & \textbf{load}/corner/save \\
+		\hline
+	\end{tabular}
+	\caption{Materials with mode}
+\end{table}
 
 \subsubsection{Note}
-NOTE\_BLOCK & 0-24
+Specified tuned pitch that the instrument will be played in.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		NOTE\_BLOCK & 0-24 \\
+		\hline
+	\end{tabular}
+	\caption{Note block}
+\end{table}
 
 \subsubsection{Open}
-open=false (ACACIA_DOOR)
-open=false (ACACIA_FENCE_GATE)
-open=false (ACACIA_TRAPDOOR)
-open=false (BARREL)
-open=false (BIRCH_DOOR)
-open=false (BIRCH_FENCE_GATE)
-open=false (BIRCH_TRAPDOOR)
-open=false (CRIMSON_DOOR)
-open=false (CRIMSON_FENCE_GATE)
-open=false (CRIMSON_TRAPDOOR)
-open=false (DARK_OAK_DOOR)
-open=false (DARK_OAK_FENCE_GATE)
-open=false (DARK_OAK_TRAPDOOR)
-open=false (IRON_DOOR)
-open=false (IRON_TRAPDOOR)
-open=false (JUNGLE_DOOR)
-open=false (JUNGLE_FENCE_GATE)
-open=false (JUNGLE_TRAPDOOR)
-open=false (MANGROVE_DOOR)
-open=false (MANGROVE_FENCE_GATE)
-open=false (MANGROVE_TRAPDOOR)
-open=false (OAK_DOOR)
-open=false (OAK_FENCE_GATE)
-open=false (OAK_TRAPDOOR)
-open=false (SPRUCE_DOOR)
-open=false (SPRUCE_FENCE_GATE)
-open=false (SPRUCE_TRAPDOOR)
-open=false (WARPED_DOOR)
-open=false (WARPED_FENCE_GATE)
-open=false (WARPED_TRAPDOOR)
+Denotes whether this block is currently opened.
+
+Defaults to false.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	\endhead
+	ACACIA\_DOOR & true/false \\
+	ACACIA\_FENCE\_GATE & true/false \\
+	ACACIA\_TRAPDOOR & true/false \\
+	BARREL & true/false \\
+	BIRCH\_DOOR & true/false \\
+	BIRCH\_FENCE\_GATE & true/false \\
+	BIRCH\_TRAPDOOR & true/false \\
+	CRIMSON\_DOOR & true/false \\
+	CRIMSON\_FENCE\_GATE & true/false \\
+	CRIMSON\_TRAPDOOR & true/false \\
+	DARK\_OAK\_DOOR & true/false \\
+	DARK\_OAK\_FENCE\_GATE & true/false \\
+	DARK\_OAK\_TRAPDOOR & true/false \\
+	IRON\_DOOR & true/false \\
+	IRON\_TRAPDOOR & true/false \\
+	JUNGLE\_DOOR & true/false \\
+	JUNGLE\_FENCE\_GATE & true/false \\
+	JUNGLE\_TRAPDOOR & true/false \\
+	MANGROVE\_DOOR & true/false \\
+	MANGROVE\_FENCE\_GATE & true/false \\
+	MANGROVE\_TRAPDOOR & true/false \\
+	OAK\_DOOR & true/false \\
+	OAK\_FENCE\_GATE & true/false \\
+	OAK\_TRAPDOOR & true/false \\
+	SPRUCE\_DOOR & true/false \\
+	SPRUCE\_FENCE\_GATE & true/false \\
+	SPRUCE\_TRAPDOOR & true/false \\
+	WARPED\_DOOR & true/false \\
+	WARPED\_FENCE\_GATE & true/false \\
+	WARPED\_TRAPDOOR & true/false \\
+	\hline
+	\caption{Openable materials}
+\end{longtable}
 
 \subsubsection{Orientation}
 Direction the block is facing.
 
 Defaults to north\_up, and can take any of the values shown in \hyperref[ab:jigsaw]{Table \ref{ab:jigsaw}, Jigsaw orientations}.
 
-\begin{longtable}{ |c|c| }
+\begin{longtable}{ |c| }
 	\hline
 	Orientation \\
 	\hline
@@ -1184,7 +1222,7 @@ Defaults to north\_up, and can take any of the values shown in \hyperref[ab:jigs
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c|c| }
+	\begin{tabular}{ |c| }
 		\hline
 		Material \\
 		\hline
@@ -1195,22 +1233,34 @@ Defaults to north\_up, and can take any of the values shown in \hyperref[ab:jigs
 \end{table}
 
 \subsubsection{Part}
-BLACK\_BED foot/head
-part=foot (BLUE_BED)
-part=foot (BROWN_BED)
-part=foot (CYAN_BED)
-part=foot (GRAY_BED)
-part=foot (GREEN_BED)
-part=foot (LIGHT_BLUE_BED)
-part=foot (LIGHT_GRAY_BED)
-part=foot (LIME_BED)
-part=foot (MAGENTA_BED)
-part=foot (ORANGE_BED)
-part=foot (PINK_BED)
-part=foot (PURPLE_BED)
-part=foot (RED_BED)
-part=foot (WHITE_BED)
-part=foot (YELLOW_BED)
+Denotes which half of the bed this block corresponds to.
+
+Defaults to foot.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	\endhead
+	BLACK\_BED & foot/head \\
+	BLUE\_BED & foot/head \\
+	BROWN\_BED & foot/head \\
+	CYAN\_BED & foot/head \\
+	GRAY\_BED & foot/head \\
+	GREEN\_BED & foot/head \\
+	LIGHT\_BLUE\_BED & foot/head \\
+	LIGHT\_GRAY\_BED & foot/head \\
+	LIME\_BED & foot/head \\
+	MAGENTA\_BED & foot/head \\
+	ORANGE\_BED & foot/head \\
+	PINK\_BED & foot/head \\
+	PURPLE\_BED & foot/head \\
+	RED\_BED & foot/head \\
+	WHITE\_BED & foot/head \\
+	YELLOW\_BED & foot/head \\
+	\hline
+	\caption{Openable materials}
+\end{longtable}
 
 \subsubsection{Pickles}
 Indicates the number of pickles in this block.
@@ -1790,8 +1840,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\begin{rail}
 			'...' \\
 			([vertical-direction!=down]() | [vertical-direction=down]('\_D')) \\
-			([orientation undefined or orientation=north\_up]() | [orientation=south\_up]('\_S') | [orientation=east\_up]('\_E') | [orientation=west\_up]('\_W') | [orientation=up\_north]('\_UN') | [orientation=up\_south]('\_US') | [orientation=up\_east]('\_UE') | [orientation=up\_west]('\_UW') | [orientation=down\_north]('\_DN') | [orientation=down\_south]('\_DS') | [orientation=down\_east]('\_DE') | [orientation=down\_west]('\_DW')) \\
-			'...'
+			([orientation undefined or orientation=north\_up]() | [orientation=south\_up]('\_S') | [orientation=east\_up]('\_E') | [orientation=west\_up]('\_W') | [orientation=up\_north]('\_UN') | [orientation=up\_south]('\_US') | [orientation=up\_east]('\_UE') | [orientation=up\_west]('\_UW') | [orientation=down\_north]('\_DN') | [orientation=down\_south]('\_DS') | [orientation=down\_east]('\_DE') | [orientation=down\_west]('\_DW')) '...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
 		\caption{Direction modifier concatenation 2}
