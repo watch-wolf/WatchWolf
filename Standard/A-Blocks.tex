@@ -1925,6 +1925,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\begin{rail}
 			([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) ([attachment undefined or attachment=floor] () | [attachment=ceiling] 'CEILING\_' | [attachment=double\_wall] 'DWALL\_' | [attachment=single\_wall] 'SWALL\_') \\
 			([powered=false] () | [powered=true] 'TRIGGERED\_') ([half!=upper] () | [half=upper] 'UPPER\_') ([eye=false] () | [eye=true] 'EYED\_') \\
+			([type!=sticky and type!=double] () | [type=sticky] 'STICKY\_' | [type=double] 'DOUBLE\_') \\
 			Material \\
 			([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
 			([conditional=false] () | [conditional=true] '\_CONDITIONAL')
@@ -1949,7 +1950,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 	\begin{figure}
 		\begin{rail}
 			'...' \\
-			([vertical-direction!=down]() | [vertical-direction=down]('\_D')) \\
+			([vertical-direction!=down and type!=top]() | [vertical-direction=down] '\_D' | [type=top] '\_U') \\
 			([orientation undefined or orientation=north\_up]() | [orientation=south\_up]('\_S') | [orientation=east\_up]('\_E') | [orientation=west\_up]('\_W') | [orientation=up\_north]('\_UN') | [orientation=up\_south]('\_US') | [orientation=up\_east]('\_UE') | [orientation=up\_west]('\_UW') | [orientation=down\_north]('\_DN') | [orientation=down\_south]('\_DS') | [orientation=down\_east]('\_DE') | [orientation=down\_west]('\_DW')) '...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
