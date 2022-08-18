@@ -130,6 +130,9 @@ In addition to this, some modifiers applied to certain blocks doesn't change the
 	SMOKER & lit \\
 	FURNACE & lit \\
 	\hline
+	CHEST & type \\
+	TRAPPED\_CHEST & type \\
+	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers on certain blocks}
 	\label{fig:unused-blockdata-blocks}
@@ -1383,122 +1386,229 @@ Defaults to 0 and goes up to 15.
 	\caption{Directional materials}
 \end{longtable}
 
-\subsubsection{Shape}
-shape=north_south (ACTIVATOR_RAIL)
-shape=north_south (DETECTOR_RAIL)
-shape=north_south (POWERED_RAIL)
-shape=north_south (RAIL)
+\subsubsection{Shape - Rails}
+Represents the current layout of a minecart rail.
 
-shape=straight (ACACIA_STAIRS)
-shape=straight (ANDESITE_STAIRS)
-shape=straight (BIRCH_STAIRS)
-shape=straight (BLACKSTONE_STAIRS)
-shape=straight (BRICK_STAIRS)
-shape=straight (COBBLED_DEEPSLATE_STAIRS)
-shape=straight (COBBLESTONE_STAIRS)
-shape=straight (CRIMSON_STAIRS)
-shape=straight (CUT_COPPER_STAIRS)
-shape=straight (DARK_OAK_STAIRS)
-shape=straight (DARK_PRISMARINE_STAIRS)
-shape=straight (DEEPSLATE_BRICK_STAIRS)
-shape=straight (DEEPSLATE_TILE_STAIRS)
-shape=straight (DIORITE_STAIRS)
-shape=straight (END_STONE_BRICK_STAIRS)
-shape=straight (EXPOSED_CUT_COPPER_STAIRS)
-shape=straight (GRANITE_STAIRS)
-shape=straight (JUNGLE_STAIRS)
-shape=straight (MANGROVE_STAIRS)
-shape=straight (MOSSY_COBBLESTONE_STAIRS)
-shape=straight (MOSSY_STONE_BRICK_STAIRS)
-shape=straight (MUD_BRICK_STAIRS)
-shape=straight (NETHER_BRICK_STAIRS)
-shape=straight (OAK_STAIRS)
-shape=straight (OXIDIZED_CUT_COPPER_STAIRS)
-shape=straight (POLISHED_ANDESITE_STAIRS)
-shape=straight (POLISHED_BLACKSTONE_BRICK_STAIRS)
-shape=straight (POLISHED_BLACKSTONE_STAIRS)
-shape=straight (POLISHED_DEEPSLATE_STAIRS)
-shape=straight (POLISHED_DIORITE_STAIRS)
-shape=straight (POLISHED_GRANITE_STAIRS)
-shape=straight (PRISMARINE_BRICK_STAIRS)
-shape=straight (PRISMARINE_STAIRS)
-shape=straight (PURPUR_STAIRS)
-shape=straight (QUARTZ_STAIRS)
-shape=straight (RED_NETHER_BRICK_STAIRS)
-shape=straight (RED_SANDSTONE_STAIRS)
-shape=straight (SANDSTONE_STAIRS)
-shape=straight (SMOOTH_QUARTZ_STAIRS)
-shape=straight (SMOOTH_RED_SANDSTONE_STAIRS)
-shape=straight (SMOOTH_SANDSTONE_STAIRS)
-shape=straight (SPRUCE_STAIRS)
-shape=straight (STONE_BRICK_STAIRS)
-shape=straight (STONE_STAIRS)
-shape=straight (WARPED_STAIRS)
-shape=straight (WAXED_CUT_COPPER_STAIRS)
-shape=straight (WAXED_EXPOSED_CUT_COPPER_STAIRS)
-shape=straight (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
-shape=straight (WAXED_WEATHERED_CUT_COPPER_STAIRS)
-shape=straight (WEATHERED_CUT_COPPER_STAIRS)
+Defaults to north\_south, and it can take any value of those mentioned in \hyperref[ab:rail]{Table \ref{ab:rail}, Rail directions}.
+
+\begin{longtable}{ |c| }
+	\hline
+	Shape \\
+	\hline
+	\endhead
+	north\_south \\
+	east\_west \\
+	\hline
+	north\_east \\
+	north\_west \\
+	south\_east \\
+	south\_west \\
+	\hline
+	ascending\_north \\
+	ascending\_south \\
+	ascending\_east \\
+	ascending\_west \\
+	\hline
+	\caption{Rail directions}
+	\label{ab:rail}
+\end{longtable}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ |c| }
+	\hline
+	Material \\
+	\hline
+	ACTIVATOR\_RAIL \\
+	DETECTOR\_RAIL \\
+	POWERED\_RAIL \\
+	RAIL \\
+	\hline
+\end{tabular}
+\caption{Rails}
+\end{table}
+
+\subsubsection{Shape - Stairs}
+Represents the texture and bounding box shape of these stairs.
+
+Defaults to straight.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Shape \\
+	\hline
+	\endhead
+	ACACIA\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	ANDESITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BIRCH\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BLACKSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	COBBLED\_DEEPSLATE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	COBBLESTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	CRIMSON\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DARK\_OAK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DARK\_PRISMARINE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DEEPSLATE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DEEPSLATE\_TILE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DIORITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	END\_STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	GRANITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	JUNGLE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MANGROVE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MOSSY\_COBBLESTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MOSSY\_STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MUD\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	NETHER\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	OAK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_ANDESITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_BLACKSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_DEEPSLATE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_DIORITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_GRANITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PRISMARINE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PRISMARINE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PURPUR\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	QUARTZ\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	RED\_NETHER\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	RED\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_QUARTZ\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SPRUCE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	STONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WARPED\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	\hline
+	\caption{Stairs}
+\end{longtable}
 
 \subsubsection{Type}
-type=bottom (ACACIA_SLAB)
-type=bottom (ANDESITE_SLAB)
-type=bottom (BIRCH_SLAB)
-type=bottom (BLACKSTONE_SLAB)
-type=bottom (BRICK_SLAB)
-type=bottom (COBBLED_DEEPSLATE_SLAB)
-type=bottom (COBBLESTONE_SLAB)
-type=bottom (CRIMSON_SLAB)
-type=bottom (CUT_COPPER_SLAB)
-type=bottom (CUT_RED_SANDSTONE_SLAB)
-type=bottom (CUT_SANDSTONE_SLAB)
-type=bottom (DARK_OAK_SLAB)
-type=bottom (DARK_PRISMARINE_SLAB)
-type=bottom (DEEPSLATE_BRICK_SLAB)
-type=bottom (DEEPSLATE_TILE_SLAB)
-type=bottom (DIORITE_SLAB)
-type=bottom (END_STONE_BRICK_SLAB)
-type=bottom (EXPOSED_CUT_COPPER_SLAB)
-type=bottom (GRANITE_SLAB)
-type=bottom (JUNGLE_SLAB)
-type=bottom (MANGROVE_SLAB)
-type=bottom (MOSSY_COBBLESTONE_SLAB)
-type=bottom (MOSSY_STONE_BRICK_SLAB)
-type=bottom (MUD_BRICK_SLAB)
-type=bottom (NETHER_BRICK_SLAB)
-type=bottom (OAK_SLAB)
-type=bottom (OXIDIZED_CUT_COPPER_SLAB)
-type=bottom (PETRIFIED_OAK_SLAB)
-type=bottom (POLISHED_ANDESITE_SLAB)
-type=bottom (POLISHED_BLACKSTONE_BRICK_SLAB)
-type=bottom (POLISHED_BLACKSTONE_SLAB)
-type=bottom (POLISHED_DEEPSLATE_SLAB)
-type=bottom (POLISHED_DIORITE_SLAB)
-type=bottom (POLISHED_GRANITE_SLAB)
-type=bottom (PRISMARINE_BRICK_SLAB)
-type=bottom (PRISMARINE_SLAB)
-type=bottom (PURPUR_SLAB)
-type=bottom (QUARTZ_SLAB)
-type=bottom (RED_NETHER_BRICK_SLAB)
-type=bottom (RED_SANDSTONE_SLAB)
-type=bottom (SANDSTONE_SLAB)
-type=bottom (SMOOTH_QUARTZ_SLAB)
-type=bottom (SMOOTH_RED_SANDSTONE_SLAB)
-type=bottom (SMOOTH_SANDSTONE_SLAB)
-type=bottom (SMOOTH_STONE_SLAB)
-type=bottom (SPRUCE_SLAB)
-type=bottom (STONE_BRICK_SLAB)
-type=bottom (STONE_SLAB)
-type=bottom (WARPED_SLAB)
-type=bottom (WAXED_CUT_COPPER_SLAB)
-type=bottom (WAXED_EXPOSED_CUT_COPPER_SLAB)
-type=bottom (WAXED_OXIDIZED_CUT_COPPER_SLAB)
-type=bottom (WAXED_WEATHERED_CUT_COPPER_SLAB)
-type=bottom (WEATHERED_CUT_COPPER_SLAB)
-type=normal (MOVING_PISTON)
-type=normal (PISTON_HEAD)
-type=single (CHEST)
-type=single (TRAPPED_CHEST)
+Represents the type of piston which that block corresponds to, or represents what state the slab is in.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	ACACIA\_SLAB & \textbf{bottom}/top/double \\
+	ANDESITE\_SLAB & \textbf{bottom}/top/double \\
+	BIRCH\_SLAB & \textbf{bottom}/top/double \\
+	BLACKSTONE\_SLAB & \textbf{bottom}/top/double \\
+	BRICK\_SLAB & \textbf{bottom}/top/double \\
+	COBBLED\_DEEPSLATE\_SLAB & \textbf{bottom}/top/double \\
+	COBBLESTONE\_SLAB & \textbf{bottom}/top/double \\
+	CRIMSON\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	DARK\_OAK\_SLAB & \textbf{bottom}/top/double \\
+	DARK\_PRISMARINE\_SLAB & \textbf{bottom}/top/double \\
+	DEEPSLATE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	DEEPSLATE\_TILE\_SLAB & \textbf{bottom}/top/double \\
+	DIORITE\_SLAB & \textbf{bottom}/top/double \\
+	END\_STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	EXPOSED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	GRANITE\_SLAB & \textbf{bottom}/top/double \\
+	JUNGLE\_SLAB & \textbf{bottom}/top/double \\
+	MANGROVE\_SLAB & \textbf{bottom}/top/double \\
+	MOSSY\_COBBLESTONE\_SLAB & \textbf{bottom}/top/double \\
+	MOSSY\_STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	MUD\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	NETHER\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	OAK\_SLAB & \textbf{bottom}/top/double \\
+	OXIDIZED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	PETRIFIED\_OAK\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_ANDESITE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_BLACKSTONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_BLACKSTONE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_DEEPSLATE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_DIORITE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_GRANITE\_SLAB & \textbf{bottom}/top/double \\
+	PRISMARINE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	PRISMARINE\_SLAB & \textbf{bottom}/top/double \\
+	PURPUR\_SLAB & \textbf{bottom}/top/double \\
+	QUARTZ\_SLAB & \textbf{bottom}/top/double \\
+	RED\_NETHER\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_QUARTZ\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_STONE\_SLAB & \textbf{bottom}/top/double \\
+	SPRUCE\_SLAB & \textbf{bottom}/top/double \\
+	STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	STONE\_SLAB & \textbf{bottom}/top/double \\
+	WARPED\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WEATHERED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	\hline
+	PISTON\_HEAD & \textbf{normal}/sticky \\
+	\hline
+	\caption{Type materials}
+\end{longtable}
 
 \subsubsection{Vertical direction}
 Represents the dripstone orientation.
