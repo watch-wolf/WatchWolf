@@ -1952,7 +1952,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			'...' \\
 			([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
 			([(face undefined or face=wall) and (facing undefined or facing=north) and half!=top]() | [face!=wall or facing!=north or half=top]('\_' \\
-			([face!=ceiling and facing!=up and half!=top]() | [face=ceiling or facing=up or half=top]'U') \\ ([face!=floor and facing!=down]() | [face=floor or facing=down]'D') ([facing!=north]() | [facing=north]'N') \\ ([facing!=south]() | [facing=south]'S') ([facing!=east]() | [facing=east]'E') ([facing!=west]() | [facing=west]'W'))) \\
+			([face!=ceiling and facing!=up and half!=top]() | [face=ceiling or facing=up or half=top]'U') \\ ([face!=floor and facing!=down]() | [face=floor or facing=down]'D') \\ ([facing!=south]() | [facing=south]'S') ([facing!=east]() | [facing=east]'E') ([facing!=west]() | [facing=west]'W'))) \\
 			'...'
 		\end{rail}
 		\caption{Direction modifier concatenation}
