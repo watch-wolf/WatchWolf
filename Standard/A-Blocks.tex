@@ -1927,7 +1927,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			([powered=false] () | [powered=true] 'TRIGGERED\_') ([half!=upper] () | [half=upper] 'UPPER\_') ([eye=false] () | [eye=true] 'EYED\_') \\
 			([type!=sticky and type!=double] () | [type=sticky] 'STICKY\_' | [type=double] 'DOUBLE\_') ([open!=true]() | [open=true] 'OPENED\_') \\
 			([locked!=true]() | [locked=true] 'LOCKED\_') ([lit!=true]() | [lit=true] 'LIGHTED\_') \\
-			([leaves undefined or leaves=none]() | [leaves=small] 'LEAVED\_' | [leaves=large] 'XLEAVED\_') \\
+			([leaves undefined or leaves=none]() | [leaves=small] 'LEAVED\_' | [leaves=large] 'XLEAVED\_') ([extended!=true]() | [extended=true] 'EXTENDED\_') \\
 			'...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
@@ -1983,6 +1983,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			[shape=north\_east] '\_NE' |
 			[shape=north\_west] '\_NW' |
 			[shape=south\_east] '\_SE') \\
+			([hanging!=true]() | [hanging=true] '\_U') \\
 			'...'
 		\end{rail}
 		\caption{Direction modifier concatenation 3}
@@ -1992,6 +1993,7 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\begin{rail}
 			'...' \\
 			([shape!=inner\_right and shape!=inner\_left and shape!=outer\_right and shape!=outer\_left]() | [shape=inner\_right] '\_IR' | [shape=inner\_left] '\_IL' | [shape=outer\_right] '\_OR' | [shape=outer\_left] '\_OL') \\
+			([hinge!=right]() | [hinge=right] '\_HR')
 			([rotation undefined or rotation=0] () | [rotation$>$0] '\_R' rotation) \\
 			([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 			([bites=0] () | [bites!=0] '\_' bites) ([candles$<$2] () | [candles$>$1] '\_' candles) \\
