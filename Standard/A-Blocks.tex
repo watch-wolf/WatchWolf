@@ -2,12 +2,11 @@
 To generate the \hyperref[type:block]{blocks enum} Spigot 1.19 was used.
 That means that all the block names \textit{should} be the exact same as \cite{spigot-material}.
 
-\subsection{Material modifiers}
-There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.
+%\myworries{There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.}
 
-That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, all the block modifiers has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces).
+%\myworries{That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, all the block modifiers has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces).}
 
-\subsubsection{Unused modifiers}
+\subsection{Unused material modifiers}
 There's some Spigot modifiers that beside existing it won't be imported because there aren't a distinguished block in their own. You can find those in \hyperref[fig:unused-blockdata]{Figure \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}.
 
 \begin{longtable}{ |c|c| }
@@ -138,6 +137,7 @@ In addition to this, some modifiers applied to certain blocks doesn't change the
 	\label{fig:unused-blockdata-blocks}
 \end{longtable}
 
+\subsection{Material modifiers}
 \subsubsection{Age}
 Represents the different growth stages that a crop-like block can go through.
 
@@ -1916,6 +1916,133 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 % Aquatic block's footnote
 \footnotetext{If it's an underwater block (defaults to true).}
 
+\subsection{Material name attached modifiers}
+Some materials have modifiers already attached to the material name.
+
+\subsubsection{Color}
+\myworries{...}
+
+\begin{longtable}{ |c| }
+	\hline
+	Color \\
+	\hline
+	\endhead
+	black \\
+	blue \\
+	brown \\
+	cyan \\
+	gray \\
+	green \\
+	light\_blue \\
+	light\_gray \\
+	lime \\
+	magenta \\
+	orange \\
+	pink \\
+	purple \\
+	red \\
+	white \\
+	yellow \\
+	\hline
+	\caption{Wool colors}
+\end{longtable}
+
+\subsubsection{Wood type}\label{ab:wood}
+\myworries{...}
+
+\begin{longtable}{ |c| }
+	\hline
+	Wood \\
+	\hline
+	\endhead
+	acacia \\
+	birch \\
+	crimson \\
+	dark\_oak \\
+	jungle \\
+	mangrove \\
+	oak \\
+	spruce \\
+	warped \\
+	\hline
+	\caption{Wood types}
+\end{longtable}
+
+\subsubsection{Material}
+In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be made of other type of blocks.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c| }
+		\hline
+		Material \\
+		\hline
+		iron \\
+		gold \\
+		stone \\
+		blackstone \\
+		\hline
+	\end{tabular}
+	\caption{Additional materials}
+\end{table}
+
+\myworries{iron and gold pressure plates have their name as 'heavy/light weighted pressure plate'}
+\myworries{blackstone pressure plates have its name as 'polished blackstone pressure plate'}
+
+\subsection{Material modifiers aggregation}
+\myworries{some modifiers are similar, so let's add them together}
+
+\subsubsection{Direction aggregation}
+\myworries{modifier, followed by the condition to set the bit to 1}
+
+\begin{longtable}{ |c|c|c|c|c|c|c| }
+	\hline
+	Property & U & D & N & S & E & W \\
+	\hline
+	\endhead
+	up & \rotatebox{90}{true} &&&&& \\
+	\hline
+	down && \rotatebox{90}{true} &&&& \\
+	\hline
+	north &&& \rotatebox{90}{true} &&& \\
+	\hline
+	south &&&& \rotatebox{90}{true} && \\
+	\hline
+	east &&&&& \rotatebox{90}{true} & \\
+	\hline
+	west &&&&&& \rotatebox{90}{true} \\
+	\hline
+	face & \rotatebox{90}{ceiling} & \rotatebox{90}{floor} &&&& \\
+	\hline
+	half & \rotatebox{90}{top} &  \rotatebox{90}{bottom} &&&& \\
+	\hline
+	facing & \rotatebox{90}{up} & \rotatebox{90}{down} &
+		\rotatebox{90}{north} & \rotatebox{90}{south} &
+		\rotatebox{90}{east} & \rotatebox{90}{west} \\
+		\hline
+	vertical-direction & \rotatebox{90}{up} &  \rotatebox{90}{down} &&&& \\
+	\hline
+	type & \rotatebox{90}{top} &  \rotatebox{90}{bottom} &&&& \\
+	\hline
+	orientation & \rotatebox{90}{up\_\textit{X}} & \rotatebox{90}{down\_\textit{X}} &
+		\rotatebox{90}{\textit{X}\_north or north\_up} &
+		\rotatebox{90}{\textit{X}\_south or south\_up} &
+		\rotatebox{90}{\textit{X}\_east or east\_up} &
+		\rotatebox{90}{\textit{X}\_west or west\_up} \\
+	\hline
+	shape & \rotatebox{90}{ascending\_\textit{X}} &&
+		\rotatebox{90}{ascending\_north or north\_\textit{X}} &
+		\rotatebox{90}{ascending\_south or south\_\textit{X} or north\_south} &
+		\rotatebox{90}{ascending\_east or \textit{X}\_east or east\_west} &
+		\rotatebox{90}{ascending\_west or \textit{X}\_west} \\
+	\hline
+	hanging & \rotatebox{90}{true} &&&&& \\
+	\hline
+	\caption{Direction aggregation}
+\end{longtable}
+
+
+\iffalse
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
 
@@ -2014,3 +2141,4 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\caption{Integer modifier concatenation 2}
 	\end{figure}
 \end{subfigures}
+\fi
