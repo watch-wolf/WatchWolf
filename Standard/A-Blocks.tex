@@ -1920,67 +1920,70 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 Some materials have modifiers already attached to the material name.
 
 \subsubsection{Color}
-\myworries{...}
+\myworries{... wool/glass}
 
-\begin{longtable}{ |c| }
+\begin{longtable}{ |c|c| }
 	\hline
-	Color \\
+	Index & Color \\
 	\hline
 	\endhead
-	black \\
-	blue \\
-	brown \\
-	cyan \\
-	gray \\
-	green \\
-	light\_blue \\
-	light\_gray \\
-	lime \\
-	magenta \\
-	orange \\
-	pink \\
-	purple \\
-	red \\
-	white \\
-	yellow \\
+	0 & none \\
+	1 & black \\
+	2 & blue \\
+	3 & brown \\
+	4 & cyan \\
+	5 & gray \\
+	6 & green \\
+	7 & light\_blue \\
+	8 & light\_gray \\
+	9 & lime \\
+	10 & magenta \\
+	11 & orange \\
+	12 & pink \\
+	13 & purple \\
+	14 & red \\
+	15 & white \\
+	16 & yellow \\
 	\hline
-	\caption{Wool colors}
+	\caption{Colors}
 \end{longtable}
 
 \subsubsection{Wood type}\label{ab:wood}
 \myworries{...}
 
-\begin{longtable}{ |c| }
+\begin{longtable}{ |c|c| }
 	\hline
-	Wood \\
+	Index & Wood \\
 	\hline
 	\endhead
-	acacia \\
-	birch \\
-	crimson \\
-	dark\_oak \\
-	jungle \\
-	mangrove \\
-	oak \\
-	spruce \\
-	warped \\
+	0 & acacia \\
+	1 & birch \\
+	2 & crimson \\
+	3 & dark\_oak \\
+	4 & jungle \\
+	5 & mangrove \\
+	6 & oak \\
+	7 & spruce \\
+	8 & warped \\
 	\hline
 	\caption{Wood types}
 \end{longtable}
+
+\myworries{saplings}
 
 \subsubsection{Material}
 In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be made of other type of blocks.
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c| }
+	\begin{tabular}{ |c|c| }
 		\hline
-		Material \\
+		Index & Material \\
 		\hline
-		iron \\
-		gold \\
-		stone \\
-		blackstone \\
+		16 & iron \\
+		17 & gold \\
+		18 & stone \\
+		19 & blackstone \\
 		\hline
 	\end{tabular}
 	\caption{Additional materials}
@@ -1994,18 +1997,63 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c| }
+	\begin{tabular}{ |c|c| }
 		\hline
-		Liquid \\
+		Index & Liquid \\
 		\hline
-		none \\
-		lava \\
-		powder\_snow \\
-		water \\
+		0 & none \\
+		1 & lava \\
+		2 & powder\_snow \\
+		3 & water \\
 		\hline
 	\end{tabular}
 	\caption{Liquid types}
 \end{table}
+
+\subsubsection{Flower}
+\myworries{... pot}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Index & Type \\
+	\hline
+	\endhead
+	0 & none \\
+	1 & acacia\_sapling \\
+	2 & allium \\
+	3 & azalea\_bush \\
+	4 & azure\_bluet \\
+	5 & bamboo \\
+	6 & birch\_sapling \\
+	7 & blue\_orchid \\
+	8 & brown\_mushroom \\
+	9 & cactus \\
+	10 & cornflower \\
+	11 & crimson\_fungus \\
+	12 & crimson\_roots \\
+	13 & dandelion \\
+	14 & dark\_oak\_sapling \\
+	15 & dead\_bush \\
+	16 & fern \\
+	17 & flowering\_azalea\_bush \\
+	18 & jungle\_sapling \\
+	19 & lily\_of\_the\_valley \\
+	20 & mangrove\_propagule \\
+	21 & oak\_sapling \\
+	22 & orange\_tulip \\
+	23 & oxeye\_daisy \\
+	24 & pink\_tulip \\
+	25 & poppy \\
+	26 & red\_mushroom \\
+	27 & red\_tulip \\
+	28 & spruce\_sapling \\
+	29 & warped\_fungus \\
+	30 & warped\_roots \\
+	31 & white\_tulip \\
+	32 & wither\_rose \\
+	\hline
+	\caption{Plantable materials}
+\end{longtable}
 
 \subsection{Material modifiers aggregation}
 \myworries{some modifiers are similar, so let's add them together}
@@ -2059,8 +2107,6 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 	\caption{Direction aggregation}
 \end{longtable}
 
-
-\iffalse
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
 
@@ -2159,4 +2205,3 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\caption{Integer modifier concatenation 2}
 	\end{figure}
 \end{subfigures}
-\fi
