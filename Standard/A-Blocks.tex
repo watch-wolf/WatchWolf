@@ -2,12 +2,11 @@
 To generate the \hyperref[type:block]{blocks enum} Spigot 1.19 was used.
 That means that all the block names \textit{should} be the exact same as \cite{spigot-material}.
 
-\subsection{Material modifiers}
-There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.
+%\myworries{There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.}
 
-That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, all the block modifiers has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces).
+%\myworries{That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, all the block modifiers has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces).}
 
-\subsubsection{Unused modifiers}
+\subsection{Unused material modifiers}
 There's some Spigot modifiers that beside existing it won't be imported because there aren't a distinguished block in their own. You can find those in \hyperref[fig:unused-blockdata]{Figure \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}.
 
 \begin{longtable}{ |c|c| }
@@ -130,11 +129,15 @@ In addition to this, some modifiers applied to certain blocks doesn't change the
 	SMOKER & lit \\
 	FURNACE & lit \\
 	\hline
+	CHEST & type \\
+	TRAPPED\_CHEST & type \\
+	\hline
 	
 	\caption{Unused Spigot BlockData's modifiers on certain blocks}
 	\label{fig:unused-blockdata-blocks}
 \end{longtable}
 
+\subsection{Material modifiers}
 \subsubsection{Age}
 Represents the different growth stages that a crop-like block can go through.
 
@@ -438,6 +441,8 @@ As the \textit{tall} option is unused (check \hyperref[fig:unused-blockdata]{Tab
 	MUSHROOM\_STEM & \textbf{true}/false \\
 	RED\_MUSHROOM\_BLOCK & \textbf{true}/false \\
 	\hline
+	REDSTONE\_WIRE & \textbf{none}/up/slide \\
+	\hline
 	ANDESITE\_WALL & \textbf{none}/low/tall \\
 	BLACKSTONE\_WALL & \textbf{none}/low/tall \\
 	BRICK\_WALL & \textbf{none}/low/tall \\
@@ -456,7 +461,6 @@ As the \textit{tall} option is unused (check \hyperref[fig:unused-blockdata]{Tab
 	POLISHED\_BLACKSTONE\_WALL & \textbf{none}/low/tall \\
 	POLISHED\_DEEPSLATE\_WALL & \textbf{none}/low/tall \\
 	PRISMARINE\_WALL & \textbf{none}/low/tall \\
-	REDSTONE\_WIRE & \textbf{none}/low/tall \\
 	RED\_NETHER\_BRICK\_WALL & \textbf{none}/low/tall \\
 	RED\_SANDSTONE\_WALL & \textbf{none}/low/tall \\
 	SANDSTONE\_WALL & \textbf{none}/low/tall \\
@@ -1383,122 +1387,229 @@ Defaults to 0 and goes up to 15.
 	\caption{Directional materials}
 \end{longtable}
 
-\subsubsection{Shape}
-shape=north_south (ACTIVATOR_RAIL)
-shape=north_south (DETECTOR_RAIL)
-shape=north_south (POWERED_RAIL)
-shape=north_south (RAIL)
+\subsubsection{Shape - Rails}
+Represents the current layout of a minecart rail.
 
-shape=straight (ACACIA_STAIRS)
-shape=straight (ANDESITE_STAIRS)
-shape=straight (BIRCH_STAIRS)
-shape=straight (BLACKSTONE_STAIRS)
-shape=straight (BRICK_STAIRS)
-shape=straight (COBBLED_DEEPSLATE_STAIRS)
-shape=straight (COBBLESTONE_STAIRS)
-shape=straight (CRIMSON_STAIRS)
-shape=straight (CUT_COPPER_STAIRS)
-shape=straight (DARK_OAK_STAIRS)
-shape=straight (DARK_PRISMARINE_STAIRS)
-shape=straight (DEEPSLATE_BRICK_STAIRS)
-shape=straight (DEEPSLATE_TILE_STAIRS)
-shape=straight (DIORITE_STAIRS)
-shape=straight (END_STONE_BRICK_STAIRS)
-shape=straight (EXPOSED_CUT_COPPER_STAIRS)
-shape=straight (GRANITE_STAIRS)
-shape=straight (JUNGLE_STAIRS)
-shape=straight (MANGROVE_STAIRS)
-shape=straight (MOSSY_COBBLESTONE_STAIRS)
-shape=straight (MOSSY_STONE_BRICK_STAIRS)
-shape=straight (MUD_BRICK_STAIRS)
-shape=straight (NETHER_BRICK_STAIRS)
-shape=straight (OAK_STAIRS)
-shape=straight (OXIDIZED_CUT_COPPER_STAIRS)
-shape=straight (POLISHED_ANDESITE_STAIRS)
-shape=straight (POLISHED_BLACKSTONE_BRICK_STAIRS)
-shape=straight (POLISHED_BLACKSTONE_STAIRS)
-shape=straight (POLISHED_DEEPSLATE_STAIRS)
-shape=straight (POLISHED_DIORITE_STAIRS)
-shape=straight (POLISHED_GRANITE_STAIRS)
-shape=straight (PRISMARINE_BRICK_STAIRS)
-shape=straight (PRISMARINE_STAIRS)
-shape=straight (PURPUR_STAIRS)
-shape=straight (QUARTZ_STAIRS)
-shape=straight (RED_NETHER_BRICK_STAIRS)
-shape=straight (RED_SANDSTONE_STAIRS)
-shape=straight (SANDSTONE_STAIRS)
-shape=straight (SMOOTH_QUARTZ_STAIRS)
-shape=straight (SMOOTH_RED_SANDSTONE_STAIRS)
-shape=straight (SMOOTH_SANDSTONE_STAIRS)
-shape=straight (SPRUCE_STAIRS)
-shape=straight (STONE_BRICK_STAIRS)
-shape=straight (STONE_STAIRS)
-shape=straight (WARPED_STAIRS)
-shape=straight (WAXED_CUT_COPPER_STAIRS)
-shape=straight (WAXED_EXPOSED_CUT_COPPER_STAIRS)
-shape=straight (WAXED_OXIDIZED_CUT_COPPER_STAIRS)
-shape=straight (WAXED_WEATHERED_CUT_COPPER_STAIRS)
-shape=straight (WEATHERED_CUT_COPPER_STAIRS)
+Defaults to north\_south, and it can take any value of those mentioned in \hyperref[ab:rail]{Table \ref{ab:rail}, Rail directions}.
+
+\begin{longtable}{ |c| }
+	\hline
+	Shape \\
+	\hline
+	\endhead
+	north\_south \\
+	east\_west \\
+	\hline
+	north\_east \\
+	north\_west \\
+	south\_east \\
+	south\_west \\
+	\hline
+	ascending\_north \\
+	ascending\_south \\
+	ascending\_east \\
+	ascending\_west \\
+	\hline
+	\caption{Rail directions}
+	\label{ab:rail}
+\end{longtable}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ |c| }
+	\hline
+	Material \\
+	\hline
+	ACTIVATOR\_RAIL \\
+	DETECTOR\_RAIL \\
+	POWERED\_RAIL \\
+	RAIL \\
+	\hline
+\end{tabular}
+\caption{Rails}
+\end{table}
+
+\subsubsection{Shape - Stairs}
+Represents the texture and bounding box shape of these stairs.
+
+Defaults to straight.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Shape \\
+	\hline
+	\endhead
+	ACACIA\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	ANDESITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BIRCH\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BLACKSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	COBBLED\_DEEPSLATE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	COBBLESTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	CRIMSON\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DARK\_OAK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DARK\_PRISMARINE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DEEPSLATE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DEEPSLATE\_TILE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DIORITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	END\_STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	GRANITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	JUNGLE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MANGROVE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MOSSY\_COBBLESTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MOSSY\_STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MUD\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	NETHER\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	OAK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_ANDESITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_BLACKSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_DEEPSLATE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_DIORITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_GRANITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PRISMARINE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PRISMARINE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PURPUR\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	QUARTZ\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	RED\_NETHER\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	RED\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_QUARTZ\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SPRUCE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	STONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WARPED\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	\hline
+	\caption{Stairs}
+\end{longtable}
 
 \subsubsection{Type}
-type=bottom (ACACIA_SLAB)
-type=bottom (ANDESITE_SLAB)
-type=bottom (BIRCH_SLAB)
-type=bottom (BLACKSTONE_SLAB)
-type=bottom (BRICK_SLAB)
-type=bottom (COBBLED_DEEPSLATE_SLAB)
-type=bottom (COBBLESTONE_SLAB)
-type=bottom (CRIMSON_SLAB)
-type=bottom (CUT_COPPER_SLAB)
-type=bottom (CUT_RED_SANDSTONE_SLAB)
-type=bottom (CUT_SANDSTONE_SLAB)
-type=bottom (DARK_OAK_SLAB)
-type=bottom (DARK_PRISMARINE_SLAB)
-type=bottom (DEEPSLATE_BRICK_SLAB)
-type=bottom (DEEPSLATE_TILE_SLAB)
-type=bottom (DIORITE_SLAB)
-type=bottom (END_STONE_BRICK_SLAB)
-type=bottom (EXPOSED_CUT_COPPER_SLAB)
-type=bottom (GRANITE_SLAB)
-type=bottom (JUNGLE_SLAB)
-type=bottom (MANGROVE_SLAB)
-type=bottom (MOSSY_COBBLESTONE_SLAB)
-type=bottom (MOSSY_STONE_BRICK_SLAB)
-type=bottom (MUD_BRICK_SLAB)
-type=bottom (NETHER_BRICK_SLAB)
-type=bottom (OAK_SLAB)
-type=bottom (OXIDIZED_CUT_COPPER_SLAB)
-type=bottom (PETRIFIED_OAK_SLAB)
-type=bottom (POLISHED_ANDESITE_SLAB)
-type=bottom (POLISHED_BLACKSTONE_BRICK_SLAB)
-type=bottom (POLISHED_BLACKSTONE_SLAB)
-type=bottom (POLISHED_DEEPSLATE_SLAB)
-type=bottom (POLISHED_DIORITE_SLAB)
-type=bottom (POLISHED_GRANITE_SLAB)
-type=bottom (PRISMARINE_BRICK_SLAB)
-type=bottom (PRISMARINE_SLAB)
-type=bottom (PURPUR_SLAB)
-type=bottom (QUARTZ_SLAB)
-type=bottom (RED_NETHER_BRICK_SLAB)
-type=bottom (RED_SANDSTONE_SLAB)
-type=bottom (SANDSTONE_SLAB)
-type=bottom (SMOOTH_QUARTZ_SLAB)
-type=bottom (SMOOTH_RED_SANDSTONE_SLAB)
-type=bottom (SMOOTH_SANDSTONE_SLAB)
-type=bottom (SMOOTH_STONE_SLAB)
-type=bottom (SPRUCE_SLAB)
-type=bottom (STONE_BRICK_SLAB)
-type=bottom (STONE_SLAB)
-type=bottom (WARPED_SLAB)
-type=bottom (WAXED_CUT_COPPER_SLAB)
-type=bottom (WAXED_EXPOSED_CUT_COPPER_SLAB)
-type=bottom (WAXED_OXIDIZED_CUT_COPPER_SLAB)
-type=bottom (WAXED_WEATHERED_CUT_COPPER_SLAB)
-type=bottom (WEATHERED_CUT_COPPER_SLAB)
-type=normal (MOVING_PISTON)
-type=normal (PISTON_HEAD)
-type=single (CHEST)
-type=single (TRAPPED_CHEST)
+Represents the type of piston which that block corresponds to, or represents what state the slab is in.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	ACACIA\_SLAB & \textbf{bottom}/top/double \\
+	ANDESITE\_SLAB & \textbf{bottom}/top/double \\
+	BIRCH\_SLAB & \textbf{bottom}/top/double \\
+	BLACKSTONE\_SLAB & \textbf{bottom}/top/double \\
+	BRICK\_SLAB & \textbf{bottom}/top/double \\
+	COBBLED\_DEEPSLATE\_SLAB & \textbf{bottom}/top/double \\
+	COBBLESTONE\_SLAB & \textbf{bottom}/top/double \\
+	CRIMSON\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	DARK\_OAK\_SLAB & \textbf{bottom}/top/double \\
+	DARK\_PRISMARINE\_SLAB & \textbf{bottom}/top/double \\
+	DEEPSLATE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	DEEPSLATE\_TILE\_SLAB & \textbf{bottom}/top/double \\
+	DIORITE\_SLAB & \textbf{bottom}/top/double \\
+	END\_STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	EXPOSED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	GRANITE\_SLAB & \textbf{bottom}/top/double \\
+	JUNGLE\_SLAB & \textbf{bottom}/top/double \\
+	MANGROVE\_SLAB & \textbf{bottom}/top/double \\
+	MOSSY\_COBBLESTONE\_SLAB & \textbf{bottom}/top/double \\
+	MOSSY\_STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	MUD\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	NETHER\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	OAK\_SLAB & \textbf{bottom}/top/double \\
+	OXIDIZED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	PETRIFIED\_OAK\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_ANDESITE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_BLACKSTONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_BLACKSTONE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_DEEPSLATE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_DIORITE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_GRANITE\_SLAB & \textbf{bottom}/top/double \\
+	PRISMARINE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	PRISMARINE\_SLAB & \textbf{bottom}/top/double \\
+	PURPUR\_SLAB & \textbf{bottom}/top/double \\
+	QUARTZ\_SLAB & \textbf{bottom}/top/double \\
+	RED\_NETHER\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_QUARTZ\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_STONE\_SLAB & \textbf{bottom}/top/double \\
+	SPRUCE\_SLAB & \textbf{bottom}/top/double \\
+	STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	STONE\_SLAB & \textbf{bottom}/top/double \\
+	WARPED\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WEATHERED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	\hline
+	PISTON\_HEAD & \textbf{normal}/sticky \\
+	\hline
+	\caption{Type materials}
+\end{longtable}
 
 \subsubsection{Vertical direction}
 Represents the dripstone orientation.
@@ -1805,6 +1916,197 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 % Aquatic block's footnote
 \footnotetext{If it's an underwater block (defaults to true).}
 
+\subsection{Material name attached modifiers}
+Some materials have modifiers already attached to the material name.
+
+\subsubsection{Color}
+\myworries{... wool/glass}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Index & Color \\
+	\hline
+	\endhead
+	0 & none \\
+	1 & black \\
+	2 & blue \\
+	3 & brown \\
+	4 & cyan \\
+	5 & gray \\
+	6 & green \\
+	7 & light\_blue \\
+	8 & light\_gray \\
+	9 & lime \\
+	10 & magenta \\
+	11 & orange \\
+	12 & pink \\
+	13 & purple \\
+	14 & red \\
+	15 & white \\
+	16 & yellow \\
+	\hline
+	\caption{Colors}
+\end{longtable}
+
+\subsubsection{Wood type}\label{ab:wood}
+\myworries{...}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Index & Wood \\
+	\hline
+	\endhead
+	0 & acacia \\
+	1 & birch \\
+	2 & crimson \\
+	3 & dark\_oak \\
+	4 & jungle \\
+	5 & mangrove \\
+	6 & oak \\
+	7 & spruce \\
+	8 & warped \\
+	\hline
+	\caption{Wood types}
+\end{longtable}
+
+\myworries{saplings}
+
+\subsubsection{Material}
+In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be made of other type of blocks.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Index & Material \\
+		\hline
+		16 & iron \\
+		17 & gold \\
+		18 & stone \\
+		19 & blackstone \\
+		\hline
+	\end{tabular}
+	\caption{Additional materials}
+\end{table}
+
+\myworries{iron and gold pressure plates have their name as 'heavy/light weighted pressure plate'}
+\myworries{blackstone pressure plates have its name as 'polished blackstone pressure plate'}
+
+\subsubsection{Liquid recipient}
+\myworries{... cauldron}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Index & Liquid \\
+		\hline
+		0 & none \\
+		1 & lava \\
+		2 & powder\_snow \\
+		3 & water \\
+		\hline
+	\end{tabular}
+	\caption{Liquid types}
+\end{table}
+
+\subsubsection{Flower}
+\myworries{... pot}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Index & Type \\
+	\hline
+	\endhead
+	0 & none \\
+	1 & acacia\_sapling \\
+	2 & allium \\
+	3 & azalea\_bush \\
+	4 & azure\_bluet \\
+	5 & bamboo \\
+	6 & birch\_sapling \\
+	7 & blue\_orchid \\
+	8 & brown\_mushroom \\
+	9 & cactus \\
+	10 & cornflower \\
+	11 & crimson\_fungus \\
+	12 & crimson\_roots \\
+	13 & dandelion \\
+	14 & dark\_oak\_sapling \\
+	15 & dead\_bush \\
+	16 & fern \\
+	17 & flowering\_azalea\_bush \\
+	18 & jungle\_sapling \\
+	19 & lily\_of\_the\_valley \\
+	20 & mangrove\_propagule \\
+	21 & oak\_sapling \\
+	22 & orange\_tulip \\
+	23 & oxeye\_daisy \\
+	24 & pink\_tulip \\
+	25 & poppy \\
+	26 & red\_mushroom \\
+	27 & red\_tulip \\
+	28 & spruce\_sapling \\
+	29 & warped\_fungus \\
+	30 & warped\_roots \\
+	31 & white\_tulip \\
+	32 & wither\_rose \\
+	\hline
+	\caption{Plantable materials}
+\end{longtable}
+
+\subsection{Material modifiers aggregation}
+\myworries{some modifiers are similar, so let's add them together}
+
+\subsubsection{Direction aggregation}
+\myworries{modifier, followed by the condition to set the bit to 1}
+
+\begin{longtable}{ |c|c|c|c|c|c|c| }
+	\hline
+	Property & U & D & N & S & E & W \\
+	\hline
+	\endhead
+	up & \rotatebox{90}{true} &&&&& \\
+	\hline
+	down && \rotatebox{90}{true} &&&& \\
+	\hline
+	north &&& \rotatebox{90}{true} &&& \\
+	\hline
+	south &&&& \rotatebox{90}{true} && \\
+	\hline
+	east &&&&& \rotatebox{90}{true} & \\
+	\hline
+	west &&&&&& \rotatebox{90}{true} \\
+	\hline
+	face & \rotatebox{90}{ceiling} & \rotatebox{90}{floor} &&&& \\
+	\hline
+	half & \rotatebox{90}{top} &  \rotatebox{90}{bottom} &&&& \\
+	\hline
+	facing & \rotatebox{90}{up} & \rotatebox{90}{down} &
+		\rotatebox{90}{north} & \rotatebox{90}{south} &
+		\rotatebox{90}{east} & \rotatebox{90}{west} \\
+		\hline
+	vertical-direction & \rotatebox{90}{up} &  \rotatebox{90}{down} &&&& \\
+	\hline
+	type & \rotatebox{90}{top} &  \rotatebox{90}{bottom} &&&& \\
+	\hline
+	orientation & \rotatebox{90}{up\_\textit{X}} & \rotatebox{90}{down\_\textit{X}} &
+		\rotatebox{90}{\textit{X}\_north or north\_up} &
+		\rotatebox{90}{\textit{X}\_south or south\_up} &
+		\rotatebox{90}{\textit{X}\_east or east\_up} &
+		\rotatebox{90}{\textit{X}\_west or west\_up} \\
+	\hline
+	shape & \rotatebox{90}{ascending\_\textit{X}} &&
+		\rotatebox{90}{ascending\_north or north\_\textit{X}} &
+		\rotatebox{90}{ascending\_south or south\_\textit{X} or north\_south} &
+		\rotatebox{90}{ascending\_east or \textit{X}\_east or east\_west} &
+		\rotatebox{90}{ascending\_west or \textit{X}\_west} \\
+	\hline
+	hanging & \rotatebox{90}{true} &&&&& \\
+	\hline
+	\caption{Direction aggregation}
+\end{longtable}
+
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}
 
@@ -1815,12 +2117,25 @@ If a material doesn't have the attribute that the diagram is checking it will as
 		\begin{rail}
 			([waterlogged=false] () | [waterlogged=true] 'WATERLOGGED\_' ) ([attachment undefined or attachment=floor] () | [attachment=ceiling] 'CEILING\_' | [attachment=double\_wall] 'DWALL\_' | [attachment=single\_wall] 'SWALL\_') \\
 			([powered=false] () | [powered=true] 'TRIGGERED\_') ([half!=upper] () | [half=upper] 'UPPER\_') ([eye=false] () | [eye=true] 'EYED\_') \\
-			Material \\
-			([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') \\
-			([conditional=false] () | [conditional=true] '\_CONDITIONAL')
+			([type!=sticky and type!=double] () | [type=sticky] 'STICKY\_' | [type=double] 'DOUBLE\_') ([open!=true]() | [open=true] 'OPENED\_') \\
+			([locked!=true]() | [locked=true] 'LOCKED\_') ([lit!=true]() | [lit=true] 'LIGHTED\_') \\
+			([leaves undefined or leaves=none]() | [leaves=small] 'LEAVED\_' | [leaves=large] 'XLEAVED\_') ([extended!=true]() | [extended=true] 'EXTENDED\_') \\
 			'...'
 		\end{rail}
 		\label{rail:modifier-concatenation}
+		\caption{Prefix modifier concatenation}
+	\end{figure}
+
+	\begin{figure}
+		\begin{rail}
+			'...'
+			Material \\
+			([axis=x and not NETHER\_PORTAL] '\_X' | [axis=y or (NETHER\_PORTAL and axis=x)] () | [axis=z] '\_Z') ([part!=head]() | [part=head] '\_TOP') \\
+			([conditional=false] () | [conditional=true] '\_CONDITIONAL') \\
+			([not COMPARATOR or not STRUCTURE\_BLOCK or (mode!=compare and mode!=load)]() | [(COMPARATOR and mode=subtract) or (STRUCTURE\_BLOCK and mode!=load)] \\ '\_' mode) \\
+			([inverted!=true]() | [inverted=true] '\_INVERTED')
+			'...'
+		\end{rail}
 		\caption{Modifier concatenation}
 	\end{figure}
 
@@ -1829,32 +2144,64 @@ If a material doesn't have the attribute that the diagram is checking it will as
 			'...' \\
 			([up=false and down=false and north=false and south=false and east=false and west=false]() | [up=true or down=true or north=true or south=true or east=true or west=true]('\_' \\ ([up=false]() | [up=true]'U') ([down=false]() | [down=true]'D') ([north=false]() | [north=true]'N') \\ ([south=false]() | [south=true]'S') ([east=false]() | [east=true]'E') ([west=false]() | [west=true]'W'))) \\
 			([(face undefined or face=wall) and (facing undefined or facing=north) and half!=top]() | [face!=wall or facing!=north or half=top]('\_' \\
-			([face!=ceiling and facing!=up and half!=top]() | [face=ceiling or facing=up or half=top]'U') \\ ([face!=floor and facing!=down]() | [face=floor or facing=down]'D') ([facing!=north]() | [facing=north]'N') \\ ([facing!=south]() | [facing=south]'S') ([facing!=east]() | [facing=east]'E') ([facing!=west]() | [facing=west]'W'))) \\
+			([face!=ceiling and facing!=up and half!=top]() | [face=ceiling or facing=up or half=top]'U') \\ ([face!=floor and facing!=down]() | [face=floor or facing=down]'D') \\ ([facing!=south]() | [facing=south]'S') ([facing!=east]() | [facing=east]'E') ([facing!=west]() | [facing=west]'W'))) \\
 			'...'
 		\end{rail}
-		\label{rail:modifier-concatenation}
 		\caption{Direction modifier concatenation}
 	\end{figure}
 
 	\begin{figure}
 		\begin{rail}
-			'...' \\
-			([vertical-direction!=down]() | [vertical-direction=down]('\_D')) \\
+			'...' ([vertical-direction!=down and type!=top]() | [vertical-direction=down] '\_D' | [type=top] '\_U') \\
 			([orientation undefined or orientation=north\_up]() | [orientation=south\_up]('\_S') | [orientation=east\_up]('\_E') | [orientation=west\_up]('\_W') | [orientation=up\_north]('\_UN') | [orientation=up\_south]('\_US') | [orientation=up\_east]('\_UE') | [orientation=up\_west]('\_UW') | [orientation=down\_north]('\_DN') | [orientation=down\_south]('\_DS') | [orientation=down\_east]('\_DE') | [orientation=down\_west]('\_DW')) '...'
 		\end{rail}
-		\label{rail:modifier-concatenation}
 		\caption{Direction modifier concatenation 2}
 	\end{figure}
 	
 	\begin{figure}
 		\begin{rail}
+			'...' \\
+			([shape!=east\_west and shape!=north\_east and shape!=north\_west and shape!=south\_east] \\ (
+				[shape!=south\_west and shape!=ascending\_north and shape!=ascending\_south] \\ (
+					[shape!=ascending\_east and shape!=ascending\_west]() |
+					[shape=ascending\_east] '\_UE' |
+					[shape=ascending\_west] '\_UW'
+				) |
+				[shape=south\_west] '\_SW' |
+				[shape=ascending\_north] '\_UN' |
+				[shape=ascending\_south] '\_US'
+			) |
+			[shape=east\_west] '\_EW' |
+			[shape=north\_east] '\_NE' |
+			[shape=north\_west] '\_NW' |
+			[shape=south\_east] '\_SE') \\
+			([hanging!=true]() | [hanging=true] '\_U') \\
 			'...'
+		\end{rail}
+		\caption{Direction modifier concatenation 3}
+	\end{figure}
+	
+	\begin{figure}
+		\begin{rail}
+			'...' \\
+			([shape!=inner\_right and shape!=inner\_left and shape!=outer\_right and shape!=outer\_left]() | [shape=inner\_right] '\_IR' | [shape=inner\_left] '\_IL' | [shape=outer\_right] '\_OR' | [shape=outer\_left] '\_OL') \\
+			([hinge!=right]() | [hinge=right] '\_HR')
 			([rotation undefined or rotation=0] () | [rotation$>$0] '\_R' rotation) \\
 			([age=0 and berries=false] () | [age!=0] ([not CHORUS\_FLOWER] '\_' age | [CHORUS\_FLOWER and age$<$5] () | [CHORUS\_FLOWER and age=5] '\_1') | [berries=true] '\_1') \\
 			([bites=0] () | [bites!=0] '\_' bites) ([candles$<$2] () | [candles$>$1] '\_' candles) \\
 			([charges=0] () | [charges!=0] '\_' charges) ([delay$<$2] () | [delay$>$1] '\_' delay) \\
 			([eggs$<$2]() | [eggs$>$1] '\_' eggs) ([pickles$<$2]() | [pickles$>$1] '\_' pickles)
+			'...'
 		\end{rail}
 		\caption{Integer modifier concatenation}
+	\end{figure}
+	
+	\begin{figure}
+		\begin{rail}
+			'...' \\
+			([note$<$1]() | [note$>$0] '\_' note) ([level$<$1]() | [level$>$0] '\_' level) \\
+			([layers$<$2]() | [layers$>$1] '\_' layers) ([honey-level$<$5]() | [honey-level=5] '\_1')
+		\end{rail}
+		\caption{Integer modifier concatenation 2}
 	\end{figure}
 \end{subfigures}
