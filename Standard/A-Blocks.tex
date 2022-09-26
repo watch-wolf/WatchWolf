@@ -333,7 +333,7 @@ Defaults to 0.
 	\caption{Charged materials}
 \end{table}
 
-\subsubsection{Conditional}
+\subsubsection{Conditional}\label{spigot-types:conditional}
 Denotes whether this command block is conditional or not.
 
 Defaults to false.
@@ -352,7 +352,7 @@ Defaults to false.
 	\caption{Conditionable materials}
 \end{table}
 
-\subsubsection{Delay}
+\subsubsection{Delay}\label{spigot-types:delay}
 Propagation delay of a repeater.
 
 Defaults to 1.
@@ -527,7 +527,7 @@ Defaults to false.
 	\caption{Extendable materials}
 \end{table}
 
-\subsubsection{Eye}
+\subsubsection{Eye}\label{spigot-types:eye}
 Defaults to false.
 
 \begin{table}[H]
@@ -926,7 +926,7 @@ Defaults to false.
 	\caption{Hangable materials}
 \end{table}
 
-\subsubsection{Hinge}
+\subsubsection{Hinge}\label{spigot-types:hinge}
 Indicates which hinge this door is attached to and will rotate around when opened.
 
 Defaults to left.
@@ -971,7 +971,7 @@ Defaults to 0.
 % Hives' footnotes
 \footnotetext{The block is the same from honey-level 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
 
-\subsubsection{Inverted}
+\subsubsection{Inverted}\label{spigot-types:inverted}
 Denotes whether this daylight detector is in the inverted mode.
 
 Defaults to false.
@@ -1005,7 +1005,7 @@ Defaults to 1.
 	\caption{Snow}
 \end{table}
 
-\subsubsection{Leaves}
+\subsubsection{Leaves}\label{spigot-types:leaves}
 Represents the size of the leaves of the bamboo block.
 
 Defaults to none.
@@ -1043,7 +1043,7 @@ Defaults on 0 except for POWDER\_SNOW\_CAULDRON and WATER\_CAULDRON (which defau
 	\caption{Levelled materials}
 \end{table}
 
-\subsubsection{Lit}
+\subsubsection{Lit}\label{spigot-types:lit}
 Denotes whether this block is currently lit.
 
 Except for CAMPFIRE, REDSTONE\_TORCH, REDSTONE\_WALL\_TORCH and SOUL\_CAMPFIRE (which defaults to true), it defaults to false.
@@ -1101,7 +1101,7 @@ Except for CAMPFIRE, REDSTONE\_TORCH, REDSTONE\_WALL\_TORCH and SOUL\_CAMPFIRE (
 \end{longtable}
 
 
-\subsubsection{Locked}
+\subsubsection{Locked}\label{spigot-types:locked}
 Denotes whether the repeater is in the locked state or not.
 
 Defaults to false.
@@ -1118,7 +1118,7 @@ Defaults to false.
 	\caption{Repeater}
 \end{table}
 
-\subsubsection{Mode}
+\subsubsection{Mode}\label{spigot-types:mode}
 Indicates what mode the block will operate in.
 
 \begin{table}[H]
@@ -1134,7 +1134,7 @@ Indicates what mode the block will operate in.
 	\caption{Materials with mode}
 \end{table}
 
-\subsubsection{Note}
+\subsubsection{Note}\label{spigot-types:note}
 Specified tuned pitch that the instrument will be played in.
 
 Defaults to 0.
@@ -1151,7 +1151,7 @@ Defaults to 0.
 	\caption{Note block}
 \end{table}
 
-\subsubsection{Open}
+\subsubsection{Open}\label{spigot-types:open}
 Denotes whether this block is currently opened.
 
 Defaults to false.
@@ -1284,7 +1284,7 @@ Defaults to 1.
 \end{table}
 
 
-\subsubsection{Powered}
+\subsubsection{Powered}\label{spigot-types:powered}
 Indicates whether this block is in the powered state or not (emitting current).
 
 Defaults to false.
@@ -1327,7 +1327,7 @@ Defaults to false.
 	\caption{Powerabled materials}
 \end{longtable}
 
-\subsubsection{Rotation}
+\subsubsection{Rotation}\label{spigot-types:rotation}
 Denotes where the block is looking.
 
 Defaults to 0 and goes up to 15.
@@ -1919,7 +1919,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 \subsection{Material name attached modifiers}
 Some materials have modifiers already attached to the material name.
 
-\subsubsection{Color}
+\subsubsection{Color}\label{spigot-types:color}
 \myworries{... wool/glass}
 
 \begin{longtable}{ |c|c| }
@@ -2002,15 +2002,15 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 		Index & Liquid \\
 		\hline
 		0 & none \\
-		1 & lava \\
-		2 & powder\_snow \\
-		3 & water \\
+		1 & water \\
+		2 & lava \\
+		3 & powder\_snow \\
 		\hline
 	\end{tabular}
 	\caption{Liquid types}
 \end{table}
 
-\subsubsection{Flower}
+\subsubsection{Flower}\label{spigot-types:flower}
 \myworries{... pot}
 
 \begin{longtable}{ |c|c| }
@@ -2055,10 +2055,27 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 	\caption{Plantable materials}
 \end{longtable}
 
+\subsubsection{Piston heead}
+\myworries{... si head meeans extended}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ |c|c| }
+	\hline
+	Index & Type \\
+	\hline
+	0 & piston \\
+	1 & extended\_piston \\
+	2 & piston\_head \\
+	\hline
+\end{tabular}
+\caption{Piston types}
+\end{table}
+
 \subsection{Material modifiers aggregation}
 \myworries{some modifiers are similar, so let's add them together}
 
-\subsubsection{Direction aggregation}
+\subsubsection{Direction aggregation}\label{spigot-types:direction}
 \myworries{modifier, followed by the condition to set the bit to 1}
 
 \begin{longtable}{ |c|c|c|c|c|c|c| }
@@ -2106,6 +2123,117 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 	\hline
 	\caption{Direction aggregation}
 \end{longtable}
+
+\subsubsection{Axis aggregation}\label{spigot-types:axis}
+\myworries{modifier}
+\myworries{up to 2b}
+
+\begin{longtable}{ |c| }
+	\hline
+	Property \\
+	\hline
+	\endhead
+	attachment \\
+	face \\
+	axis \\
+	\hline
+	\caption{Axis aggregation}
+\end{longtable}
+
+\subsubsection{Age aggregation}\label{spigot-types:age}
+\myworries{modifier}
+\myworries{up to 8b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+age \\
+berries \\
+honey\_level \\
+\hline
+\caption{Age aggregation}
+\end{longtable}
+
+\subsubsection{Grouped materials aggregation}\label{spigot-types:groups}
+\myworries{modifier}
+\myworries{up to 3b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+candles \\
+eggs \\
+pickles \\
+\hline
+\caption{Grouped materials aggregation}
+\end{longtable}
+
+\subsubsection{Stages aggregation}\label{spigot-types:stages}
+\myworries{modifier}
+\myworries{up to 8b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+charges \\
+level \\
+bites \\
+layers \\
+\hline
+\caption{Stages aggregation}
+\end{longtable}
+
+\subsubsection{Parts aggregation}\label{spigot-types:parts}
+\myworries{modifier; up to 4b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+part \\
+type \\
+piston\_head \\
+stair\_shape \\
+\hline
+\caption{Parts aggregation}
+\end{longtable}
+
+\subsubsection{Material aggregation}\label{spigot-types:material}
+\myworries{modifier; up to 4b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+wood\_type \\
+material \\
+\hline
+\caption{Material aggregation}
+\end{longtable}
+
+\subsubsection{Liquid aggregation}\label{spigot-types:liquid}
+\myworries{modifier; up to 4b}
+
+\begin{longtable}{ |c|c| }
+\hline
+Property & value \\
+\hline
+\endhead
+liquid & \textit{liquid value} \\
+waterlogged & 1\footnotemark \\
+\hline
+\caption{Liquid aggregation}
+\end{longtable}
+
+\footnotetext{1 is the liquid value of water.}
 
 \subsection{Material modifiers concatenation}
 \myworries{... (how to join modifiers)}

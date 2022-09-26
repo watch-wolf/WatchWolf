@@ -302,13 +302,49 @@ The Server type specifies the Minecraft server.
 As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-mc}), but for scalability reasons this parameter is a \hyperref[type:str]{String} specifying the server type.
 
 \subsubsection{Block}\label{type:block}
-\myworries{...}
+\myworries{... 56 bytes}
 
 \begin{figure}[H]
 	\centering
-	\begin{bytefield}{32}
-		\bitheader{0,29,30,31} \\
-		\bitbox{30}{enum value} & \bitbox{2}{00} \\
+	\begin{bytefield}[bitwidth=2.5em]{16}
+		\bitheader{0,7,8,9,10,11,12,13,14,15} \\
+		\bitbox{16}{enum value} \\
+		\bitbox{8}{\hyperref[spigot-types:age]{age}} &
+			\bitbox{6}{\hyperref[spigot-types:direction]{direction}} & \bitbox{2}{\hyperref[spigot-types:axis]{axis}} \\
+		
+		\bitbox{8}{\hyperref[spigot-types:material]{material}} &
+			 \bitbox{3}{\hyperref[spigot-types:groups]{group\_count}} & \bitbox{2}{\hyperref[spigot-types:delay]{delay}} &
+			 \bitbox{1}{\hyperref[spigot-types:eye]{eye}} & \bitbox{1}{\hyperref[spigot-types:hinge]{hinge}} &
+			 \bitbox{1}{\hyperref[spigot-types:open]{open}} \\
+		\bitbox{8}{\hyperref[spigot-types:stages]{stage}} & 
+			\bitbox{4}{\hyperref[spigot-types:parts]{part}} & \bitbox{4}{\hyperref[spigot-types:rotation]{rotation}} \\
+		\bitbox{8}{\hyperref[spigot-types:note]{note}} &
+			\bitbox{4}{\hyperref[spigot-types:mode]{mode}} & \bitbox{2}{\hyperref[spigot-types:leaves]{leaves}} & \bitbox{1}{\hyperref[spigot-types:lit]{lit}} & \bitbox{1}{\hyperref[spigot-types:locked]{locked}} \\
+		\bitbox{8}{\hyperref[spigot-types:color]{color}} & \bitbox{8}{\hyperref[spigot-types:liquid]{liquid}} \\
+		\bitbox{8}{\hyperref[spigot-types:color]{flower}} &
+			\bitbox{1}{\hyperref[spigot-types:conditional]{cond}} & \bitbox{1}{\hyperref[spigot-types:inverted]{inv}} &
+			\bitbox{1}{\hyperref[spigot-types:powered]{pow}} & \bitbox[lrt]{5}[bgcolor=lightgray]{} \\
+			\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{reserved (173 bits)} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
 	\end{bytefield}
 	\caption{Structure of a \hyperref[type:block]{Block}}
 \end{figure}
