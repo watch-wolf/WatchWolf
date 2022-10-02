@@ -1971,27 +1971,6 @@ Some materials have modifiers already attached to the material name.
 
 \myworries{saplings}
 
-\subsubsection{Material}
-In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be made of other type of blocks.
-
-\begin{table}[H]
-	\centering
-	\begin{tabular}{ |c|c| }
-		\hline
-		Index & Material \\
-		\hline
-		16 & iron \\
-		17 & gold \\
-		18 & stone \\
-		19 & blackstone \\
-		\hline
-	\end{tabular}
-	\caption{Additional materials}
-\end{table}
-
-\myworries{iron and gold pressure plates have their name as 'heavy/light weighted pressure plate'}
-\myworries{blackstone pressure plates have its name as 'polished blackstone pressure plate'}
-
 \subsubsection{Liquid recipient}
 \myworries{... cauldron}
 
@@ -2010,7 +1989,7 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 	\caption{Liquid types}
 \end{table}
 
-\subsubsection{Flower}\label{spigot-types:flower}
+\subsubsection{Flower}
 \myworries{... pot}
 
 \begin{longtable}{ |c|c| }
@@ -2055,7 +2034,7 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 	\caption{Plantable materials}
 \end{longtable}
 
-\subsubsection{Piston heead}
+\subsubsection{Piston head}
 \myworries{... si head meeans extended}
 
 \begin{table}[H]
@@ -2071,6 +2050,9 @@ In addition to all the \hyperref[ab:wood]{Wood types}, some materials can be mad
 \end{tabular}
 \caption{Piston types}
 \end{table}
+
+\subsubsection{Sub-materials}
+\myworries{... slabs}
 
 \subsection{Material modifiers aggregation}
 \myworries{some modifiers are similar, so let's add them together}
@@ -2206,15 +2188,17 @@ stair\_shape \\
 \end{longtable}
 
 \subsubsection{Material aggregation}\label{spigot-types:material}
-\myworries{modifier; up to 4b}
+\myworries{modifier; up to 16b}
+\myworries{iron and gold pressure plates have their name as 'heavy/light weighted pressure plate'}
 
-\begin{longtable}{ |c| }
+\begin{longtable}{ |c|c| }
 \hline
-Property \\
+Property & Value \\
 \hline
 \endhead
-wood\_type \\
-material \\
+wood\_type & 0x8000 $|$ \textit{wood value} \\
+flower & 0x8000 $|$ \textit{flower value} \\
+material & \textit{material value} \\
 \hline
 \caption{Material aggregation}
 \end{longtable}

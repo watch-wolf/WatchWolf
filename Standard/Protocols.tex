@@ -308,11 +308,12 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 	\centering
 	\begin{bytefield}[bitwidth=2.5em]{16}
 		\bitheader{0,7,8,9,10,11,12,13,14,15} \\
-		\bitbox{16}{enum value} \\
+		\bitbox{15}{enum value} & \bitbox{1}[bgcolor=lightgray]{0} \\
+		\bitbox{16}{\hyperref[spigot-types:material]{material\footnotemark}} \\
 		\bitbox{8}{\hyperref[spigot-types:age]{age}} &
 			\bitbox{6}{\hyperref[spigot-types:direction]{direction}} & \bitbox{2}{\hyperref[spigot-types:axis]{axis}} \\
 		
-		\bitbox{8}{\hyperref[spigot-types:material]{material}} &
+		 \bitbox{8}{\hyperref[spigot-types:color]{color}} &
 			 \bitbox{3}{\hyperref[spigot-types:groups]{group\_count}} & \bitbox{2}{\hyperref[spigot-types:delay]{delay}} &
 			 \bitbox{1}{\hyperref[spigot-types:eye]{eye}} & \bitbox{1}{\hyperref[spigot-types:hinge]{hinge}} &
 			 \bitbox{1}{\hyperref[spigot-types:open]{open}} \\
@@ -320,12 +321,12 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 			\bitbox{4}{\hyperref[spigot-types:parts]{part}} & \bitbox{4}{\hyperref[spigot-types:rotation]{rotation}} \\
 		\bitbox{8}{\hyperref[spigot-types:note]{note}} &
 			\bitbox{4}{\hyperref[spigot-types:mode]{mode}} & \bitbox{2}{\hyperref[spigot-types:leaves]{leaves}} & \bitbox{1}{\hyperref[spigot-types:lit]{lit}} & \bitbox{1}{\hyperref[spigot-types:locked]{locked}} \\
-		\bitbox{8}{\hyperref[spigot-types:color]{color}} & \bitbox{8}{\hyperref[spigot-types:liquid]{liquid}} \\
-		\bitbox{8}{\hyperref[spigot-types:color]{flower}} &
+		\bitbox[lrt]{8}[bgcolor=lightgray]{} &
+			\bitbox{4}{\hyperref[spigot-types:liquid]{liquid}} & 
 			\bitbox{1}{\hyperref[spigot-types:conditional]{cond}} & \bitbox{1}{\hyperref[spigot-types:inverted]{inv}} &
-			\bitbox{1}{\hyperref[spigot-types:powered]{pow}} & \bitbox[lrt]{5}[bgcolor=lightgray]{} \\
-			\bitbox[lr]{16}[bgcolor=lightgray]{} \\
-		\bitbox[lr]{16}[bgcolor=lightgray]{reserved (173 bits)} \\
+			\bitbox{1}{\hyperref[spigot-types:powered]{pow}} & \bitbox[lrt]{1}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{reserved} \\
 		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
 		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
 		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
@@ -348,6 +349,8 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 	\end{bytefield}
 	\caption{Structure of a \hyperref[type:block]{Block}}
 \end{figure}
+
+\footnotetext{Some blocks (like slabs) are made of other materials.}
 
 \myworries{unsigned 4-bytes integer. 2MSB forced at 00 (01, 10 and 11 reserved for Complex/Basic Blocks (if made)), others as Enum value}
 
