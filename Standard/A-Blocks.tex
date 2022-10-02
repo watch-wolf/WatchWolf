@@ -290,6 +290,8 @@ Represents the number of candles which are present.
 
 Defaults to 1.
 
+\myworries{combine with cake if >0}
+
 \begin{longtable}{ |c|c| }
 	\hline
 	Material & Values \\
@@ -544,6 +546,8 @@ Defaults to false.
 
 \subsubsection{Face}
 Represents the face to which a lever or button is stuck.
+
+\myworries{WALL\_SIGN}
 
 Defaults to wall.
 
@@ -2051,8 +2055,58 @@ Some materials have modifiers already attached to the material name.
 \caption{Piston types}
 \end{table}
 
-\subsubsection{Sub-materials}
-\myworries{... slabs}
+\subsubsection{Stripped}\label{spigot-types:stripped}
+\myworries{... boolean; log/wood}
+
+\subsubsection{Infested}\label{spigot-types:infested}
+\myworries{... silverfish in block; boolean; stones}
+
+\subsubsection{Dead}\label{spigot-types:dead}
+\myworries{... coral outside water; boolean; coral}
+
+\subsubsection{Heads}
+\myworries{...}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		ZOMBIE & 0 \\
+		PLAYER & 1 \\
+		CREEPER & 2 \\
+		DRAGON & 3 \\
+		SKELETON & 4 \\
+		WITHER\_SKELETON & 5 \\
+		ZOMBIE & 0 \\
+		\hline
+	\end{tabular}
+	\caption{Heads}
+\end{table}
+
+\subsubsection{Heads}
+\myworries{...}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	ZOMBIE & 0 \\
+	PLAYER & 1 \\
+	CREEPER & 2 \\
+	DRAGON & 3 \\
+	SKELETON & 4 \\
+	WITHER\_SKELETON & 5 \\
+	\hline
+\end{tabular}
+\caption{Heads}
+\end{table}
+
+\subsubsection{Sizeable}
+\myworries{...; AMETHYST\_BUD \& DRIPLEAF}
 
 \subsection{Material modifiers aggregation}
 \myworries{some modifiers are similar, so let's add them together}
@@ -2183,6 +2237,7 @@ part \\
 type \\
 piston\_head \\
 stair\_shape \\
+heads \\
 \hline
 \caption{Parts aggregation}
 \end{longtable}
@@ -2197,7 +2252,10 @@ Property & Value \\
 \hline
 \endhead
 wood\_type & 0x8000 $|$ \textit{wood value} \\
-flower & 0x8000 $|$ \textit{flower value} \\
+\hline
+iron & 0xC000 \\
+gold & 0xC001 \\
+\hline
 material & \textit{material value} \\
 \hline
 \caption{Material aggregation}
