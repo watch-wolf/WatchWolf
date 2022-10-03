@@ -1924,7 +1924,7 @@ Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL
 Some materials have modifiers already attached to the material name.
 
 \subsubsection{Color}\label{spigot-types:color}
-\myworries{... wool/glass}
+\myworries{... wool/glass/bed/candle/banner/GLAZED\_TERRACOTTA}
 
 \begin{longtable}{ |c|c| }
 	\hline
@@ -2133,15 +2133,15 @@ Some materials have modifiers already attached to the material name.
 	\hline
 	face & \rotatebox{90}{ceiling} & \rotatebox{90}{floor} &&&& \\
 	\hline
-	half & \rotatebox{90}{top} &  \rotatebox{90}{bottom} &&&& \\
+	half & \rotatebox{90}{top or upper} & \rotatebox{90}{bottom or lower} &&&& \\
 	\hline
 	facing & \rotatebox{90}{up} & \rotatebox{90}{down} &
 		\rotatebox{90}{north} & \rotatebox{90}{south} &
 		\rotatebox{90}{east} & \rotatebox{90}{west} \\
 		\hline
-	vertical-direction & \rotatebox{90}{up} &  \rotatebox{90}{down} &&&& \\
+	vertical-direction & \rotatebox{90}{up} & \rotatebox{90}{down} &&&& \\
 	\hline
-	type & \rotatebox{90}{top} &  \rotatebox{90}{bottom} &&&& \\
+	type & \rotatebox{90}{top or double} & \rotatebox{90}{bottom or double} &&&& \\
 	\hline
 	orientation & \rotatebox{90}{up\_\textit{X}} & \rotatebox{90}{down\_\textit{X}} &
 		\rotatebox{90}{\textit{X}\_north or north\_up} &
@@ -2245,6 +2245,7 @@ heads \\
 \subsubsection{Material aggregation}\label{spigot-types:material}
 \myworries{modifier; up to 16b}
 \myworries{iron and gold pressure plates have their name as 'heavy/light weighted pressure plate'}
+\myworries{MOSS\_CARPET}
 
 \begin{longtable}{ |c|c| }
 \hline
