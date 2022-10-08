@@ -656,9 +656,10 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 		\hline
 		0 & 0b00000000000 & NOP\footnotemark \\
 		0 & 0b00000000001 & \hyperref[g:base]{Base operations} \\
-		0 & 0b00000000010 & \hyperref[g:performance]{Performance operations} \\
-		0 & 0b00000000011 & \hyperref[g:worldguard]{WorldGuard operations} \\
-		0 & 0b00000000100 & \hyperref[g:residence]{Residence operations} \\
+		0 & 0b00000000010 & \hyperref[g:system]{System operations} \\
+		0 & 0b00000000011 & \hyperref[g:performance]{Performance operations} \\
+		0 & 0b00000000100 & \hyperref[g:worldguard]{WorldGuard operations} \\
+		0 & 0b00000000101 & \hyperref[g:residence]{Residence operations} \\
 		\hline
 		1 &   XXXXXXXXXXX & Reserved for internal use \\
 		\hline
@@ -821,6 +822,36 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Error notification}
+\myworries{...}
+
+\subsection{System operations} \label{g:system}
+\myworries{...}
+
+\subsubsection{ACK request operation}
+\myworries{... send it as soon as all queue completed}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
+	\end{bytefield}
+	\caption{ACK request operation structure}
+\end{figure}
+
+\subsubsection{ACK operation}
+\myworries{... response to...}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
+	\end{bytefield}
+	\caption{ACK operation structure}
+\end{figure}
+
+\subsubsection{Wait for seconds operation}
 \myworries{...}
 
 \subsection{Performance operations} \label{g:performance}
