@@ -2133,6 +2133,8 @@ Some materials have modifiers already attached to the material name.
 	\hline
 	face & \rotatebox{90}{ceiling} & \rotatebox{90}{floor} &&&& \\
 	\hline
+	attachment & \rotatebox{90}{ceiling} & \rotatebox{90}{floor} &&&& \\
+	\hline
 	half & \rotatebox{90}{top or upper} & \rotatebox{90}{bottom or lower} &&&& \\
 	\hline
 	facing & \rotatebox{90}{up} & \rotatebox{90}{down} &
@@ -2164,16 +2166,16 @@ Some materials have modifiers already attached to the material name.
 \myworries{modifier}
 \myworries{up to 2b}
 
-\begin{longtable}{ |c| }
-	\hline
-	Property \\
-	\hline
-	\endhead
-	attachment \\
-	face \\
-	axis \\
-	\hline
-	\caption{Axis aggregation}
+\begin{longtable}{ |c|c|c| }
+\hline
+Property & MSB & LSB \\
+\hline
+\endhead
+axis & Y or Z & X or Z \\
+\hline
+attachment & double\_wall & single\_wall \\
+\hline
+\caption{Axis aggregation}
 \end{longtable}
 
 \subsubsection{Age aggregation}\label{spigot-types:age}
