@@ -178,7 +178,7 @@
 		\hline
 		0 & 0 & 0 & ServerManagerPetition \\
 		0 & 0 & 1 & ServerPetition \\
-		0 & 1 & 0 & ClientConnectorPetition \\
+		0 & 1 & 0 & ClientsManagerPetition \\
 		0 & 1 & 1 & ClientPetition \\
 		\hline
 		1 & X & X & \textit{Reserved} \\
@@ -863,21 +863,65 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \subsection{Residence operations} \label{g:residence}
 \myworries{...}
 
-\section{? petition} \label{s:methods}
-First-level headings should be in bold.
+\section{Clients manager petition}
+\myworries{...}
 
-\subsection{
-\emph{Subsection heading 3.1}} \label{s:methods.1}
-Second-level headings should be in bold italics.
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{operation}} & \bitbox[lrt]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[s:args]{arguments}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Clients manager petition structure}
+\end{figure}
 
-\subsubsection{\emph{Sub-subsection heading 3.1.1}} \label{s:methods.1.1}
+\subsection{Start client operation}
+\myworries{...}
 
-Third-level headings should be in italics.
-	
-\subsection{\emph{Subsection heading 3.2}} \label{s:methods.2}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Start client petition structure}
+\end{figure}
 
+\subsection{Client started response operation}
+\myworries{...}
 
-\subsection{\emph{Subsection heading 3.3}} \label{s:methods.3}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{ip:port}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Client started petition response structure}
+\end{figure}
+
+\section{Client petition}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{operation}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[s:args]{arguments}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Client petition structure}
+\end{figure}
 
 \section{Revision history}
 \begin{table}[H]
