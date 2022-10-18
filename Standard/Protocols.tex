@@ -658,8 +658,9 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 		0 & 0b00000000001 & \hyperref[g:base]{Base operations} \\
 		0 & 0b00000000010 & \hyperref[g:system]{System operations} \\
 		0 & 0b00000000011 & \hyperref[g:performance]{Performance operations} \\
-		0 & 0b00000000100 & \hyperref[g:worldguard]{WorldGuard operations} \\
-		0 & 0b00000000101 & \hyperref[g:residence]{Residence operations} \\
+		0 & 0b00000000100 & \hyperref[g:coverage]{Coverage operations} \\
+		0 & 0b00000010000 & \hyperref[g:worldguard]{WorldGuard operations} \\
+		0 & 0b00000010001 & \hyperref[g:residence]{Residence operations} \\
 		\hline
 		1 &   XXXXXXXXXXX & Reserved for internal use \\
 		\hline
@@ -856,6 +857,36 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 
 \subsection{Performance operations} \label{g:performance}
 \myworries{...}
+
+\subsection{Coverage operations} \label{g:coverage}
+\myworries{...}
+
+\subsubsection{Get coverage operation}
+\myworries{... get JaCoCo binary file}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
+	\end{bytefield}
+	\caption{Get coverage operation structure}
+\end{figure}
+
+\subsubsection{Get coverage response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}} \\
+	\wordbox[lr]{1}{\hyperref[type:file]{JaCoCo binary file}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get coverage response structure}
+\end{figure}
 
 \subsection{WorldGuard operations} \label{g:worldguard}
 \myworries{...}
