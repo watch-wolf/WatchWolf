@@ -31,18 +31,22 @@
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	%%%%% IISE Transactions package list %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\usepackage{amsmath}
-	\usepackage{graphicx}
 	\usepackage{enumerate}
 	\usepackage{xcolor}
+	\usepackage{graphicx}	% rotate row
 	\usepackage{soul}		% highlight
 	\usepackage{url} 		% not crucial - just used below for the URL
 	\usepackage{bytefield} 	% network protocol
 	\usepackage{hyperref} 	% go to labels on click
 	\usepackage{chngcntr}	% count figures/tables with sections
 	\usepackage{footnote}	% notes inside tables
+	\usepackage{float}		% place figures exactly there
+	\usepackage{longtable}	% tables that are more than one page size
+	\usepackage{subfloat}	% subfigures
+	\usepackage{pifont}
 	\usepackage[natbibapa]{apacite}	% bibliography
 	\usepackage[acronym,section=subsection]{glossaries}
+	\usepackage{rail}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	% centered bytefield
@@ -63,8 +67,16 @@
 	\counterwithin{table}{section}
 	\counterwithin{figure}{section}
 	
+	% check/cross mark
+	\newcommand{\cmark}{\ding{51}}%
+	\newcommand{\xmark}{\ding{55}}%
+	
 	% TODOs
 	\newcommand\myworries[1]{\sethlcolor{red}\hl{#1}}
+	
+	% place here
+	\restylefloat{figure}
+	\restylefloat{table}
 	
 	% acronyms
 	\makeglossaries
@@ -113,11 +125,7 @@
 		\bigskip
 		
 	\begin{abstract}
-This document provides a \LaTeX \ template for \emph{IISE Transactions}. Your paper should be compiled in the following order: title; abstract; keywords; main text, including an introduction and a conclusion or summary; acknowledgments; declaration of interest statement; references; appendices (as appropriate). Figures and tables should be inserted into the text as close to first mention as possible (NOT appended to the end of the manuscript). In-text citations and the reference list must follow \emph{IISE Transactions} guidelines. Use 11 point font, 1 inch margins, and double-spacing for the manuscript. A typical paper for this journal should be no more than 30 pages in manuscript format, counting from the title page to references. Appendices should be included as supplemental online materials. Do not use footnotes. \emph{IISE Transactions} uses a double-blind review process. Please make sure that you submit the \textbf{blind version} of your manuscript, which does not contain any information identifying the authors.  This includes removing the authors information on the title page as well as the information that may be identifying in the Acknowledgment section. \\
-
-\textcolor[rgb]{0.00,0.07,1.00}{We strongly encourage authors to address the following three questions in their \textbf{abstract}, preferably following the order shown: (1) Research problem statement: what is the research problem to be addressed? (2) Methods and results: how do the authors address the research problem and what are the main results? (3) Insights and implications:  What have the authors learned (as opposed to what they did, which is covered in point (2)) from conducting this research? What is the knowledge gained and why does it matter? The abstract should be written in \textbf{a single paragraph}.}.\\
-
-We thank you for your attention to these details.
+		\myworries{...}
 	\end{abstract}
 			
 	\noindent%
@@ -144,7 +152,7 @@ We thank you for your attention to these details.
 \section{Introduction} \label{s:intro}
 \myworries{explicar los distintos protocolos que se hablaran a continuacion}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -162,7 +170,7 @@ We thank you for your attention to these details.
 
 \myworries{reference to the interconnected blocks}
 
-\begin{table}[h]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{ |c|c|c|c| }
 		\hline
@@ -170,7 +178,7 @@ We thank you for your attention to these details.
 		\hline
 		0 & 0 & 0 & ServerManagerPetition \\
 		0 & 0 & 1 & ServerPetition \\
-		0 & 1 & 0 & ClientConnectorPetition \\
+		0 & 1 & 0 & ClientsManagerPetition \\
 		0 & 1 & 1 & ClientPetition \\
 		\hline
 		1 & X & X & \textit{Reserved} \\
@@ -205,7 +213,7 @@ Booleans are 1-bit element that represents \textit{true} (0b1), or \textit{false
 
 For alignment \myworries{define?} reasons, booleans will be sent as 1-byte element. To avoid misunderstandings, let's define \textit{false} as 0x00, and \textit{true} as '\textit{not \myworries{define?} false}'. That way, this two packets are valid \textit{true} elements:
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{8}
 		\bitheader{0,7} \\
@@ -214,7 +222,7 @@ For alignment \myworries{define?} reasons, booleans will be sent as 1-byte eleme
 	\caption{True packet with the \glslink{LSB}{LSB} at 1}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{8}
 		\bitheader{0,7} \\
@@ -223,8 +231,8 @@ For alignment \myworries{define?} reasons, booleans will be sent as 1-byte eleme
 	\caption{True packet with all bits at 1}
 \end{figure}
 
-\subsubsection{Float}\label{type:float}
-Floats are 4-bytes floating-point numbers. They are represented following the \gls{IEEE-754}\footnote{This standard should be used by C, Java and Python. \myworries{cite?}}.
+\subsubsection{Double}\label{type:double}
+Doubles are 8-bytes floating-point numbers. They are represented following the \gls{IEEE-754}\footnote{This standard should be used by C, Java and Python. \myworries{cite?}}.
 
 \subsubsection{String}\label{type:str}
 Strings are \hyperref[type:array]{arrays} of \hyperref[type:char]{characters}. Refer to the respective subsections for more information.
@@ -234,7 +242,7 @@ Arrays are a set of \textit{n} elements of the same type.
 
 The structure is a 2-byte \myworries{first (0..7) MSB, then (8..15) LSB} integer (representing the number of elements, \textit{n}), followed by \textit{n} elements of the same type. As a note here, by representing the size with a 2-byte integer the maximum number of elements per array is 65,535.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,15,16,23,24,31} \\
@@ -248,7 +256,7 @@ The structure is a 2-byte \myworries{first (0..7) MSB, then (8..15) LSB} integer
 \end{figure}
 
 Arrays can be \glslink{multidimensional-array}{multidimensional}, holding \textit{n} arrays of the same type. It's worth mentioning that they don't have to be arrays of the same length, as can be seen in Figure \ref{fig:multidimensional-array-example}, Example of a string array.
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,15,16,23,24,31} \\
@@ -267,14 +275,14 @@ Similar to the \hyperref[type:array]{Array}, a File is a name (\hyperref[type:st
 
 The problem here is that if we stick with the \hyperref[type:array]{Array} structure, the maximum size of a file will be around 8kB. To solve this, the File structure implements some kind of 'extended array', that extends the 'size' parameter to 32 bits. That way, the file size restriction by protocol definition\footnote{Besides defining here what's allowed, remember that this packet will be inside a TCP payload \myworries{definition?}. This means that the maximum file size will be probably redefined by the machine's TCP firewalls.} is 4GB.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,31} \\
 		\wordbox[ltr]{1}{\hyperref[type:str]{file name}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{} \\
-		\wordbox[ltr]{1}{\hyperref[type:str]{file path\footnote{The path must be relative, and you can't go outside the Server directory (using '../'). Both '' and './' means the root of the Server directory.}}} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{file path\footnotemark}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{} \\
 		\bitbox{32}{file number of bytes} \\
@@ -285,15 +293,153 @@ The problem here is that if we stick with the \hyperref[type:array]{Array} struc
 	\caption{File structure}
 \end{figure}
 
+% File structure's file path footnote
+\footnotetext{The path must be relative, and you can't go outside the Server directory (using '../'). Both '' and './' means the root of the Server directory.}
+
 \subsubsection{Server type}\label{type:server-type}
 The Server type specifies the Minecraft server.
 
-As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-mc}), but for major compatibility this parameter is a \hyperref[type:str]{String} specifying the server type.
+As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-mc}), but for scalability reasons this parameter is a \hyperref[type:str]{String} specifying the server type.
+
+\subsubsection{Position}\label{type:position}
+\myworries{...}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,31} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{world name}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:double]{x}} \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:double]{y}} \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:double]{z}} \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Position structure}
+\end{figure}
+
+\subsubsection{Block}\label{type:block}
+\myworries{... 56 bytes}
+
+
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2.5em]{16}
+		\bitheader{0,7,8,9,10,11,12,13,14,15} \\
+		\bitbox{15}{enum value} & \bitbox{1}[bgcolor=lightgray]{0} \\
+		\bitbox{8}{\hyperref[spigot-types:age]{age}} &
+		\bitbox{6}{\hyperref[spigot-types:direction]{direction}} & \bitbox{2}{\hyperref[spigot-types:axis]{axis}} \\
+		
+		\bitbox[lr]{8}[bgcolor=lightgray]{} &
+		\bitbox{3}{\hyperref[spigot-types:groups]{group\_count}} & \bitbox{2}{\hyperref[spigot-types:delay]{delay}} &
+		\bitbox{1}{\hyperref[spigot-types:eye]{eye}} & \bitbox{1}{\hyperref[spigot-types:hinge]{hinge}} &
+		\bitbox{1}{\hyperref[spigot-types:open]{open}} \\
+		\bitbox{8}{\hyperref[spigot-types:stages]{stage}} & 
+		\bitbox{4}{\hyperref[spigot-types:parts]{part}} & \bitbox{4}{\hyperref[spigot-types:rotation]{rotation}} \\
+		\bitbox{8}{\hyperref[spigot-types:note]{note}} &
+		\bitbox{4}{\hyperref[spigot-types:mode]{mode}} & \bitbox{2}{\hyperref[spigot-types:leaves]{leaves}} & \bitbox{1}{\hyperref[spigot-types:lit]{lit}} & \bitbox{1}{\hyperref[spigot-types:locked]{locked}} \\
+		\bitbox[lrt]{8}[bgcolor=lightgray]{} &
+			\bitbox{1}{\hyperref[spigot-types:conditional]{cond}} & \bitbox{1}{\hyperref[spigot-types:inverted]{inv}} &
+		\bitbox{1}{\hyperref[spigot-types:powered]{pow}} &
+		\bitbox[lrt]{5}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{reserved} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lrb]{16}[bgcolor=lightgray]{} \\
+	\end{bytefield}
+	\caption{Structure of a \hyperref[type:block]{Block}}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2.5em]{16}
+		\bitheader{0,3,4,5,6,7,8,9,10,11,12,13,14,15} \\
+		\bitbox{15}{enum value} & \bitbox{1}[bgcolor=lightgray]{0} \\
+		\bitbox{8}{\hyperref[spigot-types:age]{age}} &
+			\bitbox{6}{\hyperref[spigot-types:direction]{direction}} & \bitbox{2}{\hyperref[spigot-types:axis]{axis}} \\
+		
+		 \bitbox{8}{\hyperref[spigot-types:color]{color}} &
+			 \bitbox{3}{\hyperref[spigot-types:groups]{group\_count}} & \bitbox{2}{\hyperref[spigot-types:delay]{delay}} &
+			 \bitbox{1}{\hyperref[spigot-types:eye]{eye}} & \bitbox{1}{\hyperref[spigot-types:hinge]{hinge}} &
+			 \bitbox{1}{\hyperref[spigot-types:open]{open}} \\
+		\bitbox{8}{\hyperref[spigot-types:stages]{stage}} & 
+			\bitbox{4}{\hyperref[spigot-types:parts]{part}} & \bitbox{4}{\hyperref[spigot-types:rotation]{rotation}} \\
+		\bitbox{8}{\hyperref[spigot-types:note]{note}} &
+			\bitbox{4}{\hyperref[spigot-types:mode]{mode}} & \bitbox{2}{\hyperref[spigot-types:leaves]{leaves}} & \bitbox{1}{\hyperref[spigot-types:lit]{lit}} & \bitbox{1}{\hyperref[spigot-types:locked]{locked}} \\
+		\bitbox{4}{\hyperref[spigot-types:liquid]{liquid}} & 
+			\bitbox{1}{\hyperref[spigot-types:conditional]{cond}} & \bitbox{1}{\hyperref[spigot-types:inverted]{inv}} &
+			\bitbox{1}{\hyperref[spigot-types:powered]{pow}} & \bitbox{1}{\hyperref[spigot-types:stripped]{strp}} & \bitbox{1}{\hyperref[spigot-types:infested]{infst}} & \bitbox{1}{\hyperref[spigot-types:dead]{dead}} &
+			\bitbox[lrt]{6}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{reserved} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{16}[bgcolor=lightgray]{} \\
+		\bitbox[lr]{8}[bgcolor=lightgray]{} &
+			\bitbox{8}{\hyperref[spigot-types:color]{material color}} \\
+		\bitbox{16}{\hyperref[spigot-types:material]{material\footnotemark}} \\
+	\end{bytefield}
+	\caption{Structure of a \hyperref[type:block]{Block}}
+\end{figure}
+
+\footnotetext{Some blocks (like slabs) are made of other materials.}
+
+\myworries{unsigned 4-bytes integer. 2MSB forced at 00 (01, 10 and 11 reserved for Complex/Basic Blocks (if made)), others as Enum value}
+
+\begin{longtable}{ |c|c|c| }
+	\hline
+	Enum value & Block name & First Minecraft version \\
+	\hline
+	\endhead
+	0 & AIR & 1.8 \\
+	\hline
+	\caption{Block enum}
+\end{longtable}
+
+\subsubsection{Item}\label{type:item}
+\myworries{...}
 
 \section{Server manager petition}
 \myworries{...}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -314,7 +460,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 
 \newpage
 \vfill
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -344,7 +490,7 @@ Once a 'start server' request is received the program should create a server wit
 
 If it's not possible to create it (for example: one argument is invalid, the user sent a plugin when it's specified that only Usual Plugins are allowed \myworries{explain}, or there's no free servers of that type), then an empty IP is returned (see \hyperref[fig:start-error-response-structure]{Figure \ref{fig:start-error-response-structure}, Start server error response structure}).
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -357,15 +503,18 @@ If it's not possible to create it (for example: one argument is invalid, the use
 	\label{fig:start-response-structure}
 \end{figure}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
-		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox{16}{0x0000\footnote{Being the argument an array, the first 2 bytes specifies its size. As we must return an empty array, the argument should be exactly 16 zeroes.}}
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox{16}{0x0000\footnotemark}
 	\end{bytefield}
 	\caption{Start server error response structure}
 	\label{fig:start-error-response-structure}
 \end{figure}
+
+% start-error-response-structure size footnote
+\footnotetext{Being the argument an array, the first 2 bytes specifies its size. As we must return an empty array, the argument should be exactly 16 zeroes.}
 
 \subsubsection{Maps}\label{type:maps}
 Array of maps (worlds; Map[]). To have more information about arrays check the \hyperref[type:array]{subsection \ref{type:array}, Array}.
@@ -391,7 +540,7 @@ About the Plugin type, there's three types of plugins:
 		
 		The plugin version is optional, and can't be specified in the parameter \textit{name}. If no version is provided (an empty string) then the Server Manager will pick the plugin with the highest version that is compatible with the desired server version.
 		
-		\begin{figure}[h]
+		\begin{figure}[H]
 			\centering
 			\begin{bytefield}{32}
 				\bitheader{0,7,8,31} \\
@@ -419,7 +568,7 @@ About the Plugin type, there's three types of plugins:
 		
 		As can be seen in the \hyperref[fig:file-plugin-structure]{Figure \ref{fig:file-plugin-structure}, File plugin structure}, the first argument (that specifies the Plugin type) is 0x02.
 		
-		\begin{figure}[h]
+		\begin{figure}[H]
 			\centering
 			\begin{bytefield}{32}
 				\bitheader{0,7,8,31} \\
@@ -448,7 +597,7 @@ After a \hyperref[s:server-manager-start]{Start server operation} the server wil
 
 You may notice that there's another \hyperref[s:server-started]{Server started notification} under the \hyperref[s:s:server-petition]{Server petition section}. That notification goes to the ServerManager \myworries{ref?}, while this goes to the Tester \myworries{ref?}. Also, the Server one have a token that is only shared between Server and the ServerManager, and the Tester doesn't have to know it too.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{16}
 		\bitheader{0,2,3,4,15} \\
@@ -460,7 +609,7 @@ You may notice that there's another \hyperref[s:server-started]{Server started n
 \subsection{Error notification}
 \myworries{...}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -479,7 +628,7 @@ The server petitions are a bit different from the rest. The server petitions are
 
 For that reason, the operation field (defined on the Figure \ref{fig:packet-structure}, Packet structure) becomes the \hyperref[s:server-group]{group}, and then the \hyperref[s:operation]{operation} is defined on the next 2 bytes, as shown in the \hyperref[fig:server-structure]{Figure \ref{fig:server-structure}, Server petition structure}.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -499,17 +648,19 @@ The \glslink{MSB}{MSB} \myworries{abbreviation?} tells if the group is one of th
 
 The 0b000000000001 group represents the 'base group'. This group implements some basic operations, and must be implemented. All the others are optional.
 
-\begin{table}[h]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{ |c|c|c| }
 		\hline
 		type[15] & type[14..4] & Extended type \\
 		\hline
-		0 & 0b00000000000 & NOP\footnote{As stated on the  \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}, the all-zeroes operation represents a NOP request.} \\
+		0 & 0b00000000000 & NOP\footnotemark \\
 		0 & 0b00000000001 & \hyperref[g:base]{Base operations} \\
-		0 & 0b00000000010 & \hyperref[g:performance]{Performance operations} \\
-		0 & 0b00000000011 & \hyperref[g:worldguard]{WorldGuard operations} \\
-		0 & 0b00000000100 & \hyperref[g:residence]{Residence operations} \\
+		0 & 0b00000000010 & \hyperref[g:system]{System operations} \\
+		0 & 0b00000000011 & \hyperref[g:performance]{Performance operations} \\
+		0 & 0b00000000100 & \hyperref[g:coverage]{Coverage operations} \\
+		0 & 0b00000010000 & \hyperref[g:worldguard]{WorldGuard operations} \\
+		0 & 0b00000010001 & \hyperref[g:residence]{Residence operations} \\
 		\hline
 		1 &   XXXXXXXXXXX & Reserved for internal use \\
 		\hline
@@ -517,23 +668,29 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 	\caption{Extended types}
 \end{table}
 
-If you've implemented an extended type and you believe that it makes sense to be part of the standard contact \href{mailto:contacto@rogermiranda1000.com?subject=WatchWolf - New extended type}{contacto@rogermiranda1000.com} to reserve one of the addresses.
+% Extended types NOP's footnote
+\footnotetext{As stated on the  \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}, the all-zeroes operation represents a NOP request.}
+
+If you've implemented an extended type and you believe that it makes sense to be part of the standard contact \href{mailto:contact@watchwolf.dev?subject=WatchWolf - New extended type}{contact@watchwolf.dev} to reserve one of the addresses.
 
 \subsection{Server petition operation} \label{s:server-operation}
 Like the parameter \hyperref[s:operation]{Operation}, it specifies the desired request. For more information, refer to the \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}.
 
 The only reserved operation is the all-zeroes operation (0x0000). It represents the question 'is this extended petition implemented?'. The server must response (with the \hyperref[s:response]{response bit at 1}) with \textit{true} (group implemented on this machine) or \textit{false} (unknown/unimplemented group), as it can be seen in Figure \ref{fig:implemented-eop}, Implemented group response structure.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
-		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:server-group]{group\footnote{except for groups 0b000000000000 and 0b000000000001}}} & \bitbox{16}{0x0000} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{1} & \bitbox{12}{\hyperref[s:server-group]{group\footnotemark}} & \bitbox{16}{0x0000} \\
 		\bitbox{8}{\hyperref[type:bool]{\textit{true}}} & \bitbox{24}[bgcolor=lightgray]{}
 	\end{bytefield}
 	\caption{Implemented group response structure}
 	\label{fig:implemented-eop}
 \end{figure}
+
+% Implemented group response structure's group footnote
+\footnotetext{except for groups 0b000000000000 and 0b000000000001}
 
 \subsection{Base operations} \label{g:base}
 \myworries{...}
@@ -543,7 +700,7 @@ The only reserved operation is the all-zeroes operation (0x0000). It represents 
 \subsubsection{Server stop operation}
 \myworries{...}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -557,7 +714,7 @@ The only reserved operation is the all-zeroes operation (0x0000). It represents 
 
 To have more information about the \textit{server id} parameter check the \hyperref[s:server-started]{Subsection \ref{s:server-started}, Server started notification}.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -575,7 +732,7 @@ This notification is sent to the Server Manager \myworries{ref?}, as a response 
 
 As one IP can have multiple servers, a \hyperref[type:str]{string} that identifies the server must be sent with the response. This argument can be whatever you want (for example, $<$server ip$>$:$<$server port$>$ will be unique), but must be shared between both the Server Manager and the Server. For security reasons \myworries{cite IP spoofing or similar} (because the Tester \myworries{ref?} also knows the server's IP and port) a hash function is encouraged to be used.
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -590,7 +747,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \subsubsection{Whitelist player operation}
 \myworries{...}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -605,7 +762,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \subsubsection{OP player operation}
 \myworries{...}
 
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
@@ -617,11 +774,119 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\caption{OP player operation structure}
 \end{figure}
 
+\subsubsection{Set block operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0005}} \\
+	\wordbox[ltr]{1}{\hyperref[type:position]{position}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[ltr]{1}{\hyperref[type:block]{block}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Set block operation structure}
+\end{figure}
+
+\subsubsection{Get block operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0006}} \\
+	\wordbox[ltr]{1}{\hyperref[type:position]{position}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get block operation structure}
+\end{figure}
+
+\subsubsection{Get block response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0006}} \\
+	\wordbox[ltr]{1}{\hyperref[type:block]{block}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get block operation structure}
+\end{figure}
+
 \subsubsection{Error notification}
+\myworries{...}
+
+\subsection{System operations} \label{g:system}
+\myworries{...}
+
+\subsubsection{ACK request operation}
+\myworries{... send it as soon as all queue completed}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
+	\end{bytefield}
+	\caption{ACK request operation structure}
+\end{figure}
+
+\subsubsection{ACK operation}
+\myworries{... response to...}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
+	\end{bytefield}
+	\caption{ACK operation structure}
+\end{figure}
+
+\subsubsection{Wait for seconds operation}
 \myworries{...}
 
 \subsection{Performance operations} \label{g:performance}
 \myworries{...}
+
+\subsection{Coverage operations} \label{g:coverage}
+\myworries{...}
+
+\subsubsection{Get coverage operation}
+\myworries{... get JaCoCo binary file}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
+	\end{bytefield}
+	\caption{Get coverage operation structure}
+\end{figure}
+
+\subsubsection{Get coverage response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}} \\
+	\wordbox[lr]{1}{\hyperref[type:file]{JaCoCo binary file}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get coverage response structure}
+\end{figure}
 
 \subsection{WorldGuard operations} \label{g:worldguard}
 \myworries{...}
@@ -629,24 +894,68 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \subsection{Residence operations} \label{g:residence}
 \myworries{...}
 
-\section{? petition} \label{s:methods}
-First-level headings should be in bold.
+\section{Clients manager petition}
+\myworries{...}
 
-\subsection{
-\emph{Subsection heading 3.1}} \label{s:methods.1}
-Second-level headings should be in bold italics.
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{operation}} & \bitbox[lrt]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[s:args]{arguments}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Clients manager petition structure}
+\end{figure}
 
-\subsubsection{\emph{Sub-subsection heading 3.1.1}} \label{s:methods.1.1}
+\subsection{Start client operation}
+\myworries{...}
 
-Third-level headings should be in italics.
-	
-\subsection{\emph{Subsection heading 3.2}} \label{s:methods.2}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Start client petition structure}
+\end{figure}
 
+\subsection{Client started response operation}
+\myworries{...}
 
-\subsection{\emph{Subsection heading 3.3}} \label{s:methods.3}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{ip:port}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Client started petition response structure}
+\end{figure}
+
+\section{Client petition}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{operation}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[s:args]{arguments}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Client petition structure}
+\end{figure}
 
 \section{Revision history}
-\begin{table}[h]
+\begin{table}[H]
 	\centering
 	\begin{tabular}{ |c|c|c| }
 		\hline
@@ -657,6 +966,10 @@ Third-level headings should be in italics.
 	\end{tabular}
 	\caption{Revision history}
 \end{table}
+
+
+\appendix
+\include{A-Blocks}
 
 % Bibliography
 \addcontentsline{toc}{section}{References}
