@@ -205,9 +205,6 @@ Now there will be discussed the most common data types, so they will be independ
 \subsubsection{Character}\label{type:char}
 Characters are sent as a 1-byte integer, representing its ASCII \myworries{ref?} value.
 
-\subsubsection{Integer}\label{type:int}
-Integers are signed 4-bytes integers.
-
 \subsubsection{Boolean}\label{type:bool}
 Booleans are 1-bit element that represents \textit{true} (0b1), or \textit{false} (0b0).
 
@@ -435,6 +432,57 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 
 \subsubsection{Item}\label{type:item}
 \myworries{...}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2.5em]{16}
+		\bitheader{0,7,8,15} \\
+		\bitbox{15}{enum value} & \bitbox{1}[bgcolor=lightgray]{0} \\
+		\bitbox{8}{ammount} & \bitbox[ltr]{8}{} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Structure of an \hyperref[type:item]{Item}}
+\end{figure}
+
+\begin{longtable}{ |c|c|c| }
+	\hline
+	Enum value & Item name & First Minecraft version \\
+	\hline
+	\endhead
+	0 & AIR & 1.8 \\
+	\hline
+	\caption{Item enum}
+\end{longtable}
+
+\subsubsection{Entity}\label{type:entity}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitwidth=2.5em]{16}
+	\bitheader{0,7,8,15} \\
+	\bitbox{15}{enum value} & \bitbox{1}[bgcolor=lightgray]{0} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{Position}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+\end{bytefield}
+\caption{Structure of an \hyperref[type:entity]{Entity}}
+\end{figure}
+
+\begin{longtable}{ |c|c|c| }
+\hline
+Enum value & Entity name & First Minecraft version \\
+\hline
+\endhead
+0 & ZOMBIE & 1.8 \\
+\hline
+\caption{Entity enum}
+\end{longtable}
 
 \section{Server manager petition}
 \myworries{...}
