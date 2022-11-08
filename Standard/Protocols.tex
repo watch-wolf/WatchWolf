@@ -966,6 +966,9 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
 	\wordbox[lr]{1}{\hyperref[type:str]{username}} \\
 	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{server IP}} \\
+	\skippedwords \\
 	\wordbox[lrb]{1}{}
 \end{bytefield}
 \caption{Start client petition structure}
@@ -999,6 +1002,18 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\wordbox[lrb]{1}{}
 \end{bytefield}
 \caption{Client petition structure}
+\end{figure}
+
+\subsection{Stop client operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}}
+\end{bytefield}
+\caption{Stop client petition structure}
 \end{figure}
 
 \section{Revision history}
