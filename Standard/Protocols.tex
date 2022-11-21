@@ -438,10 +438,7 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 	\begin{bytefield}[bitwidth=2.5em]{16}
 		\bitheader{0,7,8,15} \\
 		\bitbox{15}{enum value} & \bitbox{1}[bgcolor=lightgray]{0} \\
-		\bitbox{8}{ammount} & \bitbox[ltr]{8}{} \\
-		\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
-		\skippedwords \\
-		\wordbox[lrb]{1}{} \\
+		\bitbox{8}{ammount} &  \bitbox{8}[bgcolor=lightgray]{}
 	\end{bytefield}
 	\caption{Structure of an \hyperref[type:item]{Item}}
 \end{figure}
@@ -1011,9 +1008,87 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \centering
 \begin{bytefield}{16}
 	\bitheader{0,2,3,4,15} \\
-	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{r}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}}
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000010}}
 \end{bytefield}
 \caption{Stop client petition structure}
+\end{figure}
+
+\subsection{Send message operation}
+\myworries{... don't use this to run commands}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000011}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{msg}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Send message petition structure}
+\end{figure}
+
+\subsection{Chat message}
+\myworries{... async}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000000011}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{sender}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lrt]{1}{\hyperref[type:str]{msg}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Client message structure}
+\end{figure}
+
+\subsection{Run command operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000100}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{cmd}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Run command petition structure}
+\end{figure}
+
+\subsection{Break block operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000101}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{block coordinates}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Run command petition structure}
+\end{figure}
+
+\subsection{Equip item in hand operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000110}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:item]{item}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Run command petition structure}
 \end{figure}
 
 \section{Revision history}
