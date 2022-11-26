@@ -56,7 +56,9 @@ case "$opt" in
 		done <<< "$(getAllVersions)"
 		
 		# WatchWolf Server as usual-plugins
-		# TODO
+		watchwolf_server_versions_base_path="https://watchwolf.dev/versions"
+		higher_version=`curl -s "$watchwolf_server_versions_base_path" | grep -o -P '(?<=WatchWolf-)[\d.]+(?=-)' | sort -r | head -1` # get the current higher version
+		wget "$watchwolf_server_versions_base_path/WatchWolf-$higher_version-1.8-1.19.jar" -P "$servers_manager_path/usual-plugins"
 
 		# ClientsManager dependencies
 		docker pull nikolaik/python-nodejs
