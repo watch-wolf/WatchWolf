@@ -50,11 +50,10 @@ case "$opt" in
 
 		# download all Spigot versions
 		num_downloading_containers=0
-		getAllVersions |
 		while read version; do
 			buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
-			num_downloading_containers=$((num_downloading_containers+1))
-		done
+			((num_downloading_containers++))
+		done <<< "$(getAllVersions)"
 		
 		# WatchWolf Server as usual-plugins
 		# TODO
@@ -72,7 +71,7 @@ case "$opt" in
 			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		done
 		
-		echo -ne '\nAll finished.\n'
+		echo -ne '\nWatchWolf built.\n'
 		;;
 		
 	"install" )
