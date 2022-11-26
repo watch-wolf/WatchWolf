@@ -29,10 +29,10 @@ To run the script:
 
 2. Run the script in `build` mode
 
-   Run `bash WatchWolfSetup.sh --build`
+   Run `sudo bash WatchWolfSetup.sh --build`
    
    You can get the code from the develop branch by using `bash WatchWolfSetup.sh --build --dev`
    
 3. (if you want to start WatchWolf on startup [recommended]) Run the script in `install` mode
 
-   Run `bash WatchWolfSetup.sh --install`
+   Run `sudo bash WatchWolfSetup.sh --install`
