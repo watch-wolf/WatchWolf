@@ -88,8 +88,9 @@ case "$opt" in
 			echo "[w] Warning: install has only been testing using WSL. If you face any problem, please report it in https://github.com/watch-wolf/WatchWolf/issues" >&2
 		fi
 		
-		$(cmd.exe /c "echo %USERPROFILE%") | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'
-		base=`sudo bash -c '/mnt/c/Windows/System32/cmd.exe /c "echo %USERPROFILE%"' | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'` # get the base path. In WSL the directory delimiter is '/' (not '\'), and 'C:' is '/mnt/c'
+		base=`/mnt/c/Windows/System32/cmd.exe /c 'echo %USERPROFILE%' | sed 's/\r$//'` # get the base path
+		base=`echo "$base" | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'` # in WSL the directory delimiter is '/' (not '\'), and 'C:' is '/mnt/c'
+		
 		windows_start_folder="$base/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup" # @ref https://www.thewindowsclub.com/startup-folder-in-windows-8
 		echo "$windows_start_folder"
 		;;
