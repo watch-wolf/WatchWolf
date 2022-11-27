@@ -103,30 +103,30 @@ case "$opt" in
 			# run at startup
 			if [ $wsl -eq 0 ]; then
 				echo "[w] Install has only been tested with WSL. Report any problem in https://github.com/watch-wolf/WatchWolf/issues" >&2
-			
-				# Ubuntu (?)
-				# create service
-				service_contents=$(cat <<-END
-					[Unit]
-					Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
-					
-					[Service]
-					Environment="SCRIPT_ARGS=--run"
-					ExecStart="$script_path" \$SCRIPT_ARGS
-					
-					[Install]
-					WantedBy=multi-user.target
-				END
-				)
-				sudo bash -c "echo '$service_contents' > /etc/systemd/system/watchwolf.service" # create service
-				sudo systemctl enable watchwolf # init service
 			else
 				# WSL
-				base=`/mnt/c/Windows/System32/cmd.exe /c 'echo %USERPROFILE%' | sed 's/\r$//'` # get the base path
-				base=`echo "$base" | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'` # in WSL the directory delimiter is '/' (not '\'), and 'C:' is '/mnt/c'
-				windows_start_folder="$base/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup" # @ref https://www.thewindowsclub.com/startup-folder-in-windows-8
-				echo "wsl bash \"$script_path\" --run" > "$windows_start_folder/WatchWolf.bat"
+				# enable systemd
+				if [ `sudo cat /etc/wsl.conf 2>/dev/null | grep -c 'systemd=true'` -eq 0 ]; then
+					echo "[e] systemd not enabled in WSL. Add 'systemd=true' under '[boot]' in '/etc/wsl.conf'." >&2
+					exit 1
+					# TODO auto-add
+				fi
 			fi
+			
+			# create service
+			service_contents=$(cat <<-END
+				[Unit]
+				Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
+				
+				[Service]
+				ExecStart=bash "$script_path" --run
+				
+				[Install]
+				WantedBy=multi-user.target
+			END
+			)
+			sudo bash -c "echo '$service_contents' > /etc/systemd/system/watchwolf.service" # create service
+			sudo systemctl enable watchwolf # init service
 		fi
 		;;
 	
@@ -156,12 +156,27 @@ case "$opt" in
 			
 			sleep 15
 		done
+		echo ""
 		
 		# run ServersManager
 		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" ubuntu:latest sh -c "cd $servers_manager_path ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail >/dev/null ; echo '[*] ServersManager ready.' ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:./ServersManagerConnector.sh" >/dev/null 2>&1 & disown
 
 		# run ClientsManager
 		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 clients-manager:latest >/dev/null 2>&1 & disown
+		
+		dots=""
+		while [ `docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
+			echo -ne "Waiting Docker containers to start$dots    \r"
+			
+			dots="$dots."
+			if [ ${#dots} -gt 3 ]; then
+				dots=""
+			fi
+			
+			sleep 1 # wait
+		done
+		
+		echo -ne "\nWatchWolf started.\n" # TODO wait for containers to install
 		;;
 	
 	* )
