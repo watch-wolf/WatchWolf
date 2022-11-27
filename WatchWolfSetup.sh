@@ -84,31 +84,32 @@ case "$opt" in
 		
 	"install" )
 		wsl=`cat /proc/version | grep -i -c 'microsoft'`
+		script_path="$(pwd)/$0"
 		if [ $wsl -eq 0 ]; then
 			echo "[w] Install has only been tested with WSL. Report any problem in https://github.com/watch-wolf/WatchWolf/issues" >&2
-		fi
 		
-		# create service
-		service_contents=$(cat <<-END
-			[Unit]
-			Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
-			
-			[Service]
-			Environment="SCRIPT_ARGS=--run"
-			ExecStart="$(pwd)/$0" \$SCRIPT_ARGS
-			
-			[Install]
-			WantedBy=multi-user.target
-		END
-		)
-		sudo bash -c "echo '$service_contents' > /etc/systemd/system/watchwolf.service" # create service
-		sudo systemctl enable watchwolf # init service
-		
-		if [ $wsl -gt 0 ]; then
+			# Ubuntu (?)
+			# create service
+			service_contents=$(cat <<-END
+				[Unit]
+				Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
+				
+				[Service]
+				Environment="SCRIPT_ARGS=--run"
+				ExecStart="$script_path" \$SCRIPT_ARGS
+				
+				[Install]
+				WantedBy=multi-user.target
+			END
+			)
+			sudo bash -c "echo '$service_contents' > /etc/systemd/system/watchwolf.service" # create service
+			sudo systemctl enable watchwolf # init service
+		else
+			# WSL
 			base=`/mnt/c/Windows/System32/cmd.exe /c 'echo %USERPROFILE%' | sed 's/\r$//'` # get the base path
 			base=`echo "$base" | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'` # in WSL the directory delimiter is '/' (not '\'), and 'C:' is '/mnt/c'
 			windows_start_folder="$base/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup" # @ref https://www.thewindowsclub.com/startup-folder-in-windows-8
-			echo "wsl sudo systemctl start watchwolf" > "$windows_start_folder/WatchWolf.bat" # @ref https://superuser.com/questions/1343558/how-to-make-wsl-run-services-at-startup
+			echo "wsl bash \"$script_path\" --run" > "$windows_start_folder/WatchWolf.bat"
 		fi
 		;;
 	
