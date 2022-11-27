@@ -66,8 +66,14 @@ case "$opt" in
 		
 		# all ended; wait for the Spigot versions to finish
 		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+		dots=""
 		while [ "$current_downloading_containers" -gt 0 ]; do
-			echo -ne "Waiting all Spigot containers to finish... ($((num_downloading_containers-current_downloading_containers))/$num_downloading_containers)  \r"
+			echo -ne "Waiting all Spigot containers to finish$dots ($((num_downloading_containers-current_downloading_containers))/$num_downloading_containers)      \r"
+			
+			dots="$dots."
+			if [ ${#dots} -gt 3 ]; then
+				dots=""
+			fi
 			
 			sleep 15
 			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
@@ -83,6 +89,18 @@ case "$opt" in
 		;;
 		
 	"run" )
+		dots=""
+		while [ `docker -v >/dev/null 2>&1 ; echo $?` -ne 0 ]; do
+			echo -ne "Waiting all Spigot containers to finish$dots    \r"
+			
+			dots="$dots."
+			if [ ${#dots} -gt 3 ]; then
+				dots=""
+			fi
+			
+			sleep 15
+		done
+		
 		# run ServersManager
 		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" ubuntu:latest sh -c "cd $servers_manager_path ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail >/dev/null ; echo '[*] ServersManager ready.' ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:./ServersManagerConnector.sh"
 
