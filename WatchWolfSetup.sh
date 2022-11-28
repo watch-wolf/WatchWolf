@@ -103,30 +103,48 @@ case "$opt" in
 			# run at startup
 			if [ $wsl -eq 0 ]; then
 				echo "[w] Install has only been tested with WSL. Report any problem in https://github.com/watch-wolf/WatchWolf/issues" >&2
+			
+				# create service
+				service_contents=$(cat <<-END
+					[Unit]
+					Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
+					
+					[Service]
+					ExecStart=bash "$script_path" --run
+					
+					[Install]
+					WantedBy=multi-user.target
+				END
+				)
+				sudo bash -c "echo '$service_contents' > /etc/systemd/system/watchwolf.service" # create service
+				sudo systemctl enable watchwolf # init service
 			else
 				# WSL
-				# enable systemd
-				if [ `sudo cat /etc/wsl.conf 2>/dev/null | grep -c 'systemd=true'` -eq 0 ]; then
-					echo "[e] systemd not enabled in WSL. Add 'systemd=true' under '[boot]' in '/etc/wsl.conf'." >&2
-					exit 1
-					# TODO auto-add
+				echo "Running WatchWolf at startup will prompt a CMD asking for the WSL password each time."
+				echo "To make this task more pleasant, this script will disable the WSL admin password."
+				echo "Do you want to disable the WSL password? (D)isable"
+				echo "Do you want to keep the WSL password, thus prompting the CMD on each startup? (K)eep"
+				echo "Do you want to exit (don't launch WatchWolf at startup; manually run './WatchWolf --run' each time)? (E)xit"
+				read -p 'D/K/E: ' option
+				while [ `echo "$option" | grep -i -E -c '^[DKE]'` -eq 0 ]; do
+					read -p 'Unknown option. Use (D)isable, (K)eep, or (E)xit: ' option
+				done
+				
+				if [ `echo "$option" | grep -i -E -c '^[DK]'` -ne 0 ]; then # Exit?
+					if [ `echo "$option" | grep -i -E -c '^D'` -ne 0 ]; then
+						# don't keep; disable sudo password
+						sudo bash -c "echo '`whoami` ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/`whoami`" && sudo chmod 0440 /etc/sudoers.d/`whoami` # @ref https://www.folkstalk.com/tech/ubuntu-wsl-disable-sudo-password-prompt-with-code-examples/
+						echo "WSL password disabled"
+					fi
+					
+					# create "service"
+					base=`/mnt/c/Windows/System32/cmd.exe /c 'echo %USERPROFILE%' | sed 's/\r$//'` # get the base path
+					base=`echo "$base" | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'` # in WSL the directory delimiter is '/' (not '\'), and 'C:' is '/mnt/c'
+					windows_start_folder="$base/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup" # @ref https://www.thewindowsclub.com/startup-folder-in-windows-8
+					echo "wsl bash \"$script_path\" --run" > "$windows_start_folder/WatchWolf.bat"
+					echo "Launch on startup done"
 				fi
 			fi
-			
-			# create service
-			service_contents=$(cat <<-END
-				[Unit]
-				Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
-				
-				[Service]
-				ExecStart=bash "$script_path" --run
-				
-				[Install]
-				WantedBy=multi-user.target
-			END
-			)
-			sudo bash -c "echo '$service_contents' > /etc/systemd/system/watchwolf.service" # create service
-			sudo systemctl enable watchwolf # init service
 		fi
 		;;
 	
