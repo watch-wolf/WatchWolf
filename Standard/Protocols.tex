@@ -896,8 +896,95 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \caption{Get block operation structure}
 \end{figure}
 
-\subsubsection{Error notification}
+\subsubsection{Get player position operation}
 \myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0007}} \\
+	\wordbox[ltr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player position operation structure}
+\end{figure}
+
+\subsubsection{Get player position response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0007}} \\
+	\wordbox[ltr]{1}{\hyperref[type:position]{position}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player position response structure}
+\end{figure}
+
+\subsubsection{Give item to player operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0008}} \\
+	\wordbox[ltr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[ltr]{1}{\hyperref[type:item]{item}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Give item to player operation structure}
+\end{figure}
+
+\subsubsection{Run command operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0009}} \\
+	\wordbox[ltr]{1}{\hyperref[type:str]{cmd}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Run command operation structure}
+\end{figure}
+
+\subsubsection{Get players operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000A}}
+\end{bytefield}
+\caption{Get players operation structure}
+\end{figure}
+
+\subsubsection{Get players response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000A}} \\
+	\wordbox[ltr]{1}{\hyperref[type:array]{usernames}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get playes response structure}
+\end{figure}
 
 \subsection{System operations} \label{g:system}
 \myworries{...}
