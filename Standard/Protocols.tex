@@ -983,38 +983,110 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\skippedwords \\
 	\wordbox[lrb]{1}{}
 \end{bytefield}
-\caption{Get playes response structure}
+\caption{Get players response structure}
 \end{figure}
 
-\subsection{System operations} \label{g:system}
+\subsubsection{Synchronize operation}
 \myworries{...}
 
-\subsubsection{ACK request operation}
-\myworries{... send it as soon as all queue completed}
-
 \begin{figure}[H]
-	\centering
-	\begin{bytefield}{32}
-		\bitheader{0,2,3,4,15,16,31} \\
-		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
-	\end{bytefield}
-	\caption{ACK request operation structure}
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000B}}
+\end{bytefield}
+\caption{Synchronize operation structure}
 \end{figure}
 
-\subsubsection{ACK operation}
-\myworries{... response to...}
-
-\begin{figure}[H]
-	\centering
-	\begin{bytefield}{32}
-		\bitheader{0,2,3,4,15,16,31} \\
-		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}}
-	\end{bytefield}
-	\caption{ACK operation structure}
-\end{figure}
-
-\subsubsection{Wait for seconds operation}
+\subsubsection{Synchronize response}
 \myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000B}}
+\end{bytefield}
+\caption{Synchronize response structure}
+\end{figure}
+
+\subsubsection{Tp player operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000C}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{position}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Tp player operation structure}
+\end{figure}
+
+\subsubsection{Get player pitch operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000D}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player pitch operation structure}
+\end{figure}
+
+\subsubsection{Get player pitch response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000D}} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{pitch}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player pitch response structure}
+\end{figure}
+
+\subsubsection{Get player yaw operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000E}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player yaw operation structure}
+\end{figure}
+
+\subsubsection{Get player yaw response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000E}} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{yaw}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player yaw response structure}
+\end{figure}
 
 \subsection{Performance operations} \label{g:performance}
 \myworries{...}
@@ -1176,6 +1248,87 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\wordbox[lrb]{1}{}
 \end{bytefield}
 \caption{Run command petition structure}
+\end{figure}
+
+\subsection{Move at operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000111}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{pos}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Move at petition structure}
+\end{figure}
+
+\subsection{Look at operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001000}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{pitch}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{yaw}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Move at petition structure}
+\end{figure}
+
+\subsection{Synchronize operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001001}}
+\end{bytefield}
+\caption{Synchronize petition structure}
+\end{figure}
+
+\subsection{Synchronize response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000001001}}
+\end{bytefield}
+\caption{Synchronize petition response structure}
+\end{figure}
+
+\subsection{Hit operation}
+\myworries{... left click with item in hand}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001010}}
+\end{bytefield}
+\caption{Hit petition structure}
+\end{figure}
+
+\subsection{Use operation}
+\myworries{... right click with item in hand}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001011}}
+\end{bytefield}
+\caption{Use petition structure}
 \end{figure}
 
 \section{Revision history}

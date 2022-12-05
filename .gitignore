@@ -1,5 +1,6 @@
 texput.log
 Protocols.*
+Protocols-*
 !Protocols.tex
 !Protocols.pdf
 A-Blocks.*
