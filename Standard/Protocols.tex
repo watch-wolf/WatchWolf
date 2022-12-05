@@ -471,6 +471,21 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 \caption{Structure of an \hyperref[type:entity]{Entity}}
 \end{figure}
 
+
+\subsubsection{Container}\label{type:container}
+\myworries{...}
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}[bitwidth=2.5em]{16}
+		\bitheader{0,7,8,15} \\
+		\wordbox{1}{\hyperref[type:array]{items}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Structure of a \hyperref[type:container]{Container}}
+\end{figure}
+
 \begin{longtable}{ |c|c|c| }
 \hline
 Enum value & Entity name & First Minecraft version \\
@@ -1086,6 +1101,71 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\wordbox[lrb]{1}{}
 \end{bytefield}
 \caption{Get player yaw response structure}
+\end{figure}
+
+\subsubsection{Get player inventory operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000F}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{username}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player inventory operation structure}
+\end{figure}
+
+\subsubsection{Get player inventory response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x000F}} \\
+	\wordbox[lr]{1}{\hyperref[type:container]{inventory}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get player inventory response structure}
+\end{figure}
+
+\subsubsection{Get entities operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0010}} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{center location}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{radius\footnotemark}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get entities operation structure}
+\end{figure}
+
+\footnotetext{Large radius or locations in unloaded chunks may return unexpected data.}
+
+\subsubsection{Get entities response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0010}} \\
+	\wordbox[lr]{1}{\hyperref[type:array]{entities}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get entities response structure}
 \end{figure}
 
 \subsection{Performance operations} \label{g:performance}
