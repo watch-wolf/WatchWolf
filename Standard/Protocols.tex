@@ -466,9 +466,27 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 	\wordbox[lrb]{1}{} \\
 	\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
 	\skippedwords \\
-	\wordbox[lrb]{1}{} \\
+	\wordbox[lrb]{1}{}
 \end{bytefield}
 \caption{Structure of an \hyperref[type:entity]{Entity}}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}[bitwidth=2.5em]{16}
+	\bitheader{0,7,8,15} \\
+	\bitbox{15}{enum value} & \bitbox{1}[bgcolor=lightgray]{0} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{Position}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[lr]{1}{\hyperref[type:item]{item}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Structure of a DroppedItem}
 \end{figure}
 
 
@@ -479,7 +497,7 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 	\centering
 	\begin{bytefield}[bitwidth=2.5em]{16}
 		\bitheader{0,7,8,15} \\
-		\wordbox{1}{\hyperref[type:array]{items}} \\
+		\wordbox[ltr]{1}{\hyperref[type:array]{items}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{}
 	\end{bytefield}
