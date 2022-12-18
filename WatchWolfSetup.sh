@@ -75,8 +75,6 @@ case "$opt" in
 		docker pull nikolaik/python-nodejs
 		docker build --tag clients-manager "$clients_manager_path"
 		
-		((num_processes++)) # TODO remove
-		
 		# all ended; wait for the Spigot versions to finish
 		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		dots=""
@@ -87,6 +85,11 @@ case "$opt" in
 					buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
 					((num_pending_containers--))
 					((current_downloading_containers++))
+					
+					# wait to start
+					while [ `docker container ls -a | grep "Spigot_build_$version\$" -c` -eq 0 ]; do # TODO exit if Nth time?
+						sleep 1
+					done
 				fi
 			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes - $current_downloading_containers)) )" # get enought versions of the remaining versions to fill the threads
 			
