@@ -85,11 +85,6 @@ case "$opt" in
 					buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
 					((num_pending_containers--))
 					((current_downloading_containers++))
-					
-					# wait to start
-					while [ `docker container ls -a | grep "Spigot_build_$version\$" -c` -eq 0 ]; do # TODO exit if Nth time?
-						sleep 1
-					done
 				fi
 			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
 			
@@ -198,10 +193,10 @@ case "$opt" in
 		echo ""
 		
 		# run ServersManager
-		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" ubuntu:latest sh -c "cd $servers_manager_path ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail >/dev/null ; echo '[*] ServersManager ready.' ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:./ServersManagerConnector.sh" >/dev/null 2>&1 & disown
+		sudo docker run --privileged=true -i --rm --detach --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" ubuntu:latest sh -c "cd $servers_manager_path ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail >/dev/null ; echo '[*] ServersManager ready.' ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:./ServersManagerConnector.sh" >/dev/null 2>&1 & disown
 
 		# run ClientsManager
-		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 clients-manager:latest >/dev/null 2>&1 & disown
+		sudo docker run -i --rm --detach --name ClientsManager -p 7000-7199:7000-7199 clients-manager:latest >/dev/null 2>&1 & disown
 		
 		dots=""
 		while [ `docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
