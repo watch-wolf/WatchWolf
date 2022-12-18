@@ -59,9 +59,16 @@ case "$opt" in
 
 		source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
 
-		# download the first <num_processes> Spigot versions
+		# prepare all the Spigot versions
+		while read version; do
+			buildVersion "$servers_manager_path/server-types/Spigot" "$version" "detach" >/dev/null 2>&1
+		done <<< "$(getAllVersions)"
+		
+		# start downloading the first <num_processes> Spigot versions
 		num_downloading_containers=`getAllVersions | grep -c $'\n'`
+		containers_that_should_be=$num_downloading_containers
 		num_pending_containers=$(($num_downloading_containers - $num_processes))
+		num_excedent=0
 		while read version; do
 			buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
 		done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
@@ -76,19 +83,21 @@ case "$opt" in
 		docker build --tag clients-manager "$clients_manager_path"
 		
 		# all ended; wait for the Spigot versions to finish
-		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+		num_current_downloading_plus_pending_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		dots=""
-		while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
+		while [ $num_current_downloading_plus_pending_containers -gt 0 ]; do
+			num_excedent=$(($containers_that_should_be - $num_current_downloading_plus_pending_containers))
+			containers_that_should_be=$num_current_downloading_plus_pending_containers
+			
 			while read version; do
 				if [ ! -z "$version" ]; then
 					# still versions remaining, and there's a place to run them
 					buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
 					((num_pending_containers--))
-					((current_downloading_containers++))
 				fi
-			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
+			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $num_excedent )" # get enought versions of the remaining versions to fill the threads
 			
-			echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
+			echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_current_downloading_plus_pending_containers ))/$num_downloading_containers)      \r"
 			
 			dots="$dots."
 			if [ ${#dots} -gt 3 ]; then
@@ -96,7 +105,7 @@ case "$opt" in
 			fi
 			
 			sleep 15
-			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+			num_current_downloading_plus_pending_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		done
 		
 		echo -ne '\nWatchWolf built.\n'
@@ -193,10 +202,10 @@ case "$opt" in
 		echo ""
 		
 		# run ServersManager
-		sudo docker run --privileged=true -i --rm --detach --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" ubuntu:latest sh -c "cd $servers_manager_path ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail >/dev/null ; echo '[*] ServersManager ready.' ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:./ServersManagerConnector.sh" >/dev/null 2>&1 & disown
+		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" ubuntu:latest sh -c "cd $servers_manager_path ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail >/dev/null ; echo '[*] ServersManager ready.' ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:./ServersManagerConnector.sh" >/dev/null 2>&1 & disown
 
 		# run ClientsManager
-		sudo docker run -i --rm --detach --name ClientsManager -p 7000-7199:7000-7199 clients-manager:latest >/dev/null 2>&1 & disown
+		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 clients-manager:latest >/dev/null 2>&1 & disown
 		
 		dots=""
 		while [ `docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
