@@ -61,7 +61,7 @@ case "$opt" in
 		
 		# WatchWolf Server as usual-plugins
 		watchwolf_server_versions_base_path="https://watchwolf.dev/versions"
-		higher_version=`curl -s "$watchwolf_server_versions_base_path" | grep -o -P '(?<=WatchWolf-)[\d.]+(?=-)' | sort -r | head -1` # get the current higher version
+		higher_version=`wget -q -O - "$watchwolf_server_versions_base_path" | grep -o -P '(?<=WatchWolf-)[\d.]+(?=-)' | sort -r | head -1` # get the current higher version
 		wget "$watchwolf_server_versions_base_path/WatchWolf-$higher_version-1.8-1.19.jar" -P "$servers_manager_path/usual-plugins"
 
 		# ClientsManager dependencies
