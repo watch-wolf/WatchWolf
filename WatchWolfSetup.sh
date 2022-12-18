@@ -85,21 +85,21 @@ case "$opt" in
 		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		dots=""
 		while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
-			echo -ne "Waiting all Spigot containers to finish$dots ($((num_downloading_containers-num_pending_containers-current_downloading_containers))/$num_downloading_containers)      \r"
-			
-			dots="$dots."
-			if [ ${#dots} -gt 3 ]; then
-				dots=""
-			fi
-			
 			while read version; do
 				if [ ! -z "$version" ]; then
 					# still versions remaining, and there's a place to run them
 					downloadSpigot "$servers_manager_path/server-types/Spigot" "$version"
 					((num_pending_containers--))
+					((current_downloading_containers++))
 				fi
-			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $((num_processes - current_downloading_containers)) )" # get enought versions of the remaining versions to fill the threads
+			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes - $current_downloading_containers)) )" # get enought versions of the remaining versions to fill the threads
 			
+			echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
+			
+			dots="$dots."
+			if [ ${#dots} -gt 3 ]; then
+				dots=""
+			fi
 			
 			sleep 15
 			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
