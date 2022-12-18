@@ -1,15 +1,22 @@
 #!/bin/bash
 
+# @param output_path
+# @param version
+function downloadSpigot {
+	buildVersion "$1" "$2" >/dev/null 2>&1 &
+}
+
 echo "Starting WatchWolfSetup..."
 
 opt=""
 branch="master"
 no_startup=0
+num_processes=$((`nproc --all` - 2))
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        #-i|--install) branch="$2"; shift ;;
         --dev) branch="dev" ;;
+		--threads) num_processes="$2"; shift ;;
 		
 		--build) opt="build" ;;
 		--install) opt="install" ;;
@@ -21,6 +28,10 @@ while [[ "$#" -gt 0 ]]; do
     esac
     shift
 done
+
+if [ $num_processes -lt 1 ]; then
+	num_processes=1 # at least 1 process
+fi
 
 # target paths
 servers_manager_path="$HOME/WatchWolf/ServersManager"
@@ -52,12 +63,12 @@ case "$opt" in
 
 		source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
 
-		# download all Spigot versions
-		num_downloading_containers=0
+		# download the first <num_processes> Spigot versions
+		num_downloading_containers=`getAllVersions | grep -c $'\n'`
+		num_pending_containers=$(($num_downloading_containers - $num_processes))
 		while read version; do
-			buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
-			((num_downloading_containers++))
-		done <<< "$(getAllVersions)"
+			downloadSpigot "$servers_manager_path/server-types/Spigot" "$version"
+		done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
 		
 		# WatchWolf Server as usual-plugins
 		watchwolf_server_versions_base_path="https://watchwolf.dev/versions"
@@ -72,11 +83,22 @@ case "$opt" in
 		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		dots=""
 		while [ "$current_downloading_containers" -gt 0 ]; do
-			echo -ne "Waiting all Spigot containers to finish$dots ($((num_downloading_containers-current_downloading_containers))/$num_downloading_containers)      \r"
+			echo -ne "Waiting all Spigot containers to finish$dots ($((num_downloading_containers-num_pending_containers-current_downloading_containers))/$num_downloading_containers)      \r"
 			
 			dots="$dots."
 			if [ ${#dots} -gt 3 ]; then
 				dots=""
+			fi
+			
+			if [ $num_pending_containers -gt 0 ]; then
+				# we still have to download versions
+				for (( thread=0; thread < num_processes - current_downloading_containers; thread++ )); do
+					# we have (at least) one thread free
+					version=`getAllVersions | tail -n $num_pending_containers | head -n 1` # get the first of the remaining versions
+					downloadSpigot "$servers_manager_path/server-types/Spigot" "$version"
+					
+					((num_pending_containers--))
+				done
 			fi
 			
 			sleep 15
