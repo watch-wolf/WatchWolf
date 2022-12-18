@@ -92,13 +92,14 @@ case "$opt" in
 				dots=""
 			fi
 			
-			if [ $num_pending_containers -gt 0 ]; then
-				# still versions remaining
-				while read version; do
+			while read version; do
+				if [ ! -z "$version" ]; then
+					# still versions remaining, and there's a place to run them
 					downloadSpigot "$servers_manager_path/server-types/Spigot" "$version"
 					((num_pending_containers--))
-				done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $((num_processes - current_downloading_containers)) )" # get enought versions of the remaining versions to fill the threads
-			fi
+				fi
+			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $((num_processes - current_downloading_containers)) )" # get enought versions of the remaining versions to fill the threads
+			
 			
 			sleep 15
 			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
