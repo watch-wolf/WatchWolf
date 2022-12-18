@@ -45,8 +45,8 @@ sudo echo "" # this will prompt the sudo password input (if not sudo)
 # run the desider operation
 case "$opt" in
 	"build" )
-		rm -rf "$servers_manager_path" 2>/dev/null
-		rm -rf "$clients_manager_path" 2>/dev/null
+		sudo rm -rf "$servers_manager_path" 2>/dev/null
+		sudo rm -rf "$clients_manager_path" 2>/dev/null
 
 		# get git files
 		git clone --branch "$branch" https://github.com/rogermiranda1000/WatchWolf-ServersManager.git "$servers_manager_path"
