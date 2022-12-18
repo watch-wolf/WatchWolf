@@ -12,11 +12,13 @@ opt=""
 branch="master"
 no_startup=0
 num_processes=$((`nproc --all` - 2))
+base_path="$HOME/WatchWolf"
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --dev) branch="dev" ;;
 		--threads) num_processes="$2"; shift ;;
+		--path) base_path="$2"; shift ;;
 		
 		--build) opt="build" ;;
 		--install) opt="install" ;;
@@ -34,8 +36,8 @@ if [ $num_processes -lt 1 ]; then
 fi
 
 # target paths
-servers_manager_path="$HOME/WatchWolf/ServersManager"
-clients_manager_path="$HOME/WatchWolf/ClientsManager"
+servers_manager_path="$base_path/ServersManager"
+clients_manager_path="$base_path/ClientsManager"
 
 # ask for sudo
 sudo echo "" # this will prompt the sudo password input (if not sudo)
@@ -132,7 +134,7 @@ case "$opt" in
 					Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
 					
 					[Service]
-					ExecStart=bash "$script_path" --run
+					ExecStart=bash "$script_path" --run --path "$base_path"
 					
 					[Install]
 					WantedBy=multi-user.target

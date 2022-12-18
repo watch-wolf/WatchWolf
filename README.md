@@ -40,3 +40,6 @@ To run the script:
    Run `bash WatchWolfSetup.sh --install`.
    
    If you want to avoid WatchWolf from starting at startup, run `bash WatchWolfSetup.sh --install --disable-startup` instead.
+
+#### Extra arguments
+1. By default, the build/instalation path is "$HOME/WatchWolf". You can change it by adding the `--path new/path` argument.
