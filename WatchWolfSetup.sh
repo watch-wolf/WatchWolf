@@ -84,7 +84,7 @@ case "$opt" in
 		# all ended; wait for the Spigot versions to finish
 		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		dots=""
-		while [ "$current_downloading_containers" -gt 0 ]; do
+		while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
 			echo -ne "Waiting all Spigot containers to finish$dots ($((num_downloading_containers-num_pending_containers-current_downloading_containers))/$num_downloading_containers)      \r"
 			
 			dots="$dots."
@@ -93,14 +93,11 @@ case "$opt" in
 			fi
 			
 			if [ $num_pending_containers -gt 0 ]; then
-				# we still have to download versions
-				for (( thread=0; thread < num_processes - current_downloading_containers; thread++ )); do
-					# we have (at least) one thread free
-					version=`getAllVersions | tail -n $num_pending_containers | head -n 1` # get the first of the remaining versions
+				# still versions remaining
+				while read version; do
 					downloadSpigot "$servers_manager_path/server-types/Spigot" "$version"
-					
 					((num_pending_containers--))
-				done
+				done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $((num_processes - current_downloading_containers)) )" # get enought versions of the remaining versions to fill the threads
 			fi
 			
 			sleep 15
