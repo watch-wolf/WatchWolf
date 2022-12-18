@@ -1,11 +1,5 @@
 #!/bin/bash
 
-# @param output_path
-# @param version
-function downloadSpigot {
-	buildVersion "$1" "$2" >/dev/null 2>&1 &
-}
-
 echo "Starting WatchWolfSetup..."
 
 opt=""
@@ -69,7 +63,7 @@ case "$opt" in
 		num_downloading_containers=`getAllVersions | grep -c $'\n'`
 		num_pending_containers=$(($num_downloading_containers - $num_processes))
 		while read version; do
-			downloadSpigot "$servers_manager_path/server-types/Spigot" "$version"
+			buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
 		done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
 		
 		# WatchWolf Server as usual-plugins
@@ -81,6 +75,8 @@ case "$opt" in
 		docker pull nikolaik/python-nodejs
 		docker build --tag clients-manager "$clients_manager_path"
 		
+		((num_processes++)) # TODO remove
+		
 		# all ended; wait for the Spigot versions to finish
 		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		dots=""
@@ -88,7 +84,7 @@ case "$opt" in
 			while read version; do
 				if [ ! -z "$version" ]; then
 					# still versions remaining, and there's a place to run them
-					downloadSpigot "$servers_manager_path/server-types/Spigot" "$version"
+					buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
 					((num_pending_containers--))
 					((current_downloading_containers++))
 				fi
