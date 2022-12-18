@@ -91,7 +91,7 @@ case "$opt" in
 						sleep 1
 					done
 				fi
-			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes - $current_downloading_containers)) )" # get enought versions of the remaining versions to fill the threads
+			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
 			
 			echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
 			
