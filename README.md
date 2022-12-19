@@ -29,12 +29,19 @@ To run the script:
 
 2. Run the script in `build` mode
 
-   Run `sudo bash WatchWolfSetup.sh --build`.
+   Run `bash WatchWolfSetup.sh --build`. Have at least 1GB of free space.
    
    You can get the code from the develop branch by using `bash WatchWolfSetup.sh --build --dev`.
    
+   While building the Spigot servers you'll launch `<thread number>-2` docker containers. To set a custom ammount of processes run `bash WatchWolfSetup.sh --build --threads 4`, changing `4` for the desired number of threads.
+   
+   If you want to skip the Spigot builds (manually putting them under `~/WatchWolf/ServersManager/server-types/Spigot`) run `bash WatchWolfSetup.sh --build --skip-spigot-build`.
+   
 3. (optional) Run the script in `install` mode
 
-   Run `sudo bash WatchWolfSetup.sh --install`.
+   Run `bash WatchWolfSetup.sh --install`.
    
-   If you want to avoid WatchWolf from starting at startup, run `sudo bash WatchWolfSetup.sh --install --disable-startup` instead.
+   If you want to avoid WatchWolf from starting at startup, run `bash WatchWolfSetup.sh --install --disable-startup` instead.
+
+#### Extra arguments
+1. By default, the build/instalation path is "$HOME/WatchWolf". You can change it by adding the `--path new/path` argument.

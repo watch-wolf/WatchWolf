@@ -5,15 +5,20 @@ echo "Starting WatchWolfSetup..."
 opt=""
 branch="master"
 no_startup=0
+no_spigot=0
+num_processes=$((`nproc --all` - 2))
+base_path="$HOME/WatchWolf"
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        #-i|--install) branch="$2"; shift ;;
         --dev) branch="dev" ;;
+		--threads) num_processes="$2"; shift ;;
+		--path) base_path="$2"; shift ;;
+		--disable-startup) no_startup=1 ;;
+		--skip-spigot-build) no_spigot=1 ;;
 		
 		--build) opt="build" ;;
 		--install) opt="install" ;;
-		--disable-startup) no_startup=1 ;;
 		--uninstall) opt="uninstall" ;;
 		--run) opt="run" ;;
 		
@@ -22,9 +27,13 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
+if [ $num_processes -lt 1 ]; then
+	num_processes=1 # at least 1 process
+fi
+
 # target paths
-servers_manager_path="$HOME/WatchWolf/ServersManager"
-clients_manager_path="$HOME/WatchWolf/ClientsManager"
+servers_manager_path="$base_path/ServersManager"
+clients_manager_path="$base_path/ClientsManager"
 
 # ask for sudo
 sudo echo "" # this will prompt the sudo password input (if not sudo)
@@ -32,8 +41,8 @@ sudo echo "" # this will prompt the sudo password input (if not sudo)
 # run the desider operation
 case "$opt" in
 	"build" )
-		rm -rf "$servers_manager_path" 2>/dev/null
-		rm -rf "$clients_manager_path" 2>/dev/null
+		sudo rm -rf "$servers_manager_path" 2>/dev/null
+		sudo rm -rf "$clients_manager_path" 2>/dev/null
 
 		# get git files
 		git clone --branch "$branch" https://github.com/rogermiranda1000/WatchWolf-ServersManager.git "$servers_manager_path"
@@ -50,14 +59,16 @@ case "$opt" in
 		docker pull openjdk:17
 		docker pull ubuntu
 
-		source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
-
-		# download all Spigot versions
-		num_downloading_containers=0
-		while read version; do
-			buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
-			((num_downloading_containers++))
-		done <<< "$(getAllVersions)"
+		if [ $no_spigot -eq 0 ]; then
+			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
+			
+			# download the first <num_processes> Spigot versions
+			num_downloading_containers=`getAllVersions | grep -c $'\n'`
+			num_pending_containers=$(($num_downloading_containers > $num_processes ? $num_downloading_containers - $num_processes : 0))
+			while read version; do
+				buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1
+			done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
+		fi
 		
 		# WatchWolf Server as usual-plugins
 		watchwolf_server_versions_base_path="https://watchwolf.dev/versions"
@@ -68,20 +79,32 @@ case "$opt" in
 		docker pull nikolaik/python-nodejs
 		docker build --tag clients-manager "$clients_manager_path"
 		
-		# all ended; wait for the Spigot versions to finish
-		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
-		dots=""
-		while [ "$current_downloading_containers" -gt 0 ]; do
-			echo -ne "Waiting all Spigot containers to finish$dots ($((num_downloading_containers-current_downloading_containers))/$num_downloading_containers)      \r"
-			
-			dots="$dots."
-			if [ ${#dots} -gt 3 ]; then
-				dots=""
-			fi
-			
-			sleep 15
+		if [ $no_spigot -eq 0 ]; then
+			# all ended; wait for the Spigot versions to finish
 			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
-		done
+			dots=""
+			while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
+				while read version; do
+					if [ ! -z "$version" ]; then
+						# still versions remaining, and there's a place to run them
+						buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1
+						((num_pending_containers--))
+						((current_downloading_containers++))
+					fi
+				done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
+				
+				echo "Spigot containers still running (this process can take up to 1 hour in an average computer)"
+				echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
+				
+				dots="$dots."
+				if [ ${#dots} -gt 3 ]; then
+					dots=""
+				fi
+				
+				sleep 15
+				current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+			done
+		fi
 		
 		echo -ne '\nWatchWolf built.\n'
 		;;
@@ -110,7 +133,7 @@ case "$opt" in
 					Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
 					
 					[Service]
-					ExecStart=bash "$script_path" --run
+					ExecStart=bash "$script_path" --run --path "$base_path"
 					
 					[Install]
 					WantedBy=multi-user.target
