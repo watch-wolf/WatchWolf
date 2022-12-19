@@ -1433,9 +1433,12 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 
 \begin{figure}[H]
 \centering
-\begin{bytefield}{16}
-	\bitheader{0,2,3,4,15} \\
-	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001100}}
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001100}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{block coordinates}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
 \end{bytefield}
 \caption{Place block petition structure}
 \end{figure}
