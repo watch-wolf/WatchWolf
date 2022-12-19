@@ -1,0 +1,2281 @@
+\section{Blocks}\label{appendix:blocks}
+To generate the \hyperref[type:block]{blocks enum} Spigot 1.19 was used.
+That means that all the block names \textit{should} be the exact same as \cite{spigot-material}.
+
+%\myworries{There's one downside on using Spigot's Material: it doesn't describes perfectly the block. In some aspects it will, for example, distinguish between wood types, but it won't differentiate between a wooden stair and a wooden stair with water.}
+
+%\myworries{That's why there's some prefixes and suffixes (that will be discussed in the following subsections) surrounding the original Spigot name, to make every possible Minecraft block combination appear in the \hyperref[type:block]{block} enum. Just to clarify, all the block modifiers has also been extracted from Spigot (all \cite{spigot-blockdata}'s subinterfaces).}
+
+\subsection{Unused material modifiers}
+There's some Spigot modifiers that beside existing it won't be imported because there aren't a distinguished block in their own. You can find those in \hyperref[fig:unused-blockdata]{Figure \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Modifier name & Reason for discarding \\
+	\hline
+	\endhead
+	has\_bottle\_\textit{X} & Inventory dependent \\
+	has\_record & Inventory dependent \\
+	enabled & Adjacent redstone dependent \\
+	triggered & Adjacent redstone dependent \\
+	instrument & Bottom-block dependent \\
+	occupied & Entity dependent \\
+	persistent & Admin block \\
+	unstable & Admin block \\
+	distance & Block dependent \\
+	stage & Same block \\
+	short & Tick dependent \\
+	attached & Block dependent \\
+	disarmed & Block dependent \\
+	power & Block/event dependent \\
+	tilt & Entity dependent \\
+	can\_summon & Admin block \\
+	shrieking & Entity dependent \\
+	bloom & Admin block \\
+	bottom & Bottom-block dependent \\
+	has\_book & Inventory dependent \\
+	sculk\_sensor\_phase & Admin block \\
+	signal\_fire & Bottom-block dependent \\
+	north=tall & Top-block dependent \\
+	south=tall & Top-block dependent \\
+	east=tall & Top-block dependent \\
+	west=tall & Top-block dependent \\
+	hatch & Unable to concatenate \\
+	thickness & Block dependent \\
+	snowy & Block dependent \\
+	in\_wall & Same block \\
+	moisture & Block dependent \\
+	\hline
+	
+	\caption{Unused Spigot BlockData's modifiers}
+	\label{fig:unused-blockdata}
+\end{longtable}
+
+In addition to this, some modifiers applied to certain blocks doesn't change the block itself. Those are mentioned in \hyperref[fig:unused-blockdata-blocks]{Figure \ref{fig:unused-blockdata-blocks}, Unused Spigot BlockData's modifiers on certain blocks}.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Block name & Modifier name \\
+	\hline
+	\endhead
+	CAVE\_VINES & age \\
+	CACTUS & age \\
+	FIRE & age \\
+	KELP & age \\
+	SUGAR\_CANE & age \\
+	MANGROVE\_PROPAGULE & age \\
+	TWISTING\_VINES & age \\
+	WEEPING\_VINES & age \\
+	\hline
+	ANDESITE\_WALL & up \\
+	BLACKSTONE\_WALL & up \\
+	BRICK\_WALL & up \\
+	COBBLED\_DEEPSLATE\_WALL & up \\
+	COBBLESTONE\_WALL & up \\
+	DEEPSLATE\_BRICK\_WALL & up \\
+	DEEPSLATE\_TILE\_WALL & up \\
+	DIORITE\_WALL & up \\
+	END\_STONE\_BRICK\_WALL & up \\
+	GRANITE\_WALL & up \\
+	MOSSY\_COBBLESTONE\_WALL & up \\
+	MOSSY\_STONE\_BRICK\_WALL & up \\
+	MUD\_BRICK\_WALL & up \\
+	NETHER\_BRICK\_WALL & up \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & up \\
+	POLISHED\_BLACKSTONE\_WALL & up \\
+	POLISHED\_DEEPSLATE\_WALL & up \\
+	PRISMARINE\_WALL & up \\
+	RED\_NETHER\_BRICK\_WALL & up \\
+	RED\_SANDSTONE\_WALL & up \\
+	SANDSTONE\_WALL & up \\
+	STONE\_BRICK\_WALL & up \\
+	\hline
+	ACACIA\_DOOR & powered \\
+	ACACIA\_FENCE\_GATE & powered \\
+	ACACIA\_TRAPDOOR & powered \\
+	ACTIVATOR\_RAIL & powered \\
+	BELL & powered \\
+	BIRCH\_DOOR & powered \\
+	BIRCH\_FENCE\_GATE & powered \\
+	BIRCH\_TRAPDOOR & powered \\
+	CRIMSON\_DOOR & powered \\
+	CRIMSON\_FENCE\_GATE & powered \\
+	CRIMSON\_TRAPDOOR & powered \\
+	DARK\_OAK\_DOOR & powered \\
+	DARK\_OAK\_FENCE\_GATE & powered \\
+	DARK\_OAK\_TRAPDOOR & powered \\
+	IRON\_DOOR & powered \\
+	IRON\_TRAPDOOR & powered \\
+	JUNGLE\_DOOR & powered \\
+	JUNGLE\_FENCE\_GATE & powered \\
+	JUNGLE\_TRAPDOOR & powered \\
+	LECTERN & powered \\
+	MANGROVE\_DOOR & powered \\
+	MANGROVE\_FENCE\_GATE & powered \\
+	MANGROVE\_TRAPDOOR & powered \\
+	NOTE\_BLOCK & powered \\
+	OAK\_DOOR & powered \\
+	OAK\_FENCE\_GATE & powered \\
+	OAK\_TRAPDOOR & powered \\
+	POWERED\_RAIL & powered \\
+	SPRUCE\_DOOR & powered \\
+	SPRUCE\_FENCE\_GATE & powered \\
+	SPRUCE\_TRAPDOOR & powered \\
+	TRIPWIRE & powered \\
+	WARPED\_DOOR & powered \\
+	WARPED\_FENCE\_GATE & powered \\
+	WARPED\_TRAPDOOR & powered \\
+	\hline
+	SMOKER & lit \\
+	FURNACE & lit \\
+	\hline
+	CHEST & type \\
+	TRAPPED\_CHEST & type \\
+	\hline
+	
+	\caption{Unused Spigot BlockData's modifiers on certain blocks}
+	\label{fig:unused-blockdata-blocks}
+\end{longtable}
+
+\subsection{Material modifiers}
+\subsubsection{Age}
+Represents the different growth stages that a crop-like block can go through.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Age range \\
+		\hline
+		BEETROOTS & 0-3 \\
+		BAMBOO & 0-1 \\
+		CARROTS & 0-7 \\
+		CHORUS\_FLOWER & 0/5\footnotemark \\
+		COCOA & 0-2 \\
+		FROSTED\_ICE & 0-3 \\
+		MELON\_STEM & 0-7 \\
+		NETHER\_WART & 0-3 \\
+		POTATOES & 0-7 \\
+		PUMPKIN\_STEM & 0-7 \\
+		SWEET\_BERRY\_BUSH & 0-3 \\
+		WHEAT & 0-7 \\
+		\hline
+	\end{tabular}
+	\caption{Ageable materials}
+\end{table}
+
+% Ageable materials' CHORUS_FLOWER footnote
+\footnotetext{The block is the same from age 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
+
+\subsubsection{Attachment}
+Denotes how the bell is attached to its block.
+
+Defaults to floor.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Options \\
+		\hline
+		BELL & ceiling/double\_wall/floor/single\_wall \\
+		\hline
+	\end{tabular}
+	\caption{Attachable materials}
+\end{table}
+
+\subsubsection{Axis}
+Represents the axis along whilst this block is oriented.
+
+Except for NETHER\_PORTAL (which defaults to x), it defaults to y.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Age range \\
+	\hline
+	\endhead
+	NETHER\_PORTAL & x/z \\
+	ACACIA\_LOG & x/y/z \\
+	ACACIA\_WOOD & x/y/z \\
+	BASALT & x/y/z \\
+	BIRCH\_LOG & x/y/z \\
+	BIRCH\_WOOD & x/y/z \\
+	BONE\_BLOCK & x/y/z \\
+	CHAIN & x/y/z \\
+	CRIMSON\_HYPHAE & x/y/z \\
+	CRIMSON\_STEM & x/y/z \\
+	DARK\_OAK\_LOG & x/y/z \\
+	DARK\_OAK\_WOOD & x/y/z \\
+	DEEPSLATE & x/y/z \\
+	HAY\_BLOCK & x/y/z \\
+	INFESTED\_DEEPSLATE & x/y/z \\
+	JUNGLE\_LOG & x/y/z \\
+	JUNGLE\_WOOD & x/y/z \\
+	MANGROVE\_LOG & x/y/z \\
+	MANGROVE\_WOOD & x/y/z \\
+	MUDDY\_MANGROVE\_ROOTS & x/y/z \\
+	OAK\_LOG & x/y/z \\
+	OAK\_WOOD & x/y/z \\
+	OCHRE\_FROGLIGHT & x/y/z \\
+	PEARLESCENT\_FROGLIGHT & x/y/z \\
+	POLISHED\_BASALT & x/y/z \\
+	PURPUR\_PILLAR & x/y/z \\
+	QUARTZ\_PILLAR & x/y/z \\
+	SPRUCE\_LOG & x/y/z \\
+	SPRUCE\_WOOD & x/y/z \\
+	STRIPPED\_ACACIA\_LOG & x/y/z \\
+	STRIPPED\_ACACIA\_WOOD & x/y/z \\
+	STRIPPED\_BIRCH\_LOG & x/y/z \\
+	STRIPPED\_BIRCH\_WOOD & x/y/z \\
+	STRIPPED\_CRIMSON\_HYPHAE & x/y/z \\
+	STRIPPED\_CRIMSON\_STEM & x/y/z \\
+	STRIPPED\_DARK\_OAK\_LOG & x/y/z \\
+	STRIPPED\_DARK\_OAK\_WOOD & x/y/z \\
+	STRIPPED\_JUNGLE\_LOG & x/y/z \\
+	STRIPPED\_JUNGLE\_WOOD & x/y/z \\
+	STRIPPED\_MANGROVE\_LOG & x/y/z \\
+	STRIPPED\_MANGROVE\_WOOD & x/y/z \\
+	STRIPPED\_OAK\_LOG & x/y/z \\
+	STRIPPED\_OAK\_WOOD & x/y/z \\
+	STRIPPED\_SPRUCE\_LOG & x/y/z \\
+	STRIPPED\_SPRUCE\_WOOD & x/y/z \\
+	STRIPPED\_WARPED\_HYPHAE & x/y/z \\
+	STRIPPED\_WARPED\_STEM & x/y/z \\
+	VERDANT\_FROGLIGHT & x/y/z \\
+	WARPED\_HYPHAE & x/y/z \\
+	WARPED\_STEM & x/y/z \\
+	\hline
+	\caption{Orientable materials}
+\end{longtable}
+
+\subsubsection{Berries}
+Indicates whether the block has berries.
+
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CAVE\_VINES & true/false \\
+		CAVE\_VINES\_PLANT & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Materials with berries}
+\end{table}
+
+\subsubsection{Bites}
+Represents the amount of bites which have been taken from this slice of cake.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CAKE & 0-6 \\
+		\hline
+	\end{tabular}
+	\caption{Cake}
+\end{table}
+
+\subsubsection{Candles}
+Represents the number of candles which are present.
+
+Defaults to 1.
+
+\myworries{combine with cake if >0}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	\endhead
+	BLACK\_CANDLE & 1-4 \\
+	BLUE\_CANDLE & 1-4 \\
+	BROWN\_CANDLE & 1-4 \\
+	CANDLE & 1-4 \\
+	CYAN\_CANDLE & 1-4 \\
+	GRAY\_CANDLE & 1-4 \\
+	GREEN\_CANDLE & 1-4 \\
+	LIGHT\_BLUE\_CANDLE & 1-4 \\
+	LIGHT\_GRAY\_CANDLE & 1-4 \\
+	LIME\_CANDLE & 1-4 \\
+	MAGENTA\_CANDLE & 1-4 \\
+	ORANGE\_CANDLE & 1-4 \\
+	PINK\_CANDLE & 1-4 \\
+	PURPLE\_CANDLE & 1-4 \\
+	RED\_CANDLE & 1-4 \\
+	WHITE\_CANDLE & 1-4 \\
+	YELLOW\_CANDLE & 1-4 \\
+	\hline
+	\caption{Materials with candles}
+\end{longtable}
+
+\subsubsection{Charges}
+Represents the amount of times the anchor may still be used.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		RESPAWN\_ANCHOR & 0-4 \\
+		\hline
+	\end{tabular}
+	\caption{Charged materials}
+\end{table}
+
+\subsubsection{Conditional}\label{spigot-types:conditional}
+Denotes whether this command block is conditional or not.
+
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CHAIN\_COMMAND\_BLOCK & true/false \\
+		COMMAND\_BLOCK & true/false \\
+		REPEATING\_COMMAND\_BLOCK & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Conditionable materials}
+\end{table}
+
+\subsubsection{Delay}\label{spigot-types:delay}
+Propagation delay of a repeater.
+
+Defaults to 1.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		REPEATER & 1-4 \\
+		\hline
+	\end{tabular}
+	\caption{Delayable materials}
+\end{table}
+
+\subsubsection{Down}
+Set which faces of the block textures are displayed on.
+
+Except for BROWN\_MUSHROOM\_BLOCK, MUSHROOM\_STEM and RED\_MUSHROOM\_BLOCK (which defaults to true), it defaults to false.
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		CHORUS\_PLANT & true/false \\
+		GLOW\_LICHEN & true/false \\
+		SCULK\_VEIN & true/false \\
+		BROWN\_MUSHROOM\_BLOCK & true/false \\
+		MUSHROOM\_STEM & true/false \\
+		RED\_MUSHROOM\_BLOCK & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Materials with down option}
+\end{table}
+
+\subsubsection{North, South, East and West}
+Set which faces of the block textures are displayed on.
+
+As the \textit{tall} option is unused (check \hyperref[fig:unused-blockdata]{Table \ref{fig:unused-blockdata}, Unused Spigot BlockData's modifiers}), \textit{none} and \textit{low} will be considered as \textit{false} and \textit{true}, respectively.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	ACACIA\_FENCE & true/\textbf{false} \\
+	BIRCH\_FENCE & true/\textbf{false} \\
+	BLACK\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	BLUE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	BROWN\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	CHORUS\_PLANT & true/\textbf{false} \\
+	CRIMSON\_FENCE & true/\textbf{false} \\
+	CYAN\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	DARK\_OAK\_FENCE & true/\textbf{false} \\
+	FIRE & true/\textbf{false} \\
+	GLASS\_PANE & true/\textbf{false} \\
+	GLOW\_LICHEN & true/\textbf{false} \\
+	GRAY\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	GREEN\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	IRON\_BARS & true/\textbf{false} \\
+	JUNGLE\_FENCE & true/\textbf{false} \\
+	LIGHT\_BLUE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	LIGHT\_GRAY\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	LIME\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	MAGENTA\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	MANGROVE\_FENCE & true/\textbf{false} \\
+	NETHER\_BRICK\_FENCE & true/\textbf{false} \\
+	OAK\_FENCE & true/\textbf{false} \\
+	ORANGE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	PINK\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	PURPLE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	RED\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	SCULK\_VEIN & true/\textbf{false} \\
+	SPRUCE\_FENCE & true/\textbf{false} \\
+	TRIPWIRE & true/\textbf{false} \\
+	VINE & true/\textbf{false} \\
+	WARPED\_FENCE & true/\textbf{false} \\
+	WHITE\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	YELLOW\_STAINED\_GLASS\_PANE & true/\textbf{false} \\
+	\hline
+	BROWN\_MUSHROOM\_BLOCK & \textbf{true}/false \\
+	MUSHROOM\_STEM & \textbf{true}/false \\
+	RED\_MUSHROOM\_BLOCK & \textbf{true}/false \\
+	\hline
+	REDSTONE\_WIRE & \textbf{none}/up/slide \\
+	\hline
+	ANDESITE\_WALL & \textbf{none}/low/tall \\
+	BLACKSTONE\_WALL & \textbf{none}/low/tall \\
+	BRICK\_WALL & \textbf{none}/low/tall \\
+	COBBLED\_DEEPSLATE\_WALL & \textbf{none}/low/tall \\
+	COBBLESTONE\_WALL & \textbf{none}/low/tall \\
+	DEEPSLATE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	DEEPSLATE\_TILE\_WALL & \textbf{none}/low/tall \\
+	DIORITE\_WALL & \textbf{none}/low/tall \\
+	END\_STONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	GRANITE\_WALL & \textbf{none}/low/tall \\
+	MOSSY\_COBBLESTONE\_WALL & \textbf{none}/low/tall \\
+	MOSSY\_STONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	MUD\_BRICK\_WALL & \textbf{none}/low/tall \\
+	NETHER\_BRICK\_WALL & \textbf{none}/low/tall \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	POLISHED\_BLACKSTONE\_WALL & \textbf{none}/low/tall \\
+	POLISHED\_DEEPSLATE\_WALL & \textbf{none}/low/tall \\
+	PRISMARINE\_WALL & \textbf{none}/low/tall \\
+	RED\_NETHER\_BRICK\_WALL & \textbf{none}/low/tall \\
+	RED\_SANDSTONE\_WALL & \textbf{none}/low/tall \\
+	SANDSTONE\_WALL & \textbf{none}/low/tall \\
+	STONE\_BRICK\_WALL & \textbf{none}/low/tall \\
+	\hline
+	\caption{Orientable materials}
+\end{longtable}
+
+\subsubsection{Up}
+Set which faces of the block textures are displayed on.
+
+Except for CHORUS\_PLANT, FIRE, GLOW\_LICHEN, SCULK\_VEIN and VINE (which defaults to false), it defaults to true.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options \\
+	\hline
+	\endhead
+	CHORUS\_PLANT & true/false \\
+	FIRE & true/false \\
+	GLOW\_LICHEN & true/false \\
+	SCULK\_VEIN & true/false \\
+	VINE & true/false \\
+	\hline
+	BROWN\_MUSHROOM\_BLOCK & true/false \\
+	MUSHROOM\_STEM & true/false \\
+	RED\_MUSHROOM\_BLOCK & true/false \\
+	\hline
+	\caption{Materials with up option}
+\end{longtable}
+
+\subsubsection{Eggs}
+Number of eggs which appear in the block.
+
+Defaults to 1.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		TURTLE\_EGG & 1-4 \\
+		\hline
+	\end{tabular}
+	\caption{Materials with eggs}
+\end{table}
+
+\subsubsection{Extended}
+Denotes whether the piston head is currently extended or not.
+
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		PISTON & true/false \\
+		STICKY\_PISTON & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Extendable materials}
+\end{table}
+
+\subsubsection{Eye}\label{spigot-types:eye}
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		END\_PORTAL\_FRAME & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Materials with eye}
+\end{table}
+
+\subsubsection{Face}
+Represents the face to which a lever or button is stuck.
+
+\myworries{WALL\_SIGN}
+
+Defaults to wall.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Directions \\
+	\hline
+	\endhead
+	ACACIA\_BUTTON & wall/floor/ceiling \\
+	BIRCH\_BUTTON & wall/floor/ceiling \\
+	CRIMSON\_BUTTON & wall/floor/ceiling \\
+	DARK\_OAK\_BUTTON & wall/floor/ceiling \\
+	GRINDSTONE & wall/floor/ceiling \\
+	JUNGLE\_BUTTON & wall/floor/ceiling \\
+	LEVER & wall/floor/ceiling \\
+	MANGROVE\_BUTTON & wall/floor/ceiling \\
+	OAK\_BUTTON & wall/floor/ceiling \\
+	POLISHED\_BLACKSTONE\_BUTTON & wall/floor/ceiling \\
+	SPRUCE\_BUTTON & wall/floor/ceiling \\
+	STONE\_BUTTON & wall/floor/ceiling \\
+	WARPED\_BUTTON & wall/floor/ceiling \\
+	\hline
+	\caption{Directional materials}
+\end{longtable}
+
+\subsubsection{Facing}
+Represents the face towards which the block is pointing.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	HOPPER & \textbf{down}/north/south/east/west \\
+	OBSERVER & up/down/north/\textbf{south}/east/west \\
+	\hline
+	BARREL & up/down/\textbf{north}/south/east/west \\
+	CHAIN\_COMMAND\_BLOCK & up/down/\textbf{north}/south/east/west \\
+	COMMAND\_BLOCK & up/down/\textbf{north}/south/east/west \\
+	DISPENSER & up/down/\textbf{north}/south/east/west \\
+	DROPPER & up/down/\textbf{north}/south/east/west \\
+	PISTON & up/down/\textbf{north}/south/east/west \\
+	PISTON\_HEAD & up/down/\textbf{north}/south/east/west \\
+	REPEATING\_COMMAND\_BLOCK & up/down/\textbf{north}/south/east/west \\
+	STICKY\_PISTON & up/down/\textbf{north}/south/east/west \\
+	\hline
+	ACACIA\_BUTTON & \textbf{north}/south/east/west \\
+	ACACIA\_DOOR & \textbf{north}/south/east/west \\
+	ACACIA\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	ACACIA\_STAIRS & \textbf{north}/south/east/west \\
+	ACACIA\_TRAPDOOR & \textbf{north}/south/east/west \\
+	ACACIA\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	ANDESITE\_STAIRS & \textbf{north}/south/east/west \\
+	ANVIL & \textbf{north}/south/east/west \\
+	ATTACHED\_MELON\_STEM & \textbf{north}/south/east/west \\
+	ATTACHED\_PUMPKIN\_STEM & \textbf{north}/south/east/west \\
+	BEEHIVE & \textbf{north}/south/east/west \\
+	BEE\_NEST & \textbf{north}/south/east/west \\
+	BELL & \textbf{north}/south/east/west \\
+	BIG\_DRIPLEAF & \textbf{north}/south/east/west \\
+	BIG\_DRIPLEAF\_STEM & \textbf{north}/south/east/west \\
+	BIRCH\_BUTTON & \textbf{north}/south/east/west \\
+	BIRCH\_DOOR & \textbf{north}/south/east/west \\
+	BIRCH\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	BIRCH\_STAIRS & \textbf{north}/south/east/west \\
+	BIRCH\_TRAPDOOR & \textbf{north}/south/east/west \\
+	BIRCH\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	BLACKSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	BLACK\_BED & \textbf{north}/south/east/west \\
+	BLACK\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	BLACK\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	BLAST\_FURNACE & \textbf{north}/south/east/west \\
+	BLUE\_BED & \textbf{north}/south/east/west \\
+	BLUE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	BLUE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	BRAIN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	BROWN\_BED & \textbf{north}/south/east/west \\
+	BROWN\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	BROWN\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	BUBBLE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	CAMPFIRE & \textbf{north}/south/east/west \\
+	CARVED\_PUMPKIN & \textbf{north}/south/east/west \\
+	CHEST & \textbf{north}/south/east/west \\
+	CHIPPED\_ANVIL & \textbf{north}/south/east/west \\
+	COBBLED\_DEEPSLATE\_STAIRS & \textbf{north}/south/east/west \\
+	COBBLESTONE\_STAIRS & \textbf{north}/south/east/west \\
+	COCOA & \textbf{north}/south/east/west \\
+	COMPARATOR & \textbf{north}/south/east/west \\
+	CREEPER\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	CRIMSON\_BUTTON & \textbf{north}/south/east/west \\
+	CRIMSON\_DOOR & \textbf{north}/south/east/west \\
+	CRIMSON\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	CRIMSON\_STAIRS & \textbf{north}/south/east/west \\
+	CRIMSON\_TRAPDOOR & \textbf{north}/south/east/west \\
+	CRIMSON\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	CYAN\_BED & \textbf{north}/south/east/west \\
+	CYAN\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	CYAN\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	DAMAGED\_ANVIL & \textbf{north}/south/east/west \\
+	DARK\_OAK\_BUTTON & \textbf{north}/south/east/west \\
+	DARK\_OAK\_DOOR & \textbf{north}/south/east/west \\
+	DARK\_OAK\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	DARK\_OAK\_STAIRS & \textbf{north}/south/east/west \\
+	DARK\_OAK\_TRAPDOOR & \textbf{north}/south/east/west \\
+	DARK\_OAK\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	DARK\_PRISMARINE\_STAIRS & \textbf{north}/south/east/west \\
+	DEAD\_BRAIN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_BUBBLE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_FIRE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_HORN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEAD\_TUBE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	DEEPSLATE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	DEEPSLATE\_TILE\_STAIRS & \textbf{north}/south/east/west \\
+	DIORITE\_STAIRS & \textbf{north}/south/east/west \\
+	DRAGON\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	ENDER\_CHEST & \textbf{north}/south/east/west \\
+	END\_PORTAL\_FRAME & \textbf{north}/south/east/west \\
+	END\_STONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	FIRE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	FURNACE & \textbf{north}/south/east/west \\
+	GRANITE\_STAIRS & \textbf{north}/south/east/west \\
+	GRAY\_BED & \textbf{north}/south/east/west \\
+	GRAY\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	GRAY\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	GREEN\_BED & \textbf{north}/south/east/west \\
+	GREEN\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	GREEN\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	GRINDSTONE & \textbf{north}/south/east/west \\
+	HORN\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	IRON\_DOOR & \textbf{north}/south/east/west \\
+	IRON\_TRAPDOOR & \textbf{north}/south/east/west \\
+	JACK\_O\_LANTERN & \textbf{north}/south/east/west \\
+	JUNGLE\_BUTTON & \textbf{north}/south/east/west \\
+	JUNGLE\_DOOR & \textbf{north}/south/east/west \\
+	JUNGLE\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	JUNGLE\_STAIRS & \textbf{north}/south/east/west \\
+	JUNGLE\_TRAPDOOR & \textbf{north}/south/east/west \\
+	JUNGLE\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	LADDER & \textbf{north}/south/east/west \\
+	LECTERN & \textbf{north}/south/east/west \\
+	LEVER & \textbf{north}/south/east/west \\
+	LIGHT\_BLUE\_BED & \textbf{north}/south/east/west \\
+	LIGHT\_BLUE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	LIGHT\_BLUE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	LIGHT\_GRAY\_BED & \textbf{north}/south/east/west \\
+	LIGHT\_GRAY\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	LIGHT\_GRAY\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	LIME\_BED & \textbf{north}/south/east/west \\
+	LIME\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	LIME\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	LOOM & \textbf{north}/south/east/west \\
+	MAGENTA\_BED & \textbf{north}/south/east/west \\
+	MAGENTA\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	MAGENTA\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	MANGROVE\_BUTTON & \textbf{north}/south/east/west \\
+	MANGROVE\_DOOR & \textbf{north}/south/east/west \\
+	MANGROVE\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	MANGROVE\_STAIRS & \textbf{north}/south/east/west \\
+	MANGROVE\_TRAPDOOR & \textbf{north}/south/east/west \\
+	MANGROVE\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	MOSSY\_COBBLESTONE\_STAIRS & \textbf{north}/south/east/west \\
+	MOSSY\_STONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	MUD\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	NETHER\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	OAK\_BUTTON & \textbf{north}/south/east/west \\
+	OAK\_DOOR & \textbf{north}/south/east/west \\
+	OAK\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	OAK\_STAIRS & \textbf{north}/south/east/west \\
+	OAK\_TRAPDOOR & \textbf{north}/south/east/west \\
+	OAK\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	ORANGE\_BED & \textbf{north}/south/east/west \\
+	ORANGE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	ORANGE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	PINK\_BED & \textbf{north}/south/east/west \\
+	PINK\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	PINK\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	PLAYER\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	POLISHED\_ANDESITE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_BLACKSTONE\_BUTTON & \textbf{north}/south/east/west \\
+	POLISHED\_BLACKSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_DEEPSLATE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_DIORITE\_STAIRS & \textbf{north}/south/east/west \\
+	POLISHED\_GRANITE\_STAIRS & \textbf{north}/south/east/west \\
+	PRISMARINE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	PRISMARINE\_STAIRS & \textbf{north}/south/east/west \\
+	PURPLE\_BED & \textbf{north}/south/east/west \\
+	PURPLE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	PURPLE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	PURPUR\_STAIRS & \textbf{north}/south/east/west \\
+	QUARTZ\_STAIRS & \textbf{north}/south/east/west \\
+	REDSTONE\_WALL\_TORCH & \textbf{north}/south/east/west \\
+	RED\_BED & \textbf{north}/south/east/west \\
+	RED\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	RED\_NETHER\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	RED\_SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	RED\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	REPEATER & \textbf{north}/south/east/west \\
+	SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	SKELETON\_WALL\_SKULL & \textbf{north}/south/east/west \\
+	SMALL\_DRIPLEAF & \textbf{north}/south/east/west \\
+	SMOKER & \textbf{north}/south/east/west \\
+	SMOOTH\_QUARTZ\_STAIRS & \textbf{north}/south/east/west \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	SMOOTH\_SANDSTONE\_STAIRS & \textbf{north}/south/east/west \\
+	SOUL\_CAMPFIRE & \textbf{north}/south/east/west \\
+	SOUL\_WALL\_TORCH & \textbf{north}/south/east/west \\
+	SPRUCE\_BUTTON & \textbf{north}/south/east/west \\
+	SPRUCE\_DOOR & \textbf{north}/south/east/west \\
+	SPRUCE\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	SPRUCE\_STAIRS & \textbf{north}/south/east/west \\
+	SPRUCE\_TRAPDOOR & \textbf{north}/south/east/west \\
+	SPRUCE\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	STONECUTTER & \textbf{north}/south/east/west \\
+	STONE\_BRICK\_STAIRS & \textbf{north}/south/east/west \\
+	STONE\_BUTTON & \textbf{north}/south/east/west \\
+	STONE\_STAIRS & \textbf{north}/south/east/west \\
+	TRAPPED\_CHEST & \textbf{north}/south/east/west \\
+	TRIPWIRE\_HOOK & \textbf{north}/south/east/west \\
+	TUBE\_CORAL\_WALL\_FAN & \textbf{north}/south/east/west \\
+	WALL\_TORCH & \textbf{north}/south/east/west \\
+	WARPED\_BUTTON & \textbf{north}/south/east/west \\
+	WARPED\_DOOR & \textbf{north}/south/east/west \\
+	WARPED\_FENCE\_GATE & \textbf{north}/south/east/west \\
+	WARPED\_STAIRS & \textbf{north}/south/east/west \\
+	WARPED\_TRAPDOOR & \textbf{north}/south/east/west \\
+	WARPED\_WALL\_SIGN & \textbf{north}/south/east/west \\
+	WAXED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & \textbf{north}/south/east/west \\
+	WHITE\_BED & \textbf{north}/south/east/west \\
+	WHITE\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	WHITE\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	WITHER\_SKELETON\_WALL\_SKULL & \textbf{north}/south/east/west \\
+	YELLOW\_BED & \textbf{north}/south/east/west \\
+	YELLOW\_GLAZED\_TERRACOTTA & \textbf{north}/south/east/west \\
+	YELLOW\_WALL\_BANNER & \textbf{north}/south/east/west \\
+	ZOMBIE\_WALL\_HEAD & \textbf{north}/south/east/west \\
+	\hline
+	AMETHYST\_CLUSTER & \textbf{up}/down/north/south/east/west \\
+	BLACK\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	BLUE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	BROWN\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	CYAN\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	END\_ROD & \textbf{up}/down/north/south/east/west \\
+	GRAY\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	GREEN\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	LARGE\_AMETHYST\_BUD & \textbf{up}/down/north/south/east/west \\
+	LIGHTNING\_ROD & \textbf{up}/down/north/south/east/west \\
+	LIGHT\_BLUE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	LIGHT\_GRAY\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	LIME\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	MAGENTA\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	MEDIUM\_AMETHYST\_BUD & \textbf{up}/down/north/south/east/west \\
+	ORANGE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	PINK\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	PURPLE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	RED\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	SMALL\_AMETHYST\_BUD & \textbf{up}/down/north/south/east/west \\
+	WHITE\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	YELLOW\_SHULKER\_BOX & \textbf{up}/down/north/south/east/west \\
+	\hline
+	\caption{Directional materials}
+\end{longtable}
+
+\subsubsection{Half}
+Denotes which half of a two block tall material this block is.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	ACACIA\_STAIRS & \textbf{bottom}/top \\
+	ACACIA\_TRAPDOOR & \textbf{bottom}/top \\
+	ANDESITE\_STAIRS & \textbf{bottom}/top \\
+	BIRCH\_STAIRS & \textbf{bottom}/top \\
+	BIRCH\_TRAPDOOR & \textbf{bottom}/top \\
+	BLACKSTONE\_STAIRS & \textbf{bottom}/top \\
+	BRICK\_STAIRS & \textbf{bottom}/top \\
+	COBBLED\_DEEPSLATE\_STAIRS & \textbf{bottom}/top \\
+	COBBLESTONE\_STAIRS & \textbf{bottom}/top \\
+	CRIMSON\_STAIRS & \textbf{bottom}/top \\
+	CRIMSON\_TRAPDOOR & \textbf{bottom}/top \\
+	CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	DARK\_OAK\_STAIRS & \textbf{bottom}/top \\
+	DARK\_OAK\_TRAPDOOR & \textbf{bottom}/top \\
+	DARK\_PRISMARINE\_STAIRS & \textbf{bottom}/top \\
+	DEEPSLATE\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	DEEPSLATE\_TILE\_STAIRS & \textbf{bottom}/top \\
+	DIORITE\_STAIRS & \textbf{bottom}/top \\
+	END\_STONE\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	GRANITE\_STAIRS & \textbf{bottom}/top \\
+	IRON\_TRAPDOOR & \textbf{bottom}/top \\
+	JUNGLE\_STAIRS & \textbf{bottom}/top \\
+	JUNGLE\_TRAPDOOR & \textbf{bottom}/top \\
+	MANGROVE\_STAIRS & \textbf{bottom}/top \\
+	MANGROVE\_TRAPDOOR & \textbf{bottom}/top \\
+	MOSSY\_COBBLESTONE\_STAIRS & \textbf{bottom}/top \\
+	MOSSY\_STONE\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	MUD\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	NETHER\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	OAK\_STAIRS & \textbf{bottom}/top \\
+	OAK\_TRAPDOOR & \textbf{bottom}/top \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	POLISHED\_ANDESITE\_STAIRS & \textbf{bottom}/top \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	POLISHED\_BLACKSTONE\_STAIRS & \textbf{bottom}/top \\
+	POLISHED\_DEEPSLATE\_STAIRS & \textbf{bottom}/top \\
+	POLISHED\_DIORITE\_STAIRS & \textbf{bottom}/top \\
+	POLISHED\_GRANITE\_STAIRS & \textbf{bottom}/top \\
+	PRISMARINE\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	PRISMARINE\_STAIRS & \textbf{bottom}/top \\
+	PURPUR\_STAIRS & \textbf{bottom}/top \\
+	QUARTZ\_STAIRS & \textbf{bottom}/top \\
+	RED\_NETHER\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	RED\_SANDSTONE\_STAIRS & \textbf{bottom}/top \\
+	SANDSTONE\_STAIRS & \textbf{bottom}/top \\
+	SMOOTH\_QUARTZ\_STAIRS & \textbf{bottom}/top \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & \textbf{bottom}/top \\
+	SMOOTH\_SANDSTONE\_STAIRS & \textbf{bottom}/top \\
+	SPRUCE\_STAIRS & \textbf{bottom}/top \\
+	SPRUCE\_TRAPDOOR & \textbf{bottom}/top \\
+	STONE\_BRICK\_STAIRS & \textbf{bottom}/top \\
+	STONE\_STAIRS & \textbf{bottom}/top \\
+	WARPED\_STAIRS & \textbf{bottom}/top \\
+	WARPED\_TRAPDOOR & \textbf{bottom}/top \\
+	WAXED\_CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & \textbf{bottom}/top \\
+	\hline
+	ACACIA\_DOOR & \textbf{lower}/upper \\
+	BIRCH\_DOOR & \textbf{lower}/upper \\
+	CRIMSON\_DOOR & \textbf{lower}/upper \\
+	DARK\_OAK\_DOOR & \textbf{lower}/upper \\
+	IRON\_DOOR & \textbf{lower}/upper \\
+	JUNGLE\_DOOR & \textbf{lower}/upper \\
+	LARGE\_FERN & \textbf{lower}/upper \\
+	LILAC & \textbf{lower}/upper \\
+	MANGROVE\_DOOR & \textbf{lower}/upper \\
+	OAK\_DOOR & \textbf{lower}/upper \\
+	PEONY & \textbf{lower}/upper \\
+	ROSE\_BUSH & \textbf{lower}/upper \\
+	SMALL\_DRIPLEAF & \textbf{lower}/upper \\
+	SPRUCE\_DOOR & \textbf{lower}/upper \\
+	SUNFLOWER & \textbf{lower}/upper \\
+	TALL\_GRASS & \textbf{lower}/upper \\
+	TALL\_SEAGRASS & \textbf{lower}/upper \\
+	WARPED\_DOOR & \textbf{lower}/upper \\
+	\hline
+	\caption{Two-blocks materials}
+\end{longtable}
+
+\subsubsection{Hanging}
+Denotes whether the block is hanging.
+
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		LANTERN & true/false \\
+		MANGROVE\_PROPAGULE & true/false \\
+		SOUL\_LANTERN & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Hangable materials}
+\end{table}
+
+\subsubsection{Hinge}\label{spigot-types:hinge}
+Indicates which hinge this door is attached to and will rotate around when opened.
+
+Defaults to left.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options \\
+	\hline
+	\endhead
+	ACACIA\_DOOR & left/right \\
+	BIRCH\_DOOR & left/right \\
+	CRIMSON\_DOOR & left/right \\
+	DARK\_OAK\_DOOR & left/right \\
+	IRON\_DOOR & left/right \\
+	JUNGLE\_DOOR & left/right \\
+	MANGROVE\_DOOR & left/right \\
+	OAK\_DOOR & left/right \\
+	SPRUCE\_DOOR & left/right \\
+	WARPED\_DOOR & left/right \\
+	\hline
+	\caption{Doors}
+\end{longtable}
+
+\subsubsection{Honey level}
+Represents the amount of honey stored in the hive.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		BEEHIVE & 0/5\footnotemark \\
+		BEE\_NEST & 0/5\footnotemark[\value{footnote}] \\ % refear to top footnote
+		\hline
+	\end{tabular}
+	\caption{Hives}
+\end{table}
+
+% Hives' footnotes
+\footnotetext{The block is the same from honey-level 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
+
+\subsubsection{Inverted}\label{spigot-types:inverted}
+Denotes whether this daylight detector is in the inverted mode.
+
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		DAYLIGHT\_DETECTOR & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Invertible blocks}
+\end{table}
+
+\subsubsection{Layers}
+Represents the amount of layers of snow which are present in this block.
+
+Defaults to 1.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		SNOW & 1-8 \\
+		\hline
+	\end{tabular}
+	\caption{Snow}
+\end{table}
+
+\subsubsection{Leaves}\label{spigot-types:leaves}
+Represents the size of the leaves of the bamboo block.
+
+Defaults to none.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		BAMBOO & none/small/large \\
+		\hline
+	\end{tabular}
+	\caption{Bamboo}
+\end{table}
+
+\subsubsection{Level}
+Represents the amount of fluid contained within this block, either by itself or inside a cauldron.
+
+Defaults on 0 except for POWDER\_SNOW\_CAULDRON and WATER\_CAULDRON (which defaults on 1).
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		COMPOSTER & 0-8 \\
+		LAVA & 0-7 \\
+		WATER & 0-7 \\
+		POWDER\_SNOW\_CAULDRON & 1-3 \\
+		WATER\_CAULDRON & 1-3 \\
+		\hline
+	\end{tabular}
+	\caption{Levelled materials}
+\end{table}
+
+\subsubsection{Lit}\label{spigot-types:lit}
+Denotes whether this block is currently lit.
+
+Except for CAMPFIRE, REDSTONE\_TORCH, REDSTONE\_WALL\_TORCH and SOUL\_CAMPFIRE (which defaults to true), it defaults to false.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options \\
+	\hline
+	\endhead
+	BLACK\_CANDLE & true/false \\
+	BLACK\_CANDLE\_CAKE & true/false \\
+	BLAST\_FURNACE & true/false \\
+	BLUE\_CANDLE & true/false \\
+	BLUE\_CANDLE\_CAKE & true/false \\
+	BROWN\_CANDLE & true/false \\
+	BROWN\_CANDLE\_CAKE & true/false \\
+	CANDLE & true/false \\
+	CANDLE\_CAKE & true/false \\
+	CYAN\_CANDLE & true/false \\
+	CYAN\_CANDLE\_CAKE & true/false \\
+	DEEPSLATE\_REDSTONE\_ORE & true/false \\
+	GRAY\_CANDLE & true/false \\
+	GRAY\_CANDLE\_CAKE & true/false \\
+	GREEN\_CANDLE & true/false \\
+	GREEN\_CANDLE\_CAKE & true/false \\
+	LIGHT\_BLUE\_CANDLE & true/false \\
+	LIGHT\_BLUE\_CANDLE\_CAKE & true/false \\
+	LIGHT\_GRAY\_CANDLE & true/false \\
+	LIGHT\_GRAY\_CANDLE\_CAKE & true/false \\
+	LIME\_CANDLE & true/false \\
+	LIME\_CANDLE\_CAKE & true/false \\
+	MAGENTA\_CANDLE & true/false \\
+	MAGENTA\_CANDLE\_CAKE & true/false \\
+	ORANGE\_CANDLE & true/false \\
+	ORANGE\_CANDLE\_CAKE & true/false \\
+	PINK\_CANDLE & true/false \\
+	PINK\_CANDLE\_CAKE & true/false \\
+	PURPLE\_CANDLE & true/false \\
+	PURPLE\_CANDLE\_CAKE & true/false \\
+	REDSTONE\_LAMP & true/false \\
+	REDSTONE\_ORE & true/false \\
+	RED\_CANDLE & true/false \\
+	RED\_CANDLE\_CAKE & true/false \\
+	WHITE\_CANDLE & true/false \\
+	WHITE\_CANDLE\_CAKE & true/false \\
+	YELLOW\_CANDLE & true/false \\
+	YELLOW\_CANDLE\_CAKE & true/false \\
+	\hline
+	CAMPFIRE & true/false \\
+	REDSTONE\_TORCH & true/false \\
+	REDSTONE\_WALL\_TORCH & true/false \\
+	SOUL\_CAMPFIRE & true/false \\
+	\hline
+	\caption{Lightable materials}
+\end{longtable}
+
+
+\subsubsection{Locked}\label{spigot-types:locked}
+Denotes whether the repeater is in the locked state or not.
+
+Defaults to false.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		REPEATER & true/false \\
+		\hline
+	\end{tabular}
+	\caption{Repeater}
+\end{table}
+
+\subsubsection{Mode}\label{spigot-types:mode}
+Indicates what mode the block will operate in.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Options (default on bold) \\
+		\hline
+		COMPARATOR & \textbf{compare}/subtract \\
+		STRUCTURE\_BLOCK & \textbf{load}/corner/save \\
+		\hline
+	\end{tabular}
+	\caption{Materials with mode}
+\end{table}
+
+\subsubsection{Note}\label{spigot-types:note}
+Specified tuned pitch that the instrument will be played in.
+
+Defaults to 0.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		NOTE\_BLOCK & 0-24 \\
+		\hline
+	\end{tabular}
+	\caption{Note block}
+\end{table}
+
+\subsubsection{Open}\label{spigot-types:open}
+Denotes whether this block is currently opened.
+
+Defaults to false.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	\endhead
+	ACACIA\_DOOR & true/false \\
+	ACACIA\_FENCE\_GATE & true/false \\
+	ACACIA\_TRAPDOOR & true/false \\
+	BARREL & true/false \\
+	BIRCH\_DOOR & true/false \\
+	BIRCH\_FENCE\_GATE & true/false \\
+	BIRCH\_TRAPDOOR & true/false \\
+	CRIMSON\_DOOR & true/false \\
+	CRIMSON\_FENCE\_GATE & true/false \\
+	CRIMSON\_TRAPDOOR & true/false \\
+	DARK\_OAK\_DOOR & true/false \\
+	DARK\_OAK\_FENCE\_GATE & true/false \\
+	DARK\_OAK\_TRAPDOOR & true/false \\
+	IRON\_DOOR & true/false \\
+	IRON\_TRAPDOOR & true/false \\
+	JUNGLE\_DOOR & true/false \\
+	JUNGLE\_FENCE\_GATE & true/false \\
+	JUNGLE\_TRAPDOOR & true/false \\
+	MANGROVE\_DOOR & true/false \\
+	MANGROVE\_FENCE\_GATE & true/false \\
+	MANGROVE\_TRAPDOOR & true/false \\
+	OAK\_DOOR & true/false \\
+	OAK\_FENCE\_GATE & true/false \\
+	OAK\_TRAPDOOR & true/false \\
+	SPRUCE\_DOOR & true/false \\
+	SPRUCE\_FENCE\_GATE & true/false \\
+	SPRUCE\_TRAPDOOR & true/false \\
+	WARPED\_DOOR & true/false \\
+	WARPED\_FENCE\_GATE & true/false \\
+	WARPED\_TRAPDOOR & true/false \\
+	\hline
+	\caption{Openable materials}
+\end{longtable}
+
+\subsubsection{Orientation}
+Direction the block is facing.
+
+Defaults to north\_up, and can take any of the values shown in \hyperref[ab:jigsaw]{Table \ref{ab:jigsaw}, Jigsaw orientations}.
+
+\begin{longtable}{ |c| }
+	\hline
+	Orientation \\
+	\hline
+	\endhead
+	north\_up \\
+	south\_up \\
+	east\_up \\
+	west\_up \\
+	\hline
+	up\_north \\
+	up\_south \\
+	up\_east \\
+	up\_west \\
+	\hline
+	down\_north \\
+	down\_south \\
+	down\_east \\
+	down\_west \\
+	\hline
+	\caption{Jigsaw orientations}
+	\label{ab:jigsaw}
+\end{longtable}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c| }
+		\hline
+		Material \\
+		\hline
+		JIGSAW \\
+		\hline
+	\end{tabular}
+	\caption{Jigsaw}
+\end{table}
+
+\subsubsection{Part}
+Denotes which half of the bed this block corresponds to.
+
+Defaults to foot.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	\endhead
+	BLACK\_BED & foot/head \\
+	BLUE\_BED & foot/head \\
+	BROWN\_BED & foot/head \\
+	CYAN\_BED & foot/head \\
+	GRAY\_BED & foot/head \\
+	GREEN\_BED & foot/head \\
+	LIGHT\_BLUE\_BED & foot/head \\
+	LIGHT\_GRAY\_BED & foot/head \\
+	LIME\_BED & foot/head \\
+	MAGENTA\_BED & foot/head \\
+	ORANGE\_BED & foot/head \\
+	PINK\_BED & foot/head \\
+	PURPLE\_BED & foot/head \\
+	RED\_BED & foot/head \\
+	WHITE\_BED & foot/head \\
+	YELLOW\_BED & foot/head \\
+	\hline
+	\caption{Openable materials}
+\end{longtable}
+
+\subsubsection{Pickles}
+Indicates the number of pickles in this block.
+
+Defaults to 1.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		SEA\_PICKLE & 1-4 \\
+		\hline
+	\end{tabular}
+	\caption{Materials with pickles}
+\end{table}
+
+
+\subsubsection{Powered}\label{spigot-types:powered}
+Indicates whether this block is in the powered state or not (emitting current).
+
+Defaults to false.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Powered value \\
+	\hline
+	\endhead
+	ACACIA\_BUTTON & true/false \\
+	ACACIA\_PRESSURE\_PLATE & true/false \\
+	BIRCH\_BUTTON & true/false \\
+	BIRCH\_PRESSURE\_PLATE & true/false \\
+	COMPARATOR & true/false \\
+	CRIMSON\_BUTTON & true/false \\
+	CRIMSON\_PRESSURE\_PLATE & true/false \\
+	DARK\_OAK\_BUTTON & true/false \\
+	DARK\_OAK\_PRESSURE\_PLATE & true/false \\
+	DETECTOR\_RAIL & true/false \\
+	JUNGLE\_BUTTON & true/false \\
+	JUNGLE\_PRESSURE\_PLATE & true/false \\
+	LEVER & true/false \\
+	LIGHTNING\_ROD & true/false \\
+	MANGROVE\_BUTTON & true/false \\
+	MANGROVE\_PRESSURE\_PLATE & true/false \\
+	OAK\_BUTTON & true/false \\
+	OAK\_PRESSURE\_PLATE & true/false \\
+	OBSERVER & true/false \\
+	POLISHED\_BLACKSTONE\_BUTTON & true/false \\
+	POLISHED\_BLACKSTONE\_PRESSURE\_PLATE & true/false \\
+	REPEATER & true/false \\
+	SPRUCE\_BUTTON & true/false \\
+	SPRUCE\_PRESSURE\_PLATE & true/false \\
+	STONE\_BUTTON & true/false \\
+	STONE\_PRESSURE\_PLATE & true/false \\
+	TRIPWIRE\_HOOK & true/false \\
+	WARPED\_BUTTON & true/false \\
+	WARPED\_PRESSURE\_PLATE & true/false \\
+	\hline
+	\caption{Powerabled materials}
+\end{longtable}
+
+\subsubsection{Rotation}\label{spigot-types:rotation}
+Denotes where the block is looking.
+
+Defaults to 0 and goes up to 15.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Rotation value & Direction \\
+		\hline
+		0 & South \\
+		4 & West \\
+		8 & North \\
+		12 & East \\
+		\hline
+	\end{tabular}
+	\caption{Relation between rotation and where is looking}
+\end{table}
+
+\begin{longtable}{ |c| }
+	\hline
+	Material \\
+	\hline
+	\endhead
+	ACACIA\_SIGN \\
+	BIRCH\_SIGN \\
+	BLACK\_BANNER \\
+	BLUE\_BANNER \\
+	BROWN\_BANNER \\
+	CREEPER\_HEAD \\
+	CRIMSON\_SIGN \\
+	CYAN\_BANNER \\
+	DARK\_OAK\_SIGN \\
+	DRAGON\_HEAD \\
+	GRAY\_BANNER \\
+	GREEN\_BANNER \\
+	JUNGLE\_SIGN \\
+	LIGHT\_BLUE\_BANNER \\
+	LIGHT\_GRAY\_BANNER \\
+	LIME\_BANNER \\
+	MAGENTA\_BANNER \\
+	MANGROVE\_SIGN \\
+	OAK\_SIGN \\
+	ORANGE\_BANNER \\
+	PINK\_BANNER \\
+	PLAYER\_HEAD \\
+	PURPLE\_BANNER \\
+	RED\_BANNER \\
+	SKELETON\_SKULL \\
+	SPRUCE\_SIGN \\
+	WARPED\_SIGN \\
+	WHITE\_BANNER \\
+	WITHER\_SKELETON\_SKULL \\
+	YELLOW\_BANNER \\
+	ZOMBIE\_HEAD \\
+	\hline
+	\caption{Directional materials}
+\end{longtable}
+
+\subsubsection{Shape - Rails}
+Represents the current layout of a minecart rail.
+
+Defaults to north\_south, and it can take any value of those mentioned in \hyperref[ab:rail]{Table \ref{ab:rail}, Rail directions}.
+
+\begin{longtable}{ |c| }
+	\hline
+	Shape \\
+	\hline
+	\endhead
+	north\_south \\
+	east\_west \\
+	\hline
+	north\_east \\
+	north\_west \\
+	south\_east \\
+	south\_west \\
+	\hline
+	ascending\_north \\
+	ascending\_south \\
+	ascending\_east \\
+	ascending\_west \\
+	\hline
+	\caption{Rail directions}
+	\label{ab:rail}
+\end{longtable}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ |c| }
+	\hline
+	Material \\
+	\hline
+	ACTIVATOR\_RAIL \\
+	DETECTOR\_RAIL \\
+	POWERED\_RAIL \\
+	RAIL \\
+	\hline
+\end{tabular}
+\caption{Rails}
+\end{table}
+
+\subsubsection{Shape - Stairs}
+Represents the texture and bounding box shape of these stairs.
+
+Defaults to straight.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Shape \\
+	\hline
+	\endhead
+	ACACIA\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	ANDESITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BIRCH\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BLACKSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	COBBLED\_DEEPSLATE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	COBBLESTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	CRIMSON\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DARK\_OAK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DARK\_PRISMARINE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DEEPSLATE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DEEPSLATE\_TILE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	DIORITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	END\_STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	GRANITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	JUNGLE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MANGROVE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MOSSY\_COBBLESTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MOSSY\_STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	MUD\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	NETHER\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	OAK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_ANDESITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_BLACKSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_DEEPSLATE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_DIORITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	POLISHED\_GRANITE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PRISMARINE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PRISMARINE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	PURPUR\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	QUARTZ\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	RED\_NETHER\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	RED\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_QUARTZ\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SMOOTH\_SANDSTONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	SPRUCE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	STONE\_BRICK\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	STONE\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WARPED\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & straight/inner\_right/inner\_left/ \\
+					& outer\_right/inner\_right \\
+	\hline
+	\caption{Stairs}
+\end{longtable}
+
+\subsubsection{Type}
+Represents the type of piston which that block corresponds to, or represents what state the slab is in.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Options (default on bold) \\
+	\hline
+	\endhead
+	ACACIA\_SLAB & \textbf{bottom}/top/double \\
+	ANDESITE\_SLAB & \textbf{bottom}/top/double \\
+	BIRCH\_SLAB & \textbf{bottom}/top/double \\
+	BLACKSTONE\_SLAB & \textbf{bottom}/top/double \\
+	BRICK\_SLAB & \textbf{bottom}/top/double \\
+	COBBLED\_DEEPSLATE\_SLAB & \textbf{bottom}/top/double \\
+	COBBLESTONE\_SLAB & \textbf{bottom}/top/double \\
+	CRIMSON\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	CUT\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	DARK\_OAK\_SLAB & \textbf{bottom}/top/double \\
+	DARK\_PRISMARINE\_SLAB & \textbf{bottom}/top/double \\
+	DEEPSLATE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	DEEPSLATE\_TILE\_SLAB & \textbf{bottom}/top/double \\
+	DIORITE\_SLAB & \textbf{bottom}/top/double \\
+	END\_STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	EXPOSED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	GRANITE\_SLAB & \textbf{bottom}/top/double \\
+	JUNGLE\_SLAB & \textbf{bottom}/top/double \\
+	MANGROVE\_SLAB & \textbf{bottom}/top/double \\
+	MOSSY\_COBBLESTONE\_SLAB & \textbf{bottom}/top/double \\
+	MOSSY\_STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	MUD\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	NETHER\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	OAK\_SLAB & \textbf{bottom}/top/double \\
+	OXIDIZED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	PETRIFIED\_OAK\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_ANDESITE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_BLACKSTONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_BLACKSTONE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_DEEPSLATE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_DIORITE\_SLAB & \textbf{bottom}/top/double \\
+	POLISHED\_GRANITE\_SLAB & \textbf{bottom}/top/double \\
+	PRISMARINE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	PRISMARINE\_SLAB & \textbf{bottom}/top/double \\
+	PURPUR\_SLAB & \textbf{bottom}/top/double \\
+	QUARTZ\_SLAB & \textbf{bottom}/top/double \\
+	RED\_NETHER\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_QUARTZ\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_RED\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_SANDSTONE\_SLAB & \textbf{bottom}/top/double \\
+	SMOOTH\_STONE\_SLAB & \textbf{bottom}/top/double \\
+	SPRUCE\_SLAB & \textbf{bottom}/top/double \\
+	STONE\_BRICK\_SLAB & \textbf{bottom}/top/double \\
+	STONE\_SLAB & \textbf{bottom}/top/double \\
+	WARPED\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	WEATHERED\_CUT\_COPPER\_SLAB & \textbf{bottom}/top/double \\
+	\hline
+	PISTON\_HEAD & \textbf{normal}/sticky \\
+	\hline
+	\caption{Type materials}
+\end{longtable}
+
+\subsubsection{Vertical direction}
+Represents the dripstone orientation.
+
+Defaults to up.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		POINTED\_DRIPSTONE & up/down \\
+		\hline
+	\end{tabular}
+	\caption{Dripstone}
+\end{table}
+
+\subsubsection{Waterlogged}
+Denotes whether this block has fluid in it.
+
+Besides underwater blocks\footnote{BRAIN\_CORAL, BRAIN\_CORAL\_FAN, BRAIN\_CORAL\_WALL\_FAN, BUBBLE\_CORAL, BUBBLE\_CORAL\_FAN, BUBBLE\_CORAL\_WALL\_FAN, CONDUIT, DEAD\_BRAIN\_CORAL, DEAD\_BRAIN\_CORAL\_FAN, DEAD\_BRAIN\_CORAL\_WALL\_FAN, DEAD\_BUBBLE\_CORAL, DEAD\_BUBBLE\_CORAL\_FAN, DEAD\_BUBBLE\_CORAL\_WALL\_FAN, DEAD\_FIRE\_CORAL, DEAD\_FIRE\_CORAL\_FAN, DEAD\_FIRE\_CORAL\_WALL\_FAN, DEAD\_HORN\_CORAL, DEAD\_HORN\_CORAL\_FAN, DEAD\_HORN\_CORAL\_WALL\_FAN, DEAD\_TUBE\_CORAL, DEAD\_TUBE\_CORAL\_FAN, DEAD\_TUBE\_CORAL\_WALL\_FAN, FIRE\_CORAL, FIRE\_CORAL\_FAN, FIRE\_CORAL\_WALL\_FAN, HORN\_CORAL, HORN\_CORAL\_FAN, HORN\_CORAL\_WALL\_FAN, SEA\_PICKLE, TUBE\_CORAL, TUBE\_CORAL\_FAN and TUBE\_CORAL\_WALL\_FAN} (which defaults to true), it defaults to false. All the possible options are true or false.
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Material & Aquatic block\footnotemark \\
+	\hline
+	\endhead
+	ACACIA\_FENCE & \xmark \\
+	ACACIA\_LEAVES & \xmark \\
+	ACACIA\_SIGN & \xmark \\
+	ACACIA\_SLAB & \xmark \\
+	ACACIA\_STAIRS & \xmark \\
+	ACACIA\_TRAPDOOR & \xmark \\
+	ACACIA\_WALL\_SIGN & \xmark \\
+	ACTIVATOR\_RAIL & \xmark \\
+	AMETHYST\_CLUSTER & \xmark \\
+	ANDESITE\_SLAB & \xmark \\
+	ANDESITE\_STAIRS & \xmark \\
+	ANDESITE\_WALL & \xmark \\
+	AZALEA\_LEAVES & \xmark \\
+	BIG\_DRIPLEAF & \xmark \\
+	BIG\_DRIPLEAF\_STEM & \xmark \\
+	BIRCH\_FENCE & \xmark \\
+	BIRCH\_LEAVES & \xmark \\
+	BIRCH\_SIGN & \xmark \\
+	BIRCH\_SLAB & \xmark \\
+	BIRCH\_STAIRS & \xmark \\
+	BIRCH\_TRAPDOOR & \xmark \\
+	BIRCH\_WALL\_SIGN & \xmark \\
+	BLACKSTONE\_SLAB & \xmark \\
+	BLACKSTONE\_STAIRS & \xmark \\
+	BLACKSTONE\_WALL & \xmark \\
+	BLACK\_CANDLE & \xmark \\
+	BLACK\_STAINED\_GLASS\_PANE & \xmark \\
+	BLUE\_CANDLE & \xmark \\
+	BLUE\_STAINED\_GLASS\_PANE & \xmark \\
+	BRICK\_SLAB & \xmark \\
+	BRICK\_STAIRS & \xmark \\
+	BRICK\_WALL & \xmark \\
+	BROWN\_CANDLE & \xmark \\
+	BROWN\_STAINED\_GLASS\_PANE & \xmark \\
+	CAMPFIRE & \xmark \\
+	CANDLE & \xmark \\
+	CHAIN & \xmark \\
+	CHEST & \xmark \\
+	COBBLED\_DEEPSLATE\_SLAB & \xmark \\
+	COBBLED\_DEEPSLATE\_STAIRS & \xmark \\
+	COBBLED\_DEEPSLATE\_WALL & \xmark \\
+	COBBLESTONE\_SLAB & \xmark \\
+	COBBLESTONE\_STAIRS & \xmark \\
+	COBBLESTONE\_WALL & \xmark \\
+	CRIMSON\_FENCE & \xmark \\
+	CRIMSON\_SIGN & \xmark \\
+	CRIMSON\_SLAB & \xmark \\
+	CRIMSON\_STAIRS & \xmark \\
+	CRIMSON\_TRAPDOOR & \xmark \\
+	CRIMSON\_WALL\_SIGN & \xmark \\
+	CUT\_COPPER\_SLAB & \xmark \\
+	CUT\_COPPER\_STAIRS & \xmark \\
+	CUT\_RED\_SANDSTONE\_SLAB & \xmark \\
+	CUT\_SANDSTONE\_SLAB & \xmark \\
+	CYAN\_CANDLE & \xmark \\
+	CYAN\_STAINED\_GLASS\_PANE & \xmark \\
+	DARK\_OAK\_FENCE & \xmark \\
+	DARK\_OAK\_LEAVES & \xmark \\
+	DARK\_OAK\_SIGN & \xmark \\
+	DARK\_OAK\_SLAB & \xmark \\
+	DARK\_OAK\_STAIRS & \xmark \\
+	DARK\_OAK\_TRAPDOOR & \xmark \\
+	DARK\_OAK\_WALL\_SIGN & \xmark \\
+	DARK\_PRISMARINE\_SLAB & \xmark \\
+	DARK\_PRISMARINE\_STAIRS & \xmark \\
+	DEEPSLATE\_BRICK\_SLAB & \xmark \\
+	DEEPSLATE\_BRICK\_STAIRS & \xmark \\
+	DEEPSLATE\_BRICK\_WALL & \xmark \\
+	DEEPSLATE\_TILE\_SLAB & \xmark \\
+	DEEPSLATE\_TILE\_STAIRS & \xmark \\
+	DEEPSLATE\_TILE\_WALL & \xmark \\
+	DETECTOR\_RAIL & \xmark \\
+	DIORITE\_SLAB & \xmark \\
+	DIORITE\_STAIRS & \xmark \\
+	DIORITE\_WALL & \xmark \\
+	ENDER\_CHEST & \xmark \\
+	END\_STONE\_BRICK\_SLAB & \xmark \\
+	END\_STONE\_BRICK\_STAIRS & \xmark \\
+	END\_STONE\_BRICK\_WALL & \xmark \\
+	EXPOSED\_CUT\_COPPER\_SLAB & \xmark \\
+	EXPOSED\_CUT\_COPPER\_STAIRS & \xmark \\
+	FLOWERING\_AZALEA\_LEAVES & \xmark \\
+	GLASS\_PANE & \xmark \\
+	GLOW\_LICHEN & \xmark \\
+	GRANITE\_SLAB & \xmark \\
+	GRANITE\_STAIRS & \xmark \\
+	GRANITE\_WALL & \xmark \\
+	GRAY\_CANDLE & \xmark \\
+	GRAY\_STAINED\_GLASS\_PANE & \xmark \\
+	GREEN\_CANDLE & \xmark \\
+	GREEN\_STAINED\_GLASS\_PANE & \xmark \\
+	HANGING\_ROOTS & \xmark \\
+	IRON\_BARS & \xmark \\
+	IRON\_TRAPDOOR & \xmark \\
+	JUNGLE\_FENCE & \xmark \\
+	JUNGLE\_LEAVES & \xmark \\
+	JUNGLE\_SIGN & \xmark \\
+	JUNGLE\_SLAB & \xmark \\
+	JUNGLE\_STAIRS & \xmark \\
+	JUNGLE\_TRAPDOOR & \xmark \\
+	JUNGLE\_WALL\_SIGN & \xmark \\
+	LADDER & \xmark \\
+	LANTERN & \xmark \\
+	LARGE\_AMETHYST\_BUD & \xmark \\
+	LIGHTNING\_ROD & \xmark \\
+	LIGHT\_BLUE\_CANDLE & \xmark \\
+	LIGHT\_BLUE\_STAINED\_GLASS\_PANE & \xmark \\
+	LIGHT\_GRAY\_CANDLE & \xmark \\
+	LIGHT\_GRAY\_STAINED\_GLASS\_PANE & \xmark \\
+	LIME\_CANDLE & \xmark \\
+	LIME\_STAINED\_GLASS\_PANE & \xmark \\
+	MAGENTA\_CANDLE & \xmark \\
+	MAGENTA\_STAINED\_GLASS\_PANE & \xmark \\
+	MANGROVE\_FENCE & \xmark \\
+	MANGROVE\_LEAVES & \xmark \\
+	MANGROVE\_PROPAGULE & \xmark \\
+	MANGROVE\_ROOTS & \xmark \\
+	MANGROVE\_SIGN & \xmark \\
+	MANGROVE\_SLAB & \xmark \\
+	MANGROVE\_STAIRS & \xmark \\
+	MANGROVE\_TRAPDOOR & \xmark \\
+	MANGROVE\_WALL\_SIGN & \xmark \\
+	MEDIUM\_AMETHYST\_BUD & \xmark \\
+	MOSSY\_COBBLESTONE\_SLAB & \xmark \\
+	MOSSY\_COBBLESTONE\_STAIRS & \xmark \\
+	MOSSY\_COBBLESTONE\_WALL & \xmark \\
+	MOSSY\_STONE\_BRICK\_SLAB & \xmark \\
+	MOSSY\_STONE\_BRICK\_STAIRS & \xmark \\
+	MOSSY\_STONE\_BRICK\_WALL & \xmark \\
+	MUD\_BRICK\_SLAB & \xmark \\
+	MUD\_BRICK\_STAIRS & \xmark \\
+	MUD\_BRICK\_WALL & \xmark \\
+	NETHER\_BRICK\_FENCE & \xmark \\
+	NETHER\_BRICK\_SLAB & \xmark \\
+	NETHER\_BRICK\_STAIRS & \xmark \\
+	NETHER\_BRICK\_WALL & \xmark \\
+	OAK\_FENCE & \xmark \\
+	OAK\_LEAVES & \xmark \\
+	OAK\_SIGN & \xmark \\
+	OAK\_SLAB & \xmark \\
+	OAK\_STAIRS & \xmark \\
+	OAK\_TRAPDOOR & \xmark \\
+	OAK\_WALL\_SIGN & \xmark \\
+	ORANGE\_CANDLE & \xmark \\
+	ORANGE\_STAINED\_GLASS\_PANE & \xmark \\
+	OXIDIZED\_CUT\_COPPER\_SLAB & \xmark \\
+	OXIDIZED\_CUT\_COPPER\_STAIRS & \xmark \\
+	PETRIFIED\_OAK\_SLAB & \xmark \\
+	PINK\_CANDLE & \xmark \\
+	PINK\_STAINED\_GLASS\_PANE & \xmark \\
+	POINTED\_DRIPSTONE & \xmark \\
+	POLISHED\_ANDESITE\_SLAB & \xmark \\
+	POLISHED\_ANDESITE\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_SLAB & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_BRICK\_WALL & \xmark \\
+	POLISHED\_BLACKSTONE\_SLAB & \xmark \\
+	POLISHED\_BLACKSTONE\_STAIRS & \xmark \\
+	POLISHED\_BLACKSTONE\_WALL & \xmark \\
+	POLISHED\_DEEPSLATE\_SLAB & \xmark \\
+	POLISHED\_DEEPSLATE\_STAIRS & \xmark \\
+	POLISHED\_DEEPSLATE\_WALL & \xmark \\
+	POLISHED\_DIORITE\_SLAB & \xmark \\
+	POLISHED\_DIORITE\_STAIRS & \xmark \\
+	POLISHED\_GRANITE\_SLAB & \xmark \\
+	POLISHED\_GRANITE\_STAIRS & \xmark \\
+	POWERED\_RAIL & \xmark \\
+	PRISMARINE\_BRICK\_SLAB & \xmark \\
+	PRISMARINE\_BRICK\_STAIRS & \xmark \\
+	PRISMARINE\_SLAB & \xmark \\
+	PRISMARINE\_STAIRS & \xmark \\
+	PRISMARINE\_WALL & \xmark \\
+	PURPLE\_CANDLE & \xmark \\
+	PURPLE\_STAINED\_GLASS\_PANE & \xmark \\
+	PURPUR\_SLAB & \xmark \\
+	PURPUR\_STAIRS & \xmark \\
+	QUARTZ\_SLAB & \xmark \\
+	QUARTZ\_STAIRS & \xmark \\
+	RAIL & \xmark \\
+	RED\_CANDLE & \xmark \\
+	RED\_NETHER\_BRICK\_SLAB & \xmark \\
+	RED\_NETHER\_BRICK\_STAIRS & \xmark \\
+	RED\_NETHER\_BRICK\_WALL & \xmark \\
+	RED\_SANDSTONE\_SLAB & \xmark \\
+	RED\_SANDSTONE\_STAIRS & \xmark \\
+	RED\_SANDSTONE\_WALL & \xmark \\
+	RED\_STAINED\_GLASS\_PANE & \xmark \\
+	SANDSTONE\_SLAB & \xmark \\
+	SANDSTONE\_STAIRS & \xmark \\
+	SANDSTONE\_WALL & \xmark \\
+	SCAFFOLDING & \xmark \\
+	SCULK\_SENSOR & \xmark \\
+	SCULK\_SHRIEKER & \xmark \\
+	SCULK\_VEIN & \xmark \\
+	SMALL\_AMETHYST\_BUD & \xmark \\
+	SMALL\_DRIPLEAF & \xmark \\
+	SMOOTH\_QUARTZ\_SLAB & \xmark \\
+	SMOOTH\_QUARTZ\_STAIRS & \xmark \\
+	SMOOTH\_RED\_SANDSTONE\_SLAB & \xmark \\
+	SMOOTH\_RED\_SANDSTONE\_STAIRS & \xmark \\
+	SMOOTH\_SANDSTONE\_SLAB & \xmark \\
+	SMOOTH\_SANDSTONE\_STAIRS & \xmark \\
+	SMOOTH\_STONE\_SLAB & \xmark \\
+	SOUL\_CAMPFIRE & \xmark \\
+	SOUL\_LANTERN & \xmark \\
+	SPRUCE\_FENCE & \xmark \\
+	SPRUCE\_LEAVES & \xmark \\
+	SPRUCE\_SIGN & \xmark \\
+	SPRUCE\_SLAB & \xmark \\
+	SPRUCE\_STAIRS & \xmark \\
+	SPRUCE\_TRAPDOOR & \xmark \\
+	SPRUCE\_WALL\_SIGN & \xmark \\
+	STONE\_BRICK\_SLAB & \xmark \\
+	STONE\_BRICK\_STAIRS & \xmark \\
+	STONE\_BRICK\_WALL & \xmark \\
+	STONE\_SLAB & \xmark \\
+	STONE\_STAIRS & \xmark \\
+	TRAPPED\_CHEST & \xmark \\
+	WARPED\_FENCE & \xmark \\
+	WARPED\_SIGN & \xmark \\
+	WARPED\_SLAB & \xmark \\
+	WARPED\_STAIRS & \xmark \\
+	WARPED\_TRAPDOOR & \xmark \\
+	WARPED\_WALL\_SIGN & \xmark \\
+	WAXED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_EXPOSED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_OXIDIZED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_SLAB & \xmark \\
+	WAXED\_WEATHERED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WEATHERED\_CUT\_COPPER\_SLAB & \xmark \\
+	WEATHERED\_CUT\_COPPER\_STAIRS & \xmark \\
+	WHITE\_CANDLE & \xmark \\
+	WHITE\_STAINED\_GLASS\_PANE & \xmark \\
+	YELLOW\_CANDLE & \xmark \\
+	YELLOW\_STAINED\_GLASS\_PANE & \xmark \\
+	\hline
+	BRAIN\_CORAL & \cmark \\
+	BRAIN\_CORAL\_FAN & \cmark \\
+	BRAIN\_CORAL\_WALL\_FAN & \cmark \\
+	BUBBLE\_CORAL & \cmark \\
+	BUBBLE\_CORAL\_FAN & \cmark \\
+	BUBBLE\_CORAL\_WALL\_FAN & \cmark \\
+	CONDUIT & \cmark \\
+	DEAD\_BRAIN\_CORAL & \cmark \\
+	DEAD\_BRAIN\_CORAL\_FAN & \cmark \\
+	DEAD\_BRAIN\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_BUBBLE\_CORAL & \cmark \\
+	DEAD\_BUBBLE\_CORAL\_FAN & \cmark \\
+	DEAD\_BUBBLE\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_FIRE\_CORAL & \cmark \\
+	DEAD\_FIRE\_CORAL\_FAN & \cmark \\
+	DEAD\_FIRE\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_HORN\_CORAL & \cmark \\
+	DEAD\_HORN\_CORAL\_FAN & \cmark \\
+	DEAD\_HORN\_CORAL\_WALL\_FAN & \cmark \\
+	DEAD\_TUBE\_CORAL & \cmark \\
+	DEAD\_TUBE\_CORAL\_FAN & \cmark \\
+	DEAD\_TUBE\_CORAL\_WALL\_FAN & \cmark \\
+	FIRE\_CORAL & \cmark \\
+	FIRE\_CORAL\_FAN & \cmark \\
+	FIRE\_CORAL\_WALL\_FAN & \cmark \\
+	HORN\_CORAL & \cmark \\
+	HORN\_CORAL\_FAN & \cmark \\
+	HORN\_CORAL\_WALL\_FAN & \cmark \\
+	SEA\_PICKLE & \cmark \\
+	TUBE\_CORAL & \cmark \\
+	TUBE\_CORAL\_FAN & \cmark \\
+	TUBE\_CORAL\_WALL\_FAN & \cmark \\
+	\hline
+	\caption{Waterlogged materials}
+\end{longtable}
+
+% Aquatic block's footnote
+\footnotetext{If it's an underwater block (defaults to true).}
+
+\subsection{Material name attached modifiers}
+Some materials have modifiers already attached to the material name.
+
+\subsubsection{Color}\label{spigot-types:color}
+\myworries{... wool/glass/bed/candle/banner/GLAZED\_TERRACOTTA}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Index & Color \\
+	\hline
+	\endhead
+	0 & none \\
+	1 & black \\
+	2 & blue \\
+	3 & brown \\
+	4 & cyan \\
+	5 & gray \\
+	6 & green \\
+	7 & light\_blue \\
+	8 & light\_gray \\
+	9 & lime \\
+	10 & magenta \\
+	11 & orange \\
+	12 & pink \\
+	13 & purple \\
+	14 & red \\
+	15 & white \\
+	16 & yellow \\
+	\hline
+	\caption{Colors}
+\end{longtable}
+
+\subsubsection{Wood type}\label{ab:wood}
+\myworries{...}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Index & Wood \\
+	\hline
+	\endhead
+	0 & acacia \\
+	1 & birch \\
+	2 & crimson \\
+	3 & dark\_oak \\
+	4 & jungle \\
+	5 & mangrove \\
+	6 & oak \\
+	7 & spruce \\
+	8 & warped \\
+	\hline
+	\caption{Wood types}
+\end{longtable}
+
+\myworries{saplings}
+
+\subsubsection{Liquid recipient}
+\myworries{... cauldron}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Index & Liquid \\
+		\hline
+		0 & none \\
+		1 & water \\
+		2 & lava \\
+		3 & powder\_snow \\
+		\hline
+	\end{tabular}
+	\caption{Liquid types}
+\end{table}
+
+\subsubsection{Flower}
+\myworries{... pot}
+
+\begin{longtable}{ |c|c| }
+	\hline
+	Index & Type \\
+	\hline
+	\endhead
+	0 & none \\
+	1 & acacia\_sapling \\
+	2 & allium \\
+	3 & azalea\_bush \\
+	4 & azure\_bluet \\
+	5 & bamboo \\
+	6 & birch\_sapling \\
+	7 & blue\_orchid \\
+	8 & brown\_mushroom \\
+	9 & cactus \\
+	10 & cornflower \\
+	11 & crimson\_fungus \\
+	12 & crimson\_roots \\
+	13 & dandelion \\
+	14 & dark\_oak\_sapling \\
+	15 & dead\_bush \\
+	16 & fern \\
+	17 & flowering\_azalea\_bush \\
+	18 & jungle\_sapling \\
+	19 & lily\_of\_the\_valley \\
+	20 & mangrove\_propagule \\
+	21 & oak\_sapling \\
+	22 & orange\_tulip \\
+	23 & oxeye\_daisy \\
+	24 & pink\_tulip \\
+	25 & poppy \\
+	26 & red\_mushroom \\
+	27 & red\_tulip \\
+	28 & spruce\_sapling \\
+	29 & warped\_fungus \\
+	30 & warped\_roots \\
+	31 & white\_tulip \\
+	32 & wither\_rose \\
+	\hline
+	\caption{Plantable materials}
+\end{longtable}
+
+\subsubsection{Piston head}
+\myworries{... si head meeans extended}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ |c|c| }
+	\hline
+	Index & Type \\
+	\hline
+	0 & piston \\
+	1 & extended\_piston \\
+	2 & piston\_head \\
+	\hline
+\end{tabular}
+\caption{Piston types}
+\end{table}
+
+\subsubsection{Stripped}\label{spigot-types:stripped}
+\myworries{... boolean; log/wood}
+
+\subsubsection{Infested}\label{spigot-types:infested}
+\myworries{... silverfish in block; boolean; stones}
+
+\subsubsection{Dead}\label{spigot-types:dead}
+\myworries{... coral outside water; boolean; coral}
+
+\subsubsection{Heads}
+\myworries{...}
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		Material & Values \\
+		\hline
+		ZOMBIE & 0 \\
+		PLAYER & 1 \\
+		CREEPER & 2 \\
+		DRAGON & 3 \\
+		SKELETON & 4 \\
+		WITHER\_SKELETON & 5 \\
+		ZOMBIE & 0 \\
+		\hline
+	\end{tabular}
+	\caption{Heads}
+\end{table}
+
+\subsubsection{Heads}
+\myworries{...}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{ |c|c| }
+	\hline
+	Material & Values \\
+	\hline
+	ZOMBIE & 0 \\
+	PLAYER & 1 \\
+	CREEPER & 2 \\
+	DRAGON & 3 \\
+	SKELETON & 4 \\
+	WITHER\_SKELETON & 5 \\
+	\hline
+\end{tabular}
+\caption{Heads}
+\end{table}
+
+\subsubsection{Sizeable}
+\myworries{...; AMETHYST\_BUD \& DRIPLEAF}
+
+\subsection{Material modifiers aggregation}
+\myworries{some modifiers are similar, so let's add them together}
+
+\subsubsection{Direction aggregation}\label{spigot-types:direction}
+\myworries{modifier, followed by the condition to set the bit to 1}
+
+\begin{longtable}{ |c|c|c|c|c|c|c| }
+	\hline
+	Property & U & D & N & S & E & W \\
+	\hline
+	\endhead
+	up & \rotatebox{90}{true} &&&&& \\
+	\hline
+	down && \rotatebox{90}{true} &&&& \\
+	\hline
+	north &&& \rotatebox{90}{true} &&& \\
+	\hline
+	south &&&& \rotatebox{90}{true} && \\
+	\hline
+	east &&&&& \rotatebox{90}{true} & \\
+	\hline
+	west &&&&&& \rotatebox{90}{true} \\
+	\hline
+	face & \rotatebox{90}{ceiling} & \rotatebox{90}{floor} &&&& \\
+	\hline
+	attachment & \rotatebox{90}{ceiling} & \rotatebox{90}{floor} &&&& \\
+	\hline
+	half & \rotatebox{90}{top or upper} & \rotatebox{90}{bottom or lower} &&&& \\
+	\hline
+	facing & \rotatebox{90}{up} & \rotatebox{90}{down} &
+		\rotatebox{90}{north} & \rotatebox{90}{south} &
+		\rotatebox{90}{east} & \rotatebox{90}{west} \\
+		\hline
+	vertical-direction & \rotatebox{90}{up} & \rotatebox{90}{down} &&&& \\
+	\hline
+	type & \rotatebox{90}{top or double} & \rotatebox{90}{bottom or double} &&&& \\
+	\hline
+	orientation & \rotatebox{90}{up\_\textit{X}} & \rotatebox{90}{down\_\textit{X}} &
+		\rotatebox{90}{\textit{X}\_north or north\_up} &
+		\rotatebox{90}{\textit{X}\_south or south\_up} &
+		\rotatebox{90}{\textit{X}\_east or east\_up} &
+		\rotatebox{90}{\textit{X}\_west or west\_up} \\
+	\hline
+	shape & \rotatebox{90}{ascending\_\textit{X}} &&
+		\rotatebox{90}{ascending\_north or north\_\textit{X}} &
+		\rotatebox{90}{ascending\_south or south\_\textit{X} or north\_south} &
+		\rotatebox{90}{ascending\_east or \textit{X}\_east or east\_west} &
+		\rotatebox{90}{ascending\_west or \textit{X}\_west} \\
+	\hline
+	hanging & \rotatebox{90}{true} &&&&& \\
+	\hline
+	\caption{Direction aggregation}
+\end{longtable}
+
+\subsubsection{Axis aggregation}\label{spigot-types:axis}
+\myworries{modifier}
+\myworries{up to 2b}
+
+\begin{longtable}{ |c|c|c| }
+\hline
+Property & MSB & LSB \\
+\hline
+\endhead
+axis & Y or Z & X or Z \\
+\hline
+attachment & double\_wall & single\_wall \\
+\hline
+\caption{Axis aggregation}
+\end{longtable}
+
+\subsubsection{Age aggregation}\label{spigot-types:age}
+\myworries{modifier}
+\myworries{up to 8b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+age \\
+berries \\
+honey\_level \\
+\hline
+\caption{Age aggregation}
+\end{longtable}
+
+\subsubsection{Grouped materials aggregation}\label{spigot-types:groups}
+\myworries{modifier}
+\myworries{up to 3b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+candles \\
+eggs \\
+pickles \\
+\hline
+\caption{Grouped materials aggregation}
+\end{longtable}
+
+\subsubsection{Stages aggregation}\label{spigot-types:stages}
+\myworries{modifier}
+\myworries{up to 8b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+charges \\
+level \\
+bites \\
+layers \\
+\hline
+\caption{Stages aggregation}
+\end{longtable}
+
+\subsubsection{Parts aggregation}\label{spigot-types:parts}
+\myworries{modifier; up to 4b}
+
+\begin{longtable}{ |c| }
+\hline
+Property \\
+\hline
+\endhead
+part \\
+type \\
+piston\_head \\
+stair\_shape \\
+heads \\
+\hline
+\caption{Parts aggregation}
+\end{longtable}
+
+\subsubsection{Material aggregation}\label{spigot-types:material}
+\myworries{modifier; up to 16b}
+\myworries{iron and gold pressure plates have their name as 'heavy/light weighted pressure plate'}
+\myworries{MOSS\_CARPET}
+
+\begin{longtable}{ |c|c| }
+\hline
+Property & Value \\
+\hline
+\endhead
+wood\_type & 0x8000 $|$ \textit{wood value} \\
+\hline
+iron & 0xC000 \\
+gold & 0xC001 \\
+\hline
+material & \textit{material value} \\
+\hline
+\caption{Material aggregation}
+\end{longtable}
+
+\subsubsection{Liquid aggregation}\label{spigot-types:liquid}
+\myworries{modifier; up to 4b}
+
+\begin{longtable}{ |c|c| }
+\hline
+Property & value \\
+\hline
+\endhead
+liquid & \textit{liquid value} \\
+waterlogged & 1\footnotemark \\
+\hline
+\caption{Liquid aggregation}
+\end{longtable}
+
+\footnotetext{1 is the liquid value of water.}
