@@ -58,19 +58,12 @@ case "$opt" in
 		docker pull ubuntu
 
 		source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
-
-		# prepare all the Spigot versions
-		while read version; do
-			buildVersion "$servers_manager_path/server-types/Spigot" "$version" "detach" >/dev/null 2>&1
-		done <<< "$(getAllVersions)"
 		
-		# start downloading the first <num_processes> Spigot versions
+		# download the first <num_processes> Spigot versions
 		num_downloading_containers=`getAllVersions | grep -c $'\n'`
-		containers_that_should_be=$num_downloading_containers
 		num_pending_containers=$(($num_downloading_containers - $num_processes))
-		num_excedent=0
 		while read version; do
-			buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
+			buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1
 		done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
 		
 		# WatchWolf Server as usual-plugins
@@ -83,21 +76,19 @@ case "$opt" in
 		docker build --tag clients-manager "$clients_manager_path"
 		
 		# all ended; wait for the Spigot versions to finish
-		num_current_downloading_plus_pending_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+		current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		dots=""
-		while [ $num_current_downloading_plus_pending_containers -gt 0 ]; do
-			num_excedent=$(($containers_that_should_be - $num_current_downloading_plus_pending_containers))
-			containers_that_should_be=$num_current_downloading_plus_pending_containers
-			
+		while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
 			while read version; do
 				if [ ! -z "$version" ]; then
 					# still versions remaining, and there's a place to run them
-					buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1 &
+					buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1
 					((num_pending_containers--))
+					((current_downloading_containers++))
 				fi
-			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $num_excedent )" # get enought versions of the remaining versions to fill the threads
+			done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
 			
-			echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_current_downloading_plus_pending_containers ))/$num_downloading_containers)      \r"
+			echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
 			
 			dots="$dots."
 			if [ ${#dots} -gt 3 ]; then
@@ -105,7 +96,7 @@ case "$opt" in
 			fi
 			
 			sleep 15
-			num_current_downloading_plus_pending_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 		done
 		
 		echo -ne '\nWatchWolf built.\n'
