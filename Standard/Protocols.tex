@@ -46,7 +46,6 @@
 	\usepackage{pifont}
 	\usepackage[natbibapa]{apacite}	% bibliography
 	\usepackage[acronym,section=subsection]{glossaries}
-	\usepackage{rail}
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	
 	% centered bytefield
@@ -1285,7 +1284,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \caption{Send message petition structure}
 \end{figure}
 
-\subsection{Chat message}
+\subsection{Got message notification}
 \myworries{... async}
 
 \begin{figure}[H]
@@ -1300,7 +1299,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\skippedwords \\
 	\wordbox[lrb]{1}{}
 \end{bytefield}
-\caption{Client message structure}
+\caption{Got message notification structure}
 \end{figure}
 
 \subsection{Run command operation}
@@ -1427,6 +1426,18 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001011}}
 \end{bytefield}
 \caption{Use petition structure}
+\end{figure}
+
+\subsection{Place block operation}
+\myworries{... place current item in hand}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001100}}
+\end{bytefield}
+\caption{Place block petition structure}
 \end{figure}
 
 \section{Revision history}

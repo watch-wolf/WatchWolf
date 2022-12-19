@@ -29,7 +29,7 @@ To run the script:
 
 2. Run the script in `build` mode
 
-   Run `bash WatchWolfSetup.sh --build`. Have at least 1GB of free space.
+   Run `bash WatchWolfSetup.sh --build`. Have at least 1.5GB of free space.
    
    You can get the code from the develop branch by using `bash WatchWolfSetup.sh --build --dev`.
    
