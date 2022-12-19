@@ -64,7 +64,7 @@ case "$opt" in
 			
 			# download the first <num_processes> Spigot versions
 			num_downloading_containers=`getAllVersions | grep -c $'\n'`
-			num_pending_containers=$(($num_downloading_containers - $num_processes))
+			num_pending_containers=$(($num_downloading_containers > $num_processes ? $num_downloading_containers - $num_processes : 0))
 			while read version; do
 				buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1
 			done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
