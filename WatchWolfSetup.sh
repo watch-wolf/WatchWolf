@@ -200,7 +200,7 @@ case "$opt" in
 		echo ""
 		
 		# run ServersManager
-		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)":"$(pwd)" ubuntu:latest sh -c "echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail dos2unix jq unzip wget >/dev/null ; echo '[*] ServersManager ready.' ; cd $(pwd) ; dos2unix ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; rm ServersManager.lock 2>/dev/null ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:'bash ./ServersManagerConnector.sh'" >/dev/null 2>&1 & disown
+		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" ubuntu:latest sh -c "echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail dos2unix jq unzip wget >/dev/null ; echo '[*] ServersManager ready.' ; cd $(pwd) ; dos2unix ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; rm ServersManager.lock 2>/dev/null ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:'bash ./ServersManagerConnector.sh'" >/dev/null 2>&1 & disown
 
 		# run ClientsManager
 		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 clients-manager:latest >/dev/null 2>&1 & disown
