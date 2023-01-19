@@ -41,16 +41,22 @@ sudo echo "" # this will prompt the sudo password input (if not sudo)
 # run the desider operation
 case "$opt" in
 	"build" )
-		for dir in "$servers_manager_path/*"; do
-			[ "$dir" = "server-types" ] && continue
-			[ "$dir" = "usual-plugins" ] && continue
-			sudo rm -rf "$dir"  2>/dev/null
-		done
+		# keep previous servers/plugins
+		tmpdir=`mktemp -d`
+		cp -r "$servers_manager_path/server-types/" "$tmpdir" 2>/dev/null
+		cp -r "$servers_manager_path/usual-plugins/" "$tmpdir" 2>/dev/null
+		
+		# git needs empty folders
+		sudo rm -rf "$servers_manager_path" 2>/dev/null
 		sudo rm -rf "$clients_manager_path" 2>/dev/null
 
 		# get git files
 		git clone --branch "$branch" https://github.com/rogermiranda1000/WatchWolf-ServersManager.git "$servers_manager_path"
 		git clone --branch "$branch" https://github.com/rogermiranda1000/WatchWolf-Client.git "$clients_manager_path"
+		
+		# restore back previous servers/plugins (if any)
+		cp -r "$tmpdir/server-types/" "$servers_manager_path" 2>/dev/null
+		cp -r "$tmpdir/usual-plugins/" "$servers_manager_path" 2>/dev/null
 
 		if [ `docker -v >/dev/null 2>&1 ; echo $?` -ne 0 ]; then
 			echo "[e] Docker is not installed, or is currently stopped. Check https://docs.docker.com/get-docker/." >&2
