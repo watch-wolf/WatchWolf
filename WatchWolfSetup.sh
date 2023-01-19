@@ -41,7 +41,11 @@ sudo echo "" # this will prompt the sudo password input (if not sudo)
 # run the desider operation
 case "$opt" in
 	"build" )
-		sudo rm -rf "$servers_manager_path" 2>/dev/null
+		for dir in "$servers_manager_path/*"; do
+			[ "$dir" = "server-types" ] && continue
+			[ "$dir" = "usual-plugins" ] && continue
+			sudo rm -rf "$dir"  2>/dev/null
+		done
 		sudo rm -rf "$clients_manager_path" 2>/dev/null
 
 		# get git files
