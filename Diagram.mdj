@@ -45861,7 +45861,7 @@
 												"$ref": "AAAAAAGF0AKuiNWXInE="
 											},
 											"edgePosition": 1,
-											"text": "29 : start_client"
+											"text": "29 : startClient"
 										},
 										{
 											"_type": "EdgeLabelView",
@@ -46309,7 +46309,7 @@
 												"$ref": "AAAAAAGF0Ai1ytX0/eI="
 											},
 											"edgePosition": 1,
-											"text": "33 : client_connected"
+											"text": "33 : clientConnected"
 										},
 										{
 											"_type": "EdgeLabelView",
@@ -47667,7 +47667,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGBFfmt2SSyRcw="
 							},
-							"name": "start_client",
+							"name": "startClient",
 							"source": {
 								"$ref": "AAAAAAGFkeOsTv3hlBo="
 							},
@@ -47725,7 +47725,7 @@
 							"_parent": {
 								"$ref": "AAAAAAGBFfmt2SSyRcw="
 							},
-							"name": "client_connected",
+							"name": "clientConnected",
 							"source": {
 								"$ref": "AAAAAAGFkeQNb/4XlEY="
 							},
