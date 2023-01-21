@@ -228,7 +228,7 @@ For alignment \myworries{define?} reasons, booleans will be sent as 1-byte eleme
 \end{figure}
 
 \subsubsection{Double}\label{type:double}
-Doubles are 8-bytes floating-point numbers. They are represented following the \gls{IEEE-754}\footnote{This standard should be used by C, Java and Python. \myworries{cite?}}.
+Doubles are 8-bytes floating-point numbers. They are represented following the \gls{IEEE-754}\footnote{This standard should be used by C and Java. \myworries{cite?}}.
 
 \subsubsection{String}\label{type:str}
 Strings are \hyperref[type:array]{arrays} of \hyperref[type:char]{characters}. Refer to the respective subsections for more information.
@@ -699,7 +699,7 @@ You may notice that there's another \hyperref[s:server-started]{Server started n
 \end{figure}
 
 \subsection{Get coverage operation}
-\myworries{... get JaCoCo binary file}
+\myworries{... get combined JaCoCo binary files of all the servers that the current connection has started}
 
 \subsubsection{Get coverage request}
 \myworries{...}
@@ -721,6 +721,8 @@ You may notice that there's another \hyperref[s:server-started]{Server started n
 \begin{bytefield}{32}
 	\bitheader{0,2,3,4,15,16,31} \\
 	\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}} & \bitbox[ltr]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{coverage}} \\
+	\bitbox[lrb]{16}{} & \bitbox[ltr]{16}{} \\
 	\wordbox[lr]{1}{\hyperref[type:file]{JaCoCo binary file}} \\
 	\skippedwords \\
 	\wordbox[lrb]{1}{}
