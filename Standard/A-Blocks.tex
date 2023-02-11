@@ -152,7 +152,7 @@ Defaults to 0.
 		BEETROOTS & 0-3 \\
 		BAMBOO & 0-1 \\
 		CARROTS & 0-7 \\
-		CHORUS\_FLOWER & 0/5\footnotemark \\
+		CHORUS\_FLOWER & 0-5 \\
 		COCOA & 0-2 \\
 		FROSTED\_ICE & 0-3 \\
 		MELON\_STEM & 0-7 \\
@@ -165,9 +165,6 @@ Defaults to 0.
 	\end{tabular}
 	\caption{Ageable materials}
 \end{table}
-
-% Ageable materials' CHORUS_FLOWER footnote
-\footnotetext{The block is the same from age 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
 
 \subsubsection{Attachment}
 Denotes how the bell is attached to its block.
@@ -965,15 +962,12 @@ Defaults to 0.
 		\hline
 		Material & Values \\
 		\hline
-		BEEHIVE & 0/5\footnotemark \\
-		BEE\_NEST & 0/5\footnotemark[\value{footnote}] \\ % refear to top footnote
+		BEEHIVE & 0-5 \\
+		BEE\_NEST & 0-5 \\
 		\hline
 	\end{tabular}
 	\caption{Hives}
 \end{table}
-
-% Hives' footnotes
-\footnotetext{The block is the same from honey-level 0 to 4, and it changes in age 5. That's why age=5 is considered as age=1, and age=0-4 as age=0, as you may notice in \hyperref[rail:modifier-concatenation]{Figure \ref{rail:modifier-concatenation}, Modifier concatenation}.}
 
 \subsubsection{Inverted}\label{spigot-types:inverted}
 Denotes whether this daylight detector is in the inverted mode.
