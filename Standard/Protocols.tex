@@ -1210,6 +1210,21 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \caption{Spawn entity operation structure}
 \end{figure}
 
+\subsubsection{Spawn entity response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0011}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Spawn entity response structure}
+\end{figure}
+
 \subsection{Performance operations} \label{g:performance}
 \myworries{...}
 
