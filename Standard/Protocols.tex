@@ -470,6 +470,16 @@ As a standard, we only support Spigot (\cite{spigot-mc}) and Paper (\cite{paper-
 \caption{Structure of an \hyperref[type:entity]{Entity}}
 \end{figure}
 
+\begin{longtable}{ |c|c|c| }
+\hline
+Enum value & Entity type & First Minecraft version \\
+\hline
+\endhead
+0 & DROPPED\_ITEM & 1.8 \\
+\hline
+\caption{Entity enum}
+\end{longtable}
+
 \begin{figure}[H]
 \centering
 \begin{bytefield}[bitwidth=2.5em]{16}
@@ -1185,6 +1195,36 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \caption{Get entities response structure}
 \end{figure}
 
+\subsubsection{Spawn entity operation}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0011}} \\
+	\wordbox[lr]{1}{\hyperref[type:entity]{entity}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Spawn entity operation structure}
+\end{figure}
+
+\subsubsection{Spawn entity response}
+\myworries{...}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0011}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Spawn entity response structure}
+\end{figure}
+
 \subsection{Performance operations} \label{g:performance}
 \myworries{...}
 
@@ -1437,6 +1477,21 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\bitheader{0,2,3,4,15,16,31} \\
 	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001100}} & \bitbox[lrt]{16}{} \\
 	\wordbox[lr]{1}{\hyperref[type:position]{block coordinates}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Place block petition structure}
+\end{figure}
+
+\subsection{Hit entity operation}
+\myworries{... attack}
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001101}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:entity]{entity}} \\
 	\skippedwords \\
 	\wordbox[lrb]{1}{}
 \end{bytefield}
