@@ -57,6 +57,9 @@ case "$opt" in
 		# restore back previous servers/plugins (if any)
 		cp -r "$tmpdir/server-types/" "$servers_manager_path" 2>/dev/null
 		cp -r "$tmpdir/usual-plugins/" "$servers_manager_path" 2>/dev/null
+		
+		mkdir -p "$servers_manager_path/server-types/Spigot"
+		mkdir -p "$servers_manager_path/server-types/Paper"
 
 		if [ `docker -v >/dev/null 2>&1 ; echo $?` -ne 0 ]; then
 			echo "[e] Docker is not installed, or is currently stopped. Check https://docs.docker.com/get-docker/." >&2
@@ -71,6 +74,7 @@ case "$opt" in
 
 		if [ $no_spigot -eq 0 ]; then
 			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
+			source "$servers_manager_path/SpigotBuilder.sh" # getAllPaperVersions/buildPaperVersion
 			
 			# download the first <num_processes> Spigot versions
 			num_downloading_containers=`getAllVersions | grep -c $'\n'`
@@ -113,6 +117,30 @@ case "$opt" in
 				
 				sleep 15
 				current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+			done
+			
+			num_downloading_containers=`getAllPaperVersions | grep -c $'\n'`
+			num_pending_containers=$num_downloading_containers
+			while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
+				while read version; do
+					if [ ! -z "$version" ]; then
+						# still versions remaining, and there's a place to run them
+						buildPaperVersion "$servers_manager_path/server-types/Paper" "$version" >/dev/null 2>&1
+						((num_pending_containers--))
+						((current_downloading_containers++))
+					fi
+				done <<< "$( getAllPaperVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
+				
+				echo "Paper containers still running"
+				echo -ne "Waiting all Paper containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
+				
+				dots="$dots."
+				if [ ${#dots} -gt 3 ]; then
+					dots=""
+				fi
+				
+				sleep 15
+				current_downloading_containers=`docker container ls -a | grep 'Paper_build_' -c`
 			done
 		fi
 		
