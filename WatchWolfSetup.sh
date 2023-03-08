@@ -74,7 +74,7 @@ case "$opt" in
 
 		if [ $no_spigot -eq 0 ]; then
 			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
-			source "$servers_manager_path/PaperBuilded.sh" # getAllPaperVersions/buildPaperVersion
+			source "$servers_manager_path/PaperBuilder.sh" # getAllPaperVersions/buildPaperVersion
 			
 			# download the first <num_processes> Spigot versions
 			num_downloading_containers=`getAllVersions | grep -c $'\n'`
