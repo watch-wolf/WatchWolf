@@ -74,7 +74,7 @@ case "$opt" in
 
 		if [ $no_spigot -eq 0 ]; then
 			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
-			source "$servers_manager_path/SpigotBuilder.sh" # getAllPaperVersions/buildPaperVersion
+			source "$servers_manager_path/PaperBuilded.sh" # getAllPaperVersions/buildPaperVersion
 			
 			# download the first <num_processes> Spigot versions
 			num_downloading_containers=`getAllVersions | grep -c $'\n'`
@@ -118,30 +118,14 @@ case "$opt" in
 				sleep 15
 				current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 			done
+			# Spigot ended, now wait for Paper
 			
-			num_downloading_containers=`getAllPaperVersions | grep -c $'\n'`
-			num_pending_containers=$num_downloading_containers
-			while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
-				while read version; do
-					if [ ! -z "$version" ]; then
-						# still versions remaining, and there's a place to run them
-						buildPaperVersion "$servers_manager_path/server-types/Paper" "$version" >/dev/null 2>&1
-						((num_pending_containers--))
-						((current_downloading_containers++))
-					fi
-				done <<< "$( getAllPaperVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
-				
-				echo "Paper containers still running"
-				echo -ne "Waiting all Paper containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
-				
-				dots="$dots."
-				if [ ${#dots} -gt 3 ]; then
-					dots=""
+			while read version; do
+				if [ ! -z "$version" ]; then
+					# still versions remaining, and there's a place to run them
+					buildPaperVersion "$servers_manager_path/server-types/Paper" "$version" #>/dev/null 2>&1
 				fi
-				
-				sleep 15
-				current_downloading_containers=`docker container ls -a | grep 'Paper_build_' -c`
-			done
+			done <<< "$(getAllPaperVersions)"
 		fi
 		
 		echo -ne '\nWatchWolf built.\n'
