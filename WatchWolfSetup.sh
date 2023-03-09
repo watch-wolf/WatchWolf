@@ -57,6 +57,9 @@ case "$opt" in
 		# restore back previous servers/plugins (if any)
 		cp -r "$tmpdir/server-types/" "$servers_manager_path" 2>/dev/null
 		cp -r "$tmpdir/usual-plugins/" "$servers_manager_path" 2>/dev/null
+		
+		mkdir -p "$servers_manager_path/server-types/Spigot"
+		mkdir -p "$servers_manager_path/server-types/Paper"
 
 		if [ `docker -v >/dev/null 2>&1 ; echo $?` -ne 0 ]; then
 			echo "[e] Docker is not installed, or is currently stopped. Check https://docs.docker.com/get-docker/." >&2
@@ -71,6 +74,7 @@ case "$opt" in
 
 		if [ $no_spigot -eq 0 ]; then
 			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
+			source "$servers_manager_path/PaperBuilder.sh" # getAllPaperVersions/buildPaperVersion
 			
 			# download the first <num_processes> Spigot versions
 			num_downloading_containers=`getAllVersions | grep -c $'\n'`
@@ -114,6 +118,14 @@ case "$opt" in
 				sleep 15
 				current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
 			done
+			# Spigot ended, now wait for Paper
+			
+			while read version; do
+				if [ ! -z "$version" ]; then
+					# still versions remaining, and there's a place to run them
+					buildPaperVersion "$servers_manager_path/server-types/Paper" "$version" #>/dev/null 2>&1
+				fi
+			done <<< "$(getAllPaperVersions)"
 		fi
 		
 		echo -ne '\nWatchWolf built.\n'
