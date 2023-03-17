@@ -2743,8 +2743,10 @@ Enum value & Entity type & First Minecraft version \\
 	\caption{Structure of a \hyperref[type:container]{Container}}
 \end{figure}
 
-\section{Server manager petition}
-\myworries{...}
+\section{Servers manager petition}
+The Servers manager is the responsible for starting the servers with the desired configuration.
+
+All the Servers manager petitions will follow the structure shown in \hyperref[fig:server-manager-base]{Figure \ref{fig:server-manager-base}, Servers manager petition structure}.
 
 \begin{figure}[H]
 	\centering
@@ -2755,15 +2757,16 @@ Enum value & Entity type & First Minecraft version \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{}
 	\end{bytefield}
-	\caption{Server manager petition structure}
+	\caption{Servers manager petition structure}
+	\label{fig:server-manager-base}
 \end{figure}
 
-\myworries{Table of operations}
+\myworries{Once all the operations are implemented, here you'll find a table that shows a link to each one of the operations.}
 
 You don't have to implement the NOP operation in this destiny block because the timeout happens inside the \hyperref[s:server-petition]{Server petition block}. That is, if you don't call operations (or send NOPs) to the \hyperref[s:server-petition]{Server petition} for a long time, the server will stop, and because the server stopped the Server manager will close the established connection.
 
 \subsection{Start server operation}\label{s:server-manager-start}
-\myworries{...}
+This operation allows WatchWolf Tester to start a server. It provides high customization, as you can specify plugins, worlds and config files (among other parameters).
 
 \newpage
 \vfill
@@ -2795,7 +2798,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 
 Once a 'start server' request is received the program should create a server with the specified arguments, and return its IP:Port (for example, '127.0.0.1:25565', a 15-characters string; see \hyperref[fig:start-response-structure]{Figure \ref{fig:start-response-structure}, Start server response structure}). The IP to send the \hyperref[s:server-petition]{Server Petitions} is the same, but the next port (IP:$<$port+1$>$).
 
-If it's not possible to create it (for example: one argument is invalid, the user sent a plugin when it's specified that only Usual Plugins are allowed \myworries{explain}, or there's no free servers of that type), then an empty IP is returned (see \hyperref[fig:start-error-response-structure]{Figure \ref{fig:start-error-response-structure}, Start server error response structure}).
+If it's not possible to create it (for example: one argument is invalid, the user sent a plugin when it's specified that only Usual Plugins are allowed,\footnote{To prevent possible viruses, some servers may have enabled one option that limits which plugins are allowed to be sent. \myworries{Besides being defined by the API it hasn't been implemented yet, and won't be until WatchWolf offers public servers.}} or there's no free servers of that type), then an empty IP is returned (see \hyperref[fig:start-error-response-structure]{Figure \ref{fig:start-error-response-structure}, Start server error response structure}).
 
 \begin{figure}[H]
 	\centering
@@ -2828,9 +2831,9 @@ Array of maps (worlds; Map[]). To have more information about arrays check the \
 
 About the Map type, Minecraft is divided on different worlds (\cite{minecraft-world}). By default there's only three, but with some plugins this number can increase.
 
-In order to properly test some plugins, there may be needed some kind of known place. To avoid overusing the Set block operation \myworries{link} you can send using this argument your(s) world(s).
+In order to properly test some plugins, there may be needed some kind of known place. To avoid overusing the \hyperref[s:set-block]{Set block operation} you can send using this argument your world(s).
 
-\myworries{Map in more detail}
+\myworries{Map explanation in more detail is needed.}
 
 \subsubsection{Plugins}\label{type:plugins}
 Array of plugins (Plugin[]). To have more information check the \hyperref[type:array]{subsection \ref{type:array}, Array}.
@@ -2841,7 +2844,7 @@ About the Plugin type, there's three types of plugins:
 	
 		The Usual plugins are plugins that you expect everyone to have for being extremely common, like WorldGuard (\cite{worldguard}), or to allow the user to test plugins with Premium plugins\footnote{Premium plugins are paid plugins. For that reason, only the purchaser can download them (so you can't send a link to the plugin), and sending them through the internet via file upload may not be legal, so the plugin must be already downloaded in the machine.} dependencies. This allows both security and performance.
 
-		Something to highlight is the fact that, as mentioned in the operation Allows non usual plugins \myworries{reference}, some ServerManager will only allow plugins that are already in the machine.
+		Something to highlight is the fact that, as mentioned in the operation Allows non usual plugins,\footnote{\myworries{Reference to the operation is needed here, but not yet implemented. It won't be until WatchWolf offers public servers.}} some ServerManager will only allow plugins that are already in the machine.
 	
 		As can be seen in the \hyperref[fig:usual-plugin-structure]{Figure \ref{fig:usual-plugin-structure}, Usual plugin structure}, the first argument (that specifies the Plugin type) is 0x00.
 		
@@ -2867,7 +2870,17 @@ About the Plugin type, there's three types of plugins:
 		
 		The Uploaded plugins are plugins available in some website, thus can be sent through an URL.
 		
-		\myworries{structure?}
+		\begin{figure}[H]
+			\centering
+			\begin{bytefield}{32}
+				\bitheader{0,7,8,31} \\
+				\bitbox{8}{0x01} & \bitbox[ltr]{24}{} \\
+				\wordbox[lr]{1}{\hyperref[type:str]{url}} \\
+				\skippedwords \\
+				\wordbox[lrb]{1}{}
+			\end{bytefield}
+			\caption{Uploaded plugin structure}
+		\end{figure}
 		
 	\item File plugins
 		
@@ -2890,19 +2903,19 @@ About the Plugin type, there's three types of plugins:
 		
 \end{enumerate}
 
-\myworries{mixed plugin types example?}
+\myworries{A mixed example with different plugin types is needed here.}
 
 \subsubsection{Server version}\label{s:server-version}
 \hyperref[type:str]{String} specifying the \hyperref[type:server-type]{server type}'s version. For example, '1.12.2'.
 
 \subsubsection{Config files}\label{type:config-files}
-\myworries{...}
+\hyperref[type:array]{Array} of \hyperref[type:file]{files}. Usually they have offset 'plugins/', as they provide the default configuration for a given plugin.
 
 \subsection{Server started notification}
 
 After a \hyperref[s:server-manager-start]{Start server operation} the server will start. Due to the unpredictable amount of time that the server takes to start up you'll receive a Server started notification once the server socket is available.
 
-You may notice that there's another \hyperref[s:server-started]{Server started notification} under the \hyperref[s:s:server-petition]{Server petition section}. That notification goes to the ServerManager \myworries{ref?}, while this goes to the Tester \myworries{ref?}. Also, the Server one have a token that is only shared between Server and the ServerManager, and the Tester doesn't have to know it too.
+You may notice that there's another \hyperref[s:server-started]{Server started notification} under the \hyperref[s:server-petition]{Server petition section}. That notification goes to the ServerManager, while this one goes to the Tester, but both are used for the same purpose: notify the element ``1 level up in the hierarchy'' that the server has been started. Also, the Server one have a token that is only shared between Server and the ServerManager, and the Tester doesn't have to know it too.
 
 \begin{figure}[H]
 	\centering
@@ -2914,7 +2927,9 @@ You may notice that there's another \hyperref[s:server-started]{Server started n
 \end{figure}
 
 \subsection{Error notification}\label{s:error-notification}
-\myworries{...}
+As we're testing a \acrshort{mc} plugin it's important to consider all the errors raised during the testing. The \textit{Error notification} is an \gls{async} petition that it is sent to the WatchWolf Tester orchestrator as a response, without any previous petition.
+
+The \textit{Error notification} will contain the full stack trace of the raised error, captured by the server console.
 
 \begin{figure}[H]
 	\centering
@@ -2928,35 +2943,36 @@ You may notice that there's another \hyperref[s:server-started]{Server started n
 	\caption{Error notification structure}
 \end{figure}
 
-\subsection{Get coverage operation}
-\myworries{... get JaCoCo binary file}
+% TODO not present in v0.1.14
+%\subsection{Get coverage operation}
+%\myworries{... get JaCoCo binary file}
 
-\subsubsection{Get coverage request}
-\myworries{...}
+%\subsubsection{Get coverage request}
+%\myworries{...}
 
-\begin{figure}[H]
-\centering
-\begin{bytefield}{16}
-	\bitheader{0,2,3,4,15} \\
-	\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}}
-\end{bytefield}
-\caption{Get coverage operation structure}
-\end{figure}
+%\begin{figure}[H]
+%\centering
+%\begin{bytefield}{16}
+%	\bitheader{0,2,3,4,15} \\
+%	\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}}
+%\end{bytefield}
+%\caption{Get coverage operation structure}
+%\end{figure}
 
-\subsubsection{Get coverage response}
-\myworries{...}
+%\subsubsection{Get coverage response}
+%\myworries{...}
 
-\begin{figure}[H]
-\centering
-\begin{bytefield}{32}
-	\bitheader{0,2,3,4,15,16,31} \\
-	\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}} & \bitbox[ltr]{16}{} \\
-	\wordbox[lr]{1}{\hyperref[type:file]{JaCoCo binary file}} \\
-	\skippedwords \\
-	\wordbox[lrb]{1}{}
-\end{bytefield}
-\caption{Get coverage response structure}
-\end{figure}
+%\begin{figure}[H]
+%\centering
+%\begin{bytefield}{32}
+%	\bitheader{0,2,3,4,15,16,31} \\
+%	\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000100}} & \bitbox[ltr]{16}{} \\
+%	\wordbox[lr]{1}{\hyperref[type:file]{JaCoCo binary file}} \\
+%	\skippedwords \\
+%	\wordbox[lrb]{1}{}
+%\end{bytefield}
+%\caption{Get coverage response structure}
+%\end{figure}
 
 \section{Server petition} \label{s:server-petition}
 \myworries{...}
@@ -3032,6 +3048,8 @@ The only reserved operation is the all-zeroes operation (0x0000). It represents 
 \myworries{...}
 
 \myworries{'is implemented' (all zeroes) optional}
+
+\myworries{Once all the operations are implemented, here you'll find a table that shows a link to each one of the operations.}
 
 \subsubsection{Server stop operation}
 \myworries{...}
@@ -3110,7 +3128,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\caption{OP player operation structure}
 \end{figure}
 
-\subsubsection{Set block operation}
+\subsubsection{Set block operation}\label{s:set-block}
 \myworries{...}
 
 \begin{figure}[H]
@@ -3469,6 +3487,10 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 	\caption{Clients manager petition structure}
 \end{figure}
 
+You don't have to implement the NOP operation in this destiny block because the timeout happens inside the \hyperref[s:client-petition]{Client petition block}. That is, if you don't call operations (or send NOPs) to the \hyperref[s:client-petition]{Client petition} for a long time, the client will timeout, causing the Clients manager to close the established connection.
+
+\myworries{Once all the operations are implemented, here you'll find a table that shows a link to each one of the operations.}
+
 \subsection{Start client operation}
 \myworries{...}
 
@@ -3502,7 +3524,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \caption{Client started petition response structure}
 \end{figure}
 
-\section{Client petition}
+\section{Client petition}\label{s:client-petition}
 \myworries{...}
 
 \begin{figure}[H]
@@ -3516,6 +3538,8 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{bytefield}
 \caption{Client petition structure}
 \end{figure}
+
+\myworries{Once all the operations are implemented, here you'll find a table that shows a link to each one of the operations.}
 
 \subsection{Stop client operation}
 \myworries{...}

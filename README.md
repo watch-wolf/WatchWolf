@@ -7,8 +7,6 @@ The standard can be seen [here](https://github.com/watch-wolf/WatchWolf/blob/mai
 ### Build PDF
 `pdflatex -synctex=1 -interaction=nonstopmode %.tex|bibtex "Protocols"|makeglossaries %|pdflatex -synctex=1 -interaction=nonstopmode %.tex|pdflatex -synctex=1 -interaction=nonstopmode %.tex`
 
-Also run `rail Protocols` to generate the rail figures. More information [here](https://github.com/Holzhaus/latex-rail).
-
 ## Implementation
 You can check an implementation example of all the modules here:
 - [Tester](https://github.com/rogermiranda1000/WatchWolf-Tester)
