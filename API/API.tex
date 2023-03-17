@@ -189,6 +189,8 @@ In order to interact with the different WatchWolf modules, you'll have to follow
 	\label{fig:packet-structure}
 \end{figure}
 
+As a general rule, both \glslink{MSB}{MSB} and \glslink{LSB}{LSB} are preserved. This means that in a 2-bytes packet, the first part (0..7) will be the \glslink{MSB}{MSB}, and the last (8..15) \glslink{MSB}{MSB}.
+
 \subsection{Destiny} \label{s:dst}
 The first argument (\textit{DST}) will be the destiny of that packet. This will specify one of the 4 modules connected to WatchWolf Tester (for more information refer to \hyperref[s:intro]{Section \ref{s:intro}, WatchWolf Introduction}). Note that WatchWolf Tester itself is not present, as it will be indicated with the \hyperref[s:response]{Response} bit at 1. You can see the different \textit{DST} values for each module om the \hyperref[fig:dst]{Figure \ref{fig:dst}, DST bits meaning}.
 
@@ -226,12 +228,12 @@ The Arguments parameter specifies the arguments (if any) to the \textit{\hyperre
 Now there will be discussed the most common data types, so they will be independent of any programming language.
 
 \subsubsection{Character}\label{type:char}
-Characters are sent as a 1-byte integer, representing its ASCII \myworries{ref?} value.
+Characters are sent as a 1-byte integer, representing its \gls{ASCII} value.
 
 \subsubsection{Boolean}\label{type:bool}
 Booleans are 1-bit element that represents \textit{true} (0b1), or \textit{false} (0b0).
 
-For alignment \myworries{define?} reasons, booleans will be sent as 1-byte element. To avoid misunderstandings, let's define \textit{false} as 0x00, and \textit{true} as '\textit{not \myworries{define?} false}'. That way, this two packets are valid \textit{true} elements:
+For alignment reasons,\footnote{In order to make the read/write more easy, we want to stick with (at least) 8 bits blocks.} booleans will be sent as 1-byte element. To avoid misunderstandings, let's define \textit{false} as 0x00, and \textit{true} as '\textit{not false}'. That way, both figures \ref{fig:true-one} and \ref{fig:true-all} are valid \textit{true} elements.
 
 \begin{figure}[H]
 	\centering
@@ -240,6 +242,7 @@ For alignment \myworries{define?} reasons, booleans will be sent as 1-byte eleme
 		\bitbox{8}{0x01}
 	\end{bytefield}
 	\caption{True packet with the \glslink{LSB}{LSB} at 1}
+	\label{fig:true-one}
 \end{figure}
 
 \begin{figure}[H]
@@ -249,6 +252,7 @@ For alignment \myworries{define?} reasons, booleans will be sent as 1-byte eleme
 		\bitbox{8}{0xFF}
 	\end{bytefield}
 	\caption{True packet with all bits at 1}
+	\label{fig:true-all}
 \end{figure}
 
 \subsubsection{Double}\label{type:double}
@@ -260,7 +264,7 @@ Strings are \hyperref[type:array]{arrays} of \hyperref[type:char]{characters}. R
 \subsubsection{Array}\label{type:array}
 Arrays are a set of \textit{n} elements of the same type.
 
-The structure is a 2-byte \myworries{first (0..7) MSB, then (8..15) LSB} integer (representing the number of elements, \textit{n}), followed by \textit{n} elements of the same type. As a note here, by representing the size with a 2-byte integer the maximum number of elements per array is 65,535.
+The structure is a 2-byte integer (representing the number of elements, \textit{n}), followed by \textit{n} elements of the same type. As a note here, by representing the size with a 2-byte integer the maximum number of elements per array is 65,535.
 
 \begin{figure}[H]
 	\centering
