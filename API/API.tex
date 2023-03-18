@@ -2743,6 +2743,10 @@ Enum value & Entity type & First Minecraft version \\
 	\caption{Structure of a \hyperref[type:container]{Container}}
 \end{figure}
 
+\subsection{Synchronization}\label{s:synchronization}
+
+As this is a distributed system (multiple programs that needs to be sequential), you'll find one \textit{Synchronization operation} on both the Client and Server. Each program guarantees that the operations will be sequential (operation 1 will be before operation 2, being operation 1 the first sent operation and 2 the second one), but that doesn't applies on two different programs. By calling the \textit{Synchronization operation} and waiting for its reply each time you have to change from one program to another you'll guarantee multi-program sequencing.
+
 \section{Servers manager petition}
 The Servers manager is the responsible for starting the servers with the desired configuration.
 
@@ -2975,7 +2979,7 @@ The \textit{Error notification} will contain the full stack trace of the raised 
 %\end{figure}
 
 \section{Server petition} \label{s:server-petition}
-\myworries{...}
+WathcWolf Server is a Minecraft plugin embedded in a \acrshort{mc} server. It will notify to the Servers manager that the server is ready, and perform all the \acrshort{mc} server-related requests.
 
 The server petitions are a bit different from the rest. The server petitions are designed in a way that everyone have some common operations, and then you can add some others optionally (and even non-standard ones). We'll define this 'set of operations' as \hyperref[s:server-group]{groups}.
 
@@ -3045,14 +3049,14 @@ The only reserved operation is the all-zeroes operation (0x0000). It represents 
 \footnotetext{except for groups 0b000000000000 and 0b000000000001}
 
 \subsection{Base operations} \label{g:base}
-\myworries{...}
+The base operations are basic operations needed to interact with the server in order to test the plugins.
 
-\myworries{'is implemented' (all zeroes) optional}
+In this case, the 'is implemented' (all zeroes) operation is optional, as it must be present in all the WatchWolf Server implementations.
 
 \myworries{Once all the operations are implemented, here you'll find a table that shows a link to each one of the operations.}
 
 \subsubsection{Server stop operation}
-\myworries{...}
+This operation will stop the server, freeing the resources allocated for it. It must be called once all the testing has been done.
 
 \begin{figure}[H]
 	\centering
@@ -3064,7 +3068,7 @@ The only reserved operation is the all-zeroes operation (0x0000). It represents 
 \end{figure}
 
 \subsubsection{Server stopped notification}
-\myworries{... response to...}
+In response to the \textit{Server stop operation}, you'll get the \textit{Server stopped notification}.
 
 To have more information about the \textit{server id} parameter check the \hyperref[s:server-started]{Subsection \ref{s:server-started}, Server started notification}.
 
@@ -3082,9 +3086,9 @@ To have more information about the \textit{server id} parameter check the \hyper
 
 \subsubsection{Server started notification}\label{s:server-started}
 
-This notification is sent to the Server Manager \myworries{ref?}, as a response for the \hyperref[s:server-manager-start]{Start server operation}, thus not really a response of a Server's operation.
+This notification is sent to the Server Manager, as a response for the \hyperref[s:server-manager-start]{Start server operation}, thus not really a response of a Server's operation.
 
-As one IP can have multiple servers, a \hyperref[type:str]{string} that identifies the server must be sent with the response. This argument can be whatever you want (for example, $<$server ip$>$:$<$server port$>$ will be unique), but must be shared between both the Server Manager and the Server. For security reasons \myworries{cite IP spoofing or similar} (because the Tester \myworries{ref?} also knows the server's IP and port) a hash function is encouraged to be used.
+As one IP can have multiple servers, a \hyperref[type:str]{string} that identifies the server must be sent with the response. This argument can be whatever you want (for example, $<$server ip$>$:$<$server port$>$ will be unique), but must be shared between both the Server Manager and the Server. For security reasons (because the Tester also knows the server's IP and port), a private hash function is encouraged to be used.
 
 \begin{figure}[H]
 	\centering
@@ -3099,7 +3103,9 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Whitelist player operation}
-\myworries{...}
+To avoid unwanted players joining the server, all the servers has whitelist on\footnote{The whitelist is a set of users that will be allowed to join the world.} by default. That means that you'll have to add them to the whitelist before they join, and here's where this operation comes in.
+
+\textit{Whitelist player operation} adds one client to the whitelist.
 
 \begin{figure}[H]
 	\centering
@@ -3114,7 +3120,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{OP player operation}
-\myworries{...}
+Some plugin sections may need superuser permissions in order to access them, with the \textit{OP player operation} you'll make one user admin.
 
 \begin{figure}[H]
 	\centering
@@ -3129,7 +3135,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Set block operation}\label{s:set-block}
-\myworries{...}
+Place one block somewhere.
 
 \begin{figure}[H]
 \centering
@@ -3147,7 +3153,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get block operation}
-\myworries{...}
+Given a position, get the block in that place.
 
 \begin{figure}[H]
 \centering
@@ -3162,7 +3168,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get block response}
-\myworries{...}
+As a response of the \textit{Get block operation}, you'll get the obtained block.
 
 \begin{figure}[H]
 \centering
@@ -3177,7 +3183,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player position operation}
-\myworries{...}
+Get the location of one player.
 
 \begin{figure}[H]
 \centering
@@ -3192,7 +3198,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player position response}
-\myworries{...}
+As a response of the \textit{Get player position operation}, you'll get the player position.
 
 \begin{figure}[H]
 \centering
@@ -3207,7 +3213,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Give item to player operation}
-\myworries{...}
+Add some item to one user.
 
 \begin{figure}[H]
 \centering
@@ -3225,7 +3231,9 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Run command operation}
-\myworries{...}
+Execute one command from a console point of view.
+
+As a side note, this operation may be useful if you need to perform one action not present at this moment by the standard.
 
 \begin{figure}[H]
 \centering
@@ -3240,7 +3248,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get players operation}
-\myworries{...}
+Get all the players' usernames on-line.
 
 \begin{figure}[H]
 \centering
@@ -3252,7 +3260,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get players response}
-\myworries{...}
+As a response of the \textit{Get players operation}, you'll get one String array with all the names.
 
 \begin{figure}[H]
 \centering
@@ -3267,7 +3275,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Synchronize operation}
-\myworries{...}
+As discussed in \hyperref[s:synchronization]{Subsection \ref{s:synchronization}, Synchronization}, \textit{Synchronize operation} will guarantee the expected outcome of the tests.
 
 \begin{figure}[H]
 \centering
@@ -3279,7 +3287,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Synchronize response}
-\myworries{...}
+As a response of the \textit{Synchronize operation}, this indicates that all the operations sent by the Tester has been done, thus being ``on the same state'' as WatchWolf Tester.
 
 \begin{figure}[H]
 \centering
@@ -3291,7 +3299,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Tp player operation}
-\myworries{...}
+Teleport a player to one location.
 
 \begin{figure}[H]
 \centering
@@ -3309,7 +3317,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player pitch operation}
-\myworries{...}
+With \textit{Get player yaw operation}, it will allow the Tester to know where the player is looking.
 
 \begin{figure}[H]
 \centering
@@ -3324,7 +3332,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player pitch response}
-\myworries{...}
+\textit{Get player pitch operation} response.
 
 \begin{figure}[H]
 \centering
@@ -3339,7 +3347,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player yaw operation}
-\myworries{...}
+With \textit{Get player pitch operation}, it will allow the Tester to know where the player is looking.
 
 \begin{figure}[H]
 \centering
@@ -3354,7 +3362,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player yaw response}
-\myworries{...}
+\textit{Get player yaw operation} response.
 
 \begin{figure}[H]
 \centering
@@ -3369,7 +3377,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player inventory operation}
-\myworries{...}
+Get the container (inventory) of one player.
 
 \begin{figure}[H]
 \centering
@@ -3384,7 +3392,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get player inventory response}
-\myworries{...}
+Response to the \textit{Get player inventory operation} with the player's inventory.
 
 \begin{figure}[H]
 \centering
@@ -3399,7 +3407,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Get entities operation}
-\myworries{...}
+Given one point,\footnote{For how Minecraft loading system works, you cannot get all the entities. When a \acrshort{mc} chunk is unloaded it's like there's no entities on that place, and they will remain there until it's re-loaded again.} it will return all the entities around this spot.
 
 \begin{figure}[H]
 \centering
@@ -3419,7 +3427,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \footnotetext{Large radius or locations in unloaded chunks may return unexpected data.}
 
 \subsubsection{Get entities response}
-\myworries{...}
+\textit{Get entities operation} response with all the getted entities.
 
 \begin{figure}[H]
 \centering
@@ -3434,7 +3442,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Spawn entity operation}
-\myworries{...}
+Summon one entity. Note that \hyperref[type:entity]{Entity's UUID} will be ignored, as it's assigned by the server and cannot be set.
 
 \begin{figure}[H]
 \centering
@@ -3449,7 +3457,7 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsubsection{Spawn entity response}
-\myworries{...}
+The response of \textit{Spawn entity operation} will be the \hyperref[type:entity]{UUID} assigned to that new entity.
 
 \begin{figure}[H]
 \centering
@@ -3464,13 +3472,13 @@ As one IP can have multiple servers, a \hyperref[type:str]{string} that identifi
 \end{figure}
 
 \subsection{Performance operations} \label{g:performance}
-\myworries{...}
+\myworries{This section is incomplete. Expect some future work here about measuring the performance of your plugins.}
 
 \subsection{WorldGuard operations} \label{g:worldguard}
-\myworries{...}
+\myworries{This section is incomplete. Expect some future work here about creating WorldGuard regions.}
 
 \subsection{Residence operations} \label{g:residence}
-\myworries{...}
+\myworries{This section is incomplete. Expect some future work here about creating Residence regions.}
 
 \section{Clients manager petition}
 \myworries{...}
@@ -3665,7 +3673,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Synchronize operation}
-\myworries{...}
+As discussed in \hyperref[s:synchronization]{Subsection \ref{s:synchronization}, Synchronization}, \textit{Synchronize operation} will guarantee the expected outcome of the tests.
 
 \begin{figure}[H]
 \centering
@@ -3677,7 +3685,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Synchronize response}
-\myworries{...}
+As a response of the \textit{Synchronize operation}, this indicates that all the operations sent by the Tester has been done, thus being ``on the same state'' as WatchWolf Tester.
 
 \begin{figure}[H]
 \centering
@@ -3749,7 +3757,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 		\hline
 		Date & Revision & Changes \\
 		\hline
-		\myworries{date} & 1 & Initial public release, \textit{v0.1.14}. \\
+		\myworries{date} & 1 & Initial public release, \textit{v0.1.15}. \\
 		\hline
 	\end{tabular}
 	\caption{Revision history}
