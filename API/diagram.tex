@@ -1,0 +1,64 @@
+\begin{tikzpicture}[node distance=1cm]
+	% nodes
+	\node (plugin) [process] {User plugin};
+	
+	\node (spigot) [process, below=of plugin] {Spigot};
+	
+	\node (server) [process, left=of spigot] {WatchWolf Server};
+	
+	\node (tester) [process, left=of server] {WatchWolf Tester};
+	
+	\node(mc-server) [process, right=of spigot] {Minecraft Server};
+	
+	\node(spigot-plugin) [process, above=of mc-server] {Spigot plugin}; % implicit right=of plugin
+	
+	\node(junit) [process, above=of spigot-plugin] {JUnit test};
+	
+	\node (plugin-test) at (tester |- junit) [process] {User plugin's tests};
+	
+	\node (mc-client) [process, below=of mc-server] {Minecraft Client};
+	
+	\node (mineflayer) [process, left=of mc-client] {Mineflayer};
+	
+	\node (client) [process, left=of mineflayer] {WatchWolf Client};
+	
+	\node (servers-manager) [process, below=of tester, yshift=-3cm] {
+		WatchWolf\\
+		Servers Manager
+	};
+	
+	\node (clients-manager) [process, right=of servers-manager] {
+		WatchWolf\\
+		Clients Manager
+	};
+	
+	% wrappers
+	\node(watchwolf-wrapper-text) [above=12pt of $(tester)!0.5!(server)$] {WatchWolf environment};
+	\draw[dashed] ([xshift=-5pt,yshift=2pt] tester.west |- watchwolf-wrapper-text.north) rectangle ([xshift=5pt,yshift=-5pt] clients-manager.south -| client.east);
+	
+	\node(user-wrapper-text) [right=0 of plugin-test.north west, yshift=5pt] {User code};
+	\draw[dashed] ([xshift=-5pt,yshift=2pt] user-wrapper-text.north west) rectangle ([xshift=5pt,yshift=-5pt] plugin.south east);
+	
+	\node(abstract-wrapper-text) [right=0 of junit.north west, yshift=5pt] {Abstract classes};
+	\draw[dashed] ([xshift=-5pt,yshift=2pt] abstract-wrapper-text.north west) rectangle ([xshift=5pt,yshift=-5pt] mc-client.south east);
+	
+	\node(abstract-impl-wrapper-text) [right=0 of spigot.north west, yshift=5pt] {APIs};
+	\draw[dashed] ([xshift=-5pt,yshift=2pt] abstract-impl-wrapper-text.north west) rectangle ([xshift=5pt,yshift=-5pt] mineflayer.south east);
+	
+	
+	% arrows
+	\draw [arrow] (plugin-test) -- (tester);
+	\draw [arrow] (spigot.north) -- ++(0,0.3) -| (spigot-plugin);
+	\draw [arrow] (tester) -- (server);
+	\draw [arrow] ([xshift=1cm] tester.south) |- (client.west);
+	\draw [arrow] (tester) -- (servers-manager);
+	\draw [arrow] ([xshift=0.5cm] tester.south) |- ([yshift=1cm] clients-manager.north) -- (clients-manager);
+	\draw [arrow] (server) -- (spigot);
+	\draw [arrow] (client) -- (mineflayer);
+	\draw [generalization] (mineflayer) -- (mc-client);
+	\draw [generalization] (spigot) -- (mc-server);
+	\draw [generalization] (plugin) -- (spigot-plugin);
+	\draw [generalization] (plugin-test) -- (junit);
+	\draw [arrow] ([xshift=-0.5cm] mc-server.south) -- ([xshift=-0.5cm] mc-client.north);
+	\draw [arrow] ([xshift=0.5cm] mc-client.north) -- ([xshift=0.5cm] mc-server.south);
+\end{tikzpicture}

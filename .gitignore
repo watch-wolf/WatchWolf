@@ -1,7 +1,9 @@
 texput.log
-Protocols.*
-Protocols-*
-!Protocols.tex
-!Protocols.pdf
+API.*
+API-*
+!API.tex
+!API.pdf
 A-Blocks.*
 !A-Blocks.tex
+diagram.*
+!diagram.tex
