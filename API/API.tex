@@ -83,7 +83,8 @@
 	\newcommand{\xmark}{\ding{55}}%
 	
 	% TODOs
-	\newcommand\myworries[1]{\sethlcolor{red}\hl{#1}}
+	%\newcommand\myworries[1]{\sethlcolor{red}\hl{#1}}
+	\newcommand\myworries[1]{\textcolor{purple}{#1}}
 	
 	% place here
 	\restylefloat{figure}
@@ -2747,7 +2748,7 @@ Enum value & Entity type & First Minecraft version \\
 
 As this is a distributed system (multiple programs that needs to be sequential), you'll find one \textit{Synchronization operation} on both the Client and Server. Each program guarantees that the operations will be sequential (operation 1 will be before operation 2, being operation 1 the first sent operation and 2 the second one), but that doesn't applies on two different programs. By calling the \textit{Synchronization operation} and waiting for its reply each time you have to change from one program to another you'll guarantee multi-program sequencing.
 
-\section{Servers manager petition}
+\section{Servers manager petition}\label{s:servers-manager}
 The Servers manager is the responsible for starting the servers with the desired configuration.
 
 All the Servers manager petitions will follow the structure shown in \hyperref[fig:server-manager-base]{Figure \ref{fig:server-manager-base}, Servers manager petition structure}.
@@ -3481,7 +3482,7 @@ The response of \textit{Spawn entity operation} will be the \hyperref[type:entit
 \myworries{This section is incomplete. Expect some future work here about creating Residence regions.}
 
 \section{Clients manager petition}
-\myworries{...}
+As in \hyperref[s:servers-manager]{Section \ref{s:servers-manager}, Servers manager petition}, \textit{Clients manager petition} will allow WatchWolf Tester to create users that will connect to the (already) started servers.
 
 \begin{figure}[H]
 	\centering
@@ -3500,7 +3501,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \myworries{Once all the operations are implemented, here you'll find a table that shows a link to each one of the operations.}
 
 \subsection{Start client operation}
-\myworries{...}
+This operation will start an offline\footnote{Minecraft needs payment in order to create an account. With \textit{offline mode} no account is required, that is, no payment nor password needed to be provided. \myworries{As a petition by the community, there will be (in the future) one way to embed your Premium Minecraft accounts to the WatchWolf environment.}} Minecraft client, and it will be connected to the specified server.
 
 \begin{figure}[H]
 \centering
@@ -3518,7 +3519,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Client started response operation}
-\myworries{...}
+As a response to the \textit{Start client operation}, you'll get the IP (IP \& port) to connect to the client.
 
 \begin{figure}[H]
 \centering
@@ -3533,7 +3534,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \section{Client petition}\label{s:client-petition}
-\myworries{...}
+The client will interact with the server as if it was one normal user.
 
 \begin{figure}[H]
 \centering
@@ -3550,7 +3551,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \myworries{Once all the operations are implemented, here you'll find a table that shows a link to each one of the operations.}
 
 \subsection{Stop client operation}
-\myworries{...}
+Leave the server, and destroy the client.
 
 \begin{figure}[H]
 \centering
@@ -3562,7 +3563,9 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Send message operation}
-\myworries{... don't use this to run commands}
+Send a chat message.
+
+Note that this operation is for messages. If you want to run a command, refer to \hyperref[s:user-run-command]{Subsection \ref{s:user-run-command}, Run command operation}.
 
 \begin{figure}[H]
 \centering
@@ -3577,7 +3580,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Got message notification}
-\myworries{... async}
+This \gls{async} notification is received when one user reads a chat message from another user.
 
 \begin{figure}[H]
 \centering
@@ -3594,8 +3597,8 @@ You don't have to implement the NOP operation in this destiny block because the 
 \caption{Got message notification structure}
 \end{figure}
 
-\subsection{Run command operation}
-\myworries{...}
+\subsection{Run command operation}\label{s:user-run-command}
+Run a command.
 
 \begin{figure}[H]
 \centering
@@ -3610,7 +3613,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Break block operation}
-\myworries{...}
+Break a block with the held item.
 
 \begin{figure}[H]
 \centering
@@ -3625,7 +3628,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Equip item in hand operation}
-\myworries{...}
+Equip one item (already existing in the inventory) on hand.
 
 \begin{figure}[H]
 \centering
@@ -3640,7 +3643,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Move at operation}
-\myworries{...}
+Move the player from the current position to the target location.
 
 \begin{figure}[H]
 \centering
@@ -3655,7 +3658,7 @@ You don't have to implement the NOP operation in this destiny block because the 
 \end{figure}
 
 \subsection{Look at operation}
-\myworries{...}
+Move the player's camera.
 
 \begin{figure}[H]
 \centering
@@ -3697,7 +3700,8 @@ As a response of the \textit{Synchronize operation}, this indicates that all the
 \end{figure}
 
 \subsection{Hit operation}
-\myworries{... left click with item in hand}
+Equivalent to the left click with item in hand.
+\myworries{Currently (v0.1.15) this operation doesn't work as intended.}
 
 \begin{figure}[H]
 \centering
@@ -3709,7 +3713,7 @@ As a response of the \textit{Synchronize operation}, this indicates that all the
 \end{figure}
 
 \subsection{Use operation}
-\myworries{... right click with item in hand}
+Equivalent to the right click with item in hand.
 
 \begin{figure}[H]
 \centering
@@ -3721,7 +3725,9 @@ As a response of the \textit{Synchronize operation}, this indicates that all the
 \end{figure}
 
 \subsection{Place block operation}
-\myworries{... place current item in hand}
+Place the current item in hand to the specified location.
+
+It's important that the coordinates must be inside the player range; as this is not a \textit{move at} operation.
 
 \begin{figure}[H]
 \centering
@@ -3736,7 +3742,7 @@ As a response of the \textit{Synchronize operation}, this indicates that all the
 \end{figure}
 
 \subsection{Hit entity operation}
-\myworries{... attack}
+Attack (1 hit) one entity with the current held item.
 
 \begin{figure}[H]
 \centering
@@ -3753,11 +3759,11 @@ As a response of the \textit{Synchronize operation}, this indicates that all the
 \section{Revision history}
 \begin{table}[H]
 	\centering
-	\begin{tabular}{ |c|c|c| }
+	\begin{tabular}{ |c|c|c|c| }
 		\hline
-		Date & Revision & Changes \\
+		Date & Revision & WatchWolf version & Changes \\
 		\hline
-		\myworries{date} & 1 & Initial public release, \textit{v0.1.15}. \\
+		18/03/2023 & 1 & v0.1.15 & Initial public release. \\
 		\hline
 	\end{tabular}
 	\caption{Revision history}
