@@ -27,8 +27,6 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-echo "[v] base_path=$base_path"
-
 if [ $num_processes -lt 1 ]; then
 	num_processes=1 # at least 1 process
 fi
@@ -118,7 +116,7 @@ case "$opt" in
 				fi
 				
 				sleep 15
-				current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+				current_downloading_containers=`sudo docker container ls -a | grep 'Spigot_build_' -c`
 			done
 			# Spigot ended, now wait for Paper
 			
