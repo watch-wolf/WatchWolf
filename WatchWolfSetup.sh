@@ -67,10 +67,10 @@ case "$opt" in
 		fi
 
 		# ServersManager dependencies
-		docker pull openjdk:8
-		docker pull openjdk:16
-		docker pull openjdk:17
-		docker pull ubuntu
+		sudo docker pull openjdk:8
+		sudo docker pull openjdk:16
+		sudo docker pull openjdk:17
+		sudo docker pull ubuntu
 
 		if [ $no_spigot -eq 0 ]; then
 			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
@@ -90,12 +90,12 @@ case "$opt" in
 		wget "$watchwolf_server_versions_base_path/WatchWolf-$higher_version-1.8-1.19.jar" -P "$servers_manager_path/usual-plugins"
 
 		# ClientsManager dependencies
-		docker pull nikolaik/python-nodejs
-		docker build --tag clients-manager "$clients_manager_path"
+		sudo docker pull nikolaik/python-nodejs
+		sudo docker build --tag clients-manager "$clients_manager_path"
 		
 		if [ $no_spigot -eq 0 ]; then
 			# all ended; wait for the Spigot versions to finish
-			current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+			current_downloading_containers=`sudo docker container ls -a | grep 'Spigot_build_' -c`
 			dots=""
 			while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
 				while read version; do
@@ -116,7 +116,7 @@ case "$opt" in
 				fi
 				
 				sleep 15
-				current_downloading_containers=`docker container ls -a | grep 'Spigot_build_' -c`
+				current_downloading_containers=`sudo docker container ls -a | grep 'Spigot_build_' -c`
 			done
 			# Spigot ended, now wait for Paper
 			
@@ -230,7 +230,7 @@ case "$opt" in
 		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 --env MACHINE_IP=$(get_ip) --env PUBLIC_IP=$(curl ifconfig.me) clients-manager:latest >/dev/null 2>&1 & disown
 		
 		dots=""
-		while [ `docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
+		while [ `sudo docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
 			echo -ne "Waiting Docker containers to start$dots    \r"
 			
 			dots="$dots."
