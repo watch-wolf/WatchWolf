@@ -132,8 +132,8 @@ case "$opt" in
 		;;
 		
 	"install" )
-		if [ "$0" == "/usr/bin/WatchWolf" ]; then
-			echo "[e] 'bash WatchWolfSetup.sh --install' can only be executed from the original path. Check that location with 'stat /usr/bin/WatchWolf'." >&2
+		if [ "$0" == "/usr/bin/watchwolf" ]; then
+			echo "[e] 'bash WatchWolfSetup.sh --install' can only be executed from the original path. Check that location with 'stat /usr/bin/watchwolf'." >&2
 			exit 1
 		fi
 		
@@ -142,7 +142,7 @@ case "$opt" in
 		
 		# accessible from everywhere
 		chmod +x "$script_path"
-		sudo ln -sf "$script_path" /bin/WatchWolf # run WatchWolf from any place
+		sudo ln -sf "$script_path" /bin/watchwolf # run WatchWolf from any place
 		
 		if [ $no_startup -eq 0 ]; then
 			# run at startup
@@ -186,7 +186,7 @@ case "$opt" in
 					base=`/mnt/c/Windows/System32/cmd.exe /c 'echo %USERPROFILE%' | sed 's/\r$//'` # get the base path
 					base=`echo "$base" | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'` # in WSL the directory delimiter is '/' (not '\'), and 'C:' is '/mnt/c'
 					windows_start_folder="$base/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup" # @ref https://www.thewindowsclub.com/startup-folder-in-windows-8
-					echo "wsl bash \"$script_path\" --run" > "$windows_start_folder/WatchWolf.bat"
+					echo "wsl bash \"$script_path\" --run --path \"$base_path\"" > "$windows_start_folder/WatchWolf.bat"
 					echo "Launch on startup done"
 				fi
 			fi
@@ -195,7 +195,7 @@ case "$opt" in
 	
 	"uninstall" )
 		wsl=`cat /proc/version | grep -i -c 'microsoft'`
-		sudo rm /bin/WatchWolf
+		sudo rm /bin/watchwolf
 		if [ $wsl -eq 0 ]; then
 			echo "[w] Uninstall has only been tested with WSL. Report any problem in https://github.com/watch-wolf/WatchWolf/issues" >&2
 			sudo rm /etc/systemd/system/watchwolf.service
