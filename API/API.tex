@@ -3248,6 +3248,21 @@ As a side note, this operation may be useful if you need to perform one action n
 \caption{Run command operation structure}
 \end{figure}
 
+\subsubsection{Run command response}
+In response of the \textit{Run command operation}, it will return (if any) the response of that command. If there's no response, it will return an empty string ("").
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0009}} \\
+		\wordbox[ltr]{1}{\hyperref[type:str]{cmd response}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Run command operation structure}
+\end{figure}
+
 \subsubsection{Get players operation}
 Get all the players' usernames on-line.
 
@@ -3442,6 +3457,37 @@ Given one point,\footnote{For how Minecraft loading system works, you cannot get
 \caption{Get entities response structure}
 \end{figure}
 
+\subsubsection{Get entity operation}
+Given one Entity UUID, it will return that entity. If the entity doesn't exists, the (fake) returned entity will have a different UUID that the one requested.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0012}} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Get entities operation structure}
+\end{figure}
+
+
+\subsubsection{Get entity response}
+\textit{Get entity operation} response with the getted entity.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0012}} \\
+		\wordbox[lr]{1}{\hyperref[type:entity]{entity}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Get entities response structure}
+\end{figure}
+
 \subsubsection{Spawn entity operation}
 Summon one entity. Note that \hyperref[type:entity]{Entity's UUID} will be ignored, as it's assigned by the server and cannot be set.
 
@@ -3458,14 +3504,14 @@ Summon one entity. Note that \hyperref[type:entity]{Entity's UUID} will be ignor
 \end{figure}
 
 \subsubsection{Spawn entity response}
-The response of \textit{Spawn entity operation} will be the \hyperref[type:entity]{UUID} assigned to that new entity.
+The response of \textit{Spawn entity operation} will be that new entity. It should match the request, except for the UUID (that now it will have a valid one).
 
 \begin{figure}[H]
 \centering
 \begin{bytefield}{32}
 	\bitheader{0,2,3,4,15,16,31} \\
 	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0011}} \\
-	\wordbox[lr]{1}{\hyperref[type:str]{UUID}} \\
+	\wordbox[lr]{1}{\hyperref[type:entity]{spawned entity}} \\
 	\skippedwords \\
 	\wordbox[lrb]{1}{}
 \end{bytefield}
@@ -3612,6 +3658,21 @@ Run a command.
 \caption{Run command petition structure}
 \end{figure}
 
+\subsection{Run command response}
+In response of the \textit{Run command operation}, it will return the message related to the command. If none, it will return an empty string ("").
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000000100}} & \bitbox[lrt]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{cmd response}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Run command petition structure}
+\end{figure}
+
 \subsection{Break block operation}
 Break a block with the held item.
 
@@ -3749,7 +3810,7 @@ Attack (1 hit) one entity with the current held item.
 \begin{bytefield}{32}
 	\bitheader{0,2,3,4,15,16,31} \\
 	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001101}} & \bitbox[lrt]{16}{} \\
-	\wordbox[lr]{1}{\hyperref[type:entity]{entity}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{entity's UUID}} \\
 	\skippedwords \\
 	\wordbox[lrb]{1}{}
 \end{bytefield}
