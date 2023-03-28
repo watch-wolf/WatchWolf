@@ -3646,6 +3646,8 @@ This \gls{async} notification is received when one user reads a chat message fro
 \subsection{Run command operation}\label{s:user-run-command}
 Run a command.
 
+As we can't guarantee if the server has already replied, is busy processing data, or has no reply, we need to establish a timeout.
+
 \begin{figure}[H]
 \centering
 \begin{bytefield}{32}
@@ -3653,7 +3655,8 @@ Run a command.
 	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000100}} & \bitbox[lrt]{16}{} \\
 	\wordbox[lr]{1}{\hyperref[type:str]{cmd}} \\
 	\skippedwords \\
-	\wordbox[lrb]{1}{}
+	\wordbox[lrb]{1}{} \\
+	\bitbox{16}{ms to timeout} & \bitbox{16}[bgcolor=lightgray]{}
 \end{bytefield}
 \caption{Run command petition structure}
 \end{figure}
