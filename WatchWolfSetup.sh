@@ -73,6 +73,8 @@ case "$opt" in
 		sudo docker pull ubuntu
 
 		if [ $no_spigot -eq 0 ]; then
+			dos2unix "$servers_manager_path/SpigotBuilder.sh" "$servers_manager_path/PaperBuilder.sh"
+			
 			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
 			source "$servers_manager_path/PaperBuilder.sh" # getAllPaperVersions/buildPaperVersion
 			
