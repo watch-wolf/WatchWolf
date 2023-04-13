@@ -73,6 +73,8 @@ case "$opt" in
 		sudo docker pull ubuntu
 
 		if [ $no_spigot -eq 0 ]; then
+			dos2unix "$servers_manager_path/SpigotBuilder.sh" "$servers_manager_path/PaperBuilder.sh"
+			
 			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
 			source "$servers_manager_path/PaperBuilder.sh" # getAllPaperVersions/buildPaperVersion
 			
@@ -224,7 +226,7 @@ case "$opt" in
 		# run ServersManager
 		wsl_mode(){ echo "echo 'Hello world'" | powershell.exe >/dev/null 2>&1; return $?; }
 		get_ip(){ wsl_mode; if [ $? -eq 0 ]; then echo "(Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress" | powershell.exe 2>/dev/null | tail -n2 | head -n1; else hostname -I | awk '{print $1}';fi }
-		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" --env MACHINE_IP=$(get_ip) --env PUBLIC_IP=$(curl ifconfig.me) --env WSL_MODE=$(wsl_mode ; echo $? | grep -c 0) ubuntu:latest sh -c "echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail dos2unix jq unzip wget >/dev/null ; echo '[*] ServersManager ready.' ; cd $servers_manager_path ; dos2unix ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh ; rm ServersManager.lock 2>/dev/null ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:'bash ./ServersManagerConnector.sh'" >/dev/null 2>&1 & disown
+		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" --env MACHINE_IP=$(get_ip) --env PUBLIC_IP=$(curl ifconfig.me) --env WSL_MODE=$(wsl_mode ; echo $? | grep -c 0) ubuntu:latest sh -c "echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail dos2unix jq unzip wget >/dev/null ; echo '[*] ServersManager ready.' ; cd $servers_manager_path ; dos2unix ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh PaperBuilder.sh ConnectorHelper.sh ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh PaperBuilder.sh ConnectorHelper.sh ; rm ServersManager.lock 2>/dev/null ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:'bash ./ServersManagerConnector.sh'" >/dev/null 2>&1 & disown
 		
 		# run ClientsManager
 		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 --env MACHINE_IP=$(get_ip) --env PUBLIC_IP=$(curl ifconfig.me) clients-manager:latest >/dev/null 2>&1 & disown
