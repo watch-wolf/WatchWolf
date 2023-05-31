@@ -59,6 +59,43 @@
 	\tikzstyle{arrow} = [thick,->,>=stealth]
 	\tikzstyle{generalization} = [thick, ->, -triangle 90, fill=white] % TODO why not working
 	
+	% multiple footnotes
+	\newcounter{markedfootnotes}
+	\newif\iffnadjneeded
+	\newcommand*\xfootnotemark{% the `x' means `experimental' here
+		\iffnadjneeded
+		% before the first *text was called
+		\else
+		% this is the first *mark (or previous *marks have seen at least one *text)
+		\ifnum\value{markedfootnotes}>0
+		\FNXWarning{\themarkedfootnotes\space missing text detected.\MessageBreak
+			Maybe \string\footnotetext\space instead of \string\xfootnotetext\space was used?\MessageBreak
+			Expect weird numbering of footnotes}%
+		\fi
+		\global\fnadjneededtrue
+		\fi
+		\stepcounter{markedfootnotes}%
+		\footnotemark
+	}
+	\newcommand*\xfootnotetext{% the text argument will be picked up by \footnotetext later
+		\ifnum\value{markedfootnotes}<1
+		\FNXWarning{Footnotetext without preceding mark detected}%
+		\else
+		\iffnadjneeded
+		\addtocounter{footnote}{-\value{markedfootnotes}}%
+		\global\fnadjneededfalse
+		\fi
+		\addtocounter{markedfootnotes}{-1}%
+		\stepcounter{footnote}%
+		\fi
+		\footnotetext
+	}
+	\AtEndDocument{%
+		\ifnum\value{markedfootnotes}>0
+		\FNXWarning{There appear to be \themarkedfootnotes\space more footnotemark(s) than texts...}%
+		\fi
+	}
+	
 	
 	% centered bytefield
 	\newenvironment{cbytefield}
@@ -2780,7 +2817,7 @@ This operation allows WatchWolf Tester to start a server. It provides high custo
 	\begin{bytefield}{32}
 		\bitheader{0,2,3,4,15,16,31} \\
 		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000000001}} & \bitbox[lrt]{16}{} \\
-		\wordbox[ltr]{1}{\hyperref[type:server-type]{server type}} \\
+		\wordbox[lr]{1}{\hyperref[type:server-type]{server type}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{} \\
 		\wordbox[ltr]{1}{\hyperref[s:server-version]{server version}} \\
@@ -3028,7 +3065,7 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 % Extended types NOP's footnote
 \footnotetext{As stated on the  \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}, the all-zeroes operation represents a NOP request.}
 
-If you've implemented an extended type and you believe that it makes sense to be part of the standard contact \href{mailto:contact@watchwolf.dev?subject=WatchWolf - New extended type}{contact@watchwolf.dev} to reserve one of the addresses.
+If you've implemented an extended type and you believe that it makes sense to be part of the API contact \href{mailto:contact@watchwolf.dev?subject=WatchWolf - New extended type}{contact@watchwolf.dev}, or use the \href{https://discord.gg/PCD9MHRJ4W}{Discord} to reserve one of the addresses.
 
 \subsection{Server petition operation} \label{s:server-operation}
 Like the parameter \hyperref[s:operation]{Operation}, it specifies the desired request. For more information, refer to the \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}.
@@ -3518,11 +3555,219 @@ The response of \textit{Spawn entity operation} will be that new entity. It shou
 \caption{Spawn entity response structure}
 \end{figure}
 
-\subsection{Performance operations} \label{g:performance}
+\subsection{Enhanced information operations} \label{g:performance}
+The \textit{enhanced information} operation provides extra data to be used while reviewing your plugin. Right now there's two type of extra information: a video of what's happening in the world (\hyperref[s:place-camera]{place camera}, \hyperref[s:move-camera]{move camera}, and \hyperref[s:stop-camera]{stop recording}), and getting the timings report\footnote{The ``timings report'' specifies what \% of the CPU is being used on each Minecraft command, so you can see performance problems by reviewing that report.} (\myworries{incomplete section}).
+
 \myworries{This section is incomplete. Expect some future work here about measuring the performance of your plugins.}
 
+\subsubsection{Place camera operation}\label{s:place-camera}
+Places a camera in the target location and starts recording.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}} \\
+		\wordbox[lr]{1}{\hyperref[type:position]{position}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:double]{pitch}\xfootnotemark} \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[ltr]{1}{\hyperref[type:double]{yaw}\xfootnotemark} \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Place camera operation structure}
+\end{figure}
+
+\xfootnotetext{Minecraft's pitch is the vertical direction the user is looking at. It goes from 90 (down), to 0 (horizontal), to -90 (up).\label{foot:pitch}}
+
+\xfootnotetext{Minecraft's yaw is the horizontal direction the user is looking at. A value of 0 means south, 90 west, $\pm$180 north, and -90 east.\label{foot:yaw}}
+
+\subsubsection{Place camera response}
+The response of \textit{Place camera operation} will be the ID of the placed camera.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}} \\
+		\bitbox{16}{camera ID} & \bitbox[lr]{16}[bgcolor=lightgray]{}
+	\end{bytefield}
+	\caption{Place camera response structure}
+\end{figure}
+
+\subsubsection{Move camera operation}\label{s:move-camera}
+Moves an already placed camera into the target location.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0002}} \\
+	\bitbox{16}{camera ID} & \bitbox[lr]{16}{\hyperref[type:position]{position}} \\
+	\wordbox[lr]{1}{} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[ltr]{1}{\hyperref[type:double]{pitch}\textsuperscript{\ref{foot:pitch}}} \\
+	\wordbox[lrb]{1}{} \\
+	\wordbox[ltr]{1}{\hyperref[type:double]{yaw}\textsuperscript{\ref{foot:yaw}}} \\
+	\wordbox[lrb]{1}{} \\
+\end{bytefield}
+\caption{Move camera operation structure}
+\end{figure}
+
+\subsubsection{Stop camera operation}\label{s:stop-camera}
+Stops a camera and retrieves the recording.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0003}} \\
+	\bitbox{16}{camera ID} & \bitbox[lr]{16}[bgcolor=lightgray]{}
+\end{bytefield}
+\caption{Stop camera operation structure}
+\end{figure}
+
+\subsubsection{Stop camera response}
+The response of \textit{Stop camera operation} will be the recording.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0003}} \\
+	\wordbox[lr]{1}{\hyperref[type:file]{recording}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+\end{bytefield}
+\caption{Stop camera response structure}
+\end{figure}
+
+
+\subsubsection{Start timings report operation}
+Starts the timings report.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0004}}
+	\end{bytefield}
+	\caption{Start timings report operation structure}
+\end{figure}
+
+\subsubsection{Stop timings report operation}
+Stops the timings report and retrieves \myworries{the raw file}.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0005}}
+	\end{bytefield}
+	\caption{Stop timings report operation structure}
+\end{figure}
+
+\subsubsection{Stop timings report response}
+The response of \textit{Stop timings operation} will be that report.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0005}} \\
+		\wordbox[lr]{1}{\hyperref[type:file]{report}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Stop timings report response structure}
+\end{figure}
+
 \subsection{WorldGuard operations} \label{g:worldguard}
-\myworries{This section is incomplete. Expect some future work here about creating WorldGuard regions.}
+In this section you'll find some operations to interact with WorldGuard directly with the WatchWolf framework.
+
+\myworries{Some more methods may be needed to fully support WorldGuard's functionalities. You can request them over the \href{https://discord.gg/PCD9MHRJ4W}{Discord}.}
+
+\subsubsection{Create region operation}
+Creates a rectangular region.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{region name}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[lr]{1}{\hyperref[type:position]{first coordinate}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[lr]{1}{\hyperref[type:position]{second coordinate}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Create region operation structure}
+\end{figure}
+
+\subsubsection{Get regions operation}
+Lists all the WorldGuard regions.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0002}}
+	\end{bytefield}
+	\caption{Get regions operation structure}
+\end{figure}
+
+\subsubsection{Get regions response}
+The response of \textit{Get regions operation}. You'll get the name of all the regions.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0002}} \\
+	\wordbox[lr]{1}{\hyperref[type:array]{array of region names}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+\end{bytefield}
+\caption{Get regions response structure}
+\end{figure}
+
+\subsubsection{Get regions at position operation}
+Lists all the WorldGuard regions in one position.
+
+WorldGuard allows multiple regions/sub-regions to overlap, so it may be possible to get more than one.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0003}} \\
+		\wordbox[lr]{1}{\hyperref[type:position]{block}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Get regions at position operation structure}
+\end{figure}
+
+\subsubsection{Get regions at position response}
+The response of \textit{Get regions at position operation}. You'll get the name of all the regions present in that block.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0003}} \\
+		\wordbox[lr]{1}{\hyperref[type:array]{array of region names}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Get regions at position response structure}
+\end{figure}
 
 \subsection{Residence operations} \label{g:residence}
 \myworries{This section is incomplete. Expect some future work here about creating Residence regions.}
@@ -3729,10 +3974,10 @@ Move the player's camera.
 \begin{bytefield}{32}
 	\bitheader{0,2,3,4,15,16,31} \\
 	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001000}} & \bitbox[lrt]{16}{} \\
-	\wordbox[lr]{1}{\hyperref[type:double]{pitch}} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{pitch}\textsuperscript{\ref{foot:pitch}}} \\
 	\skippedwords \\
 	\wordbox[lrb]{1}{} \\
-	\wordbox[lr]{1}{\hyperref[type:double]{yaw}} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{yaw}\textsuperscript{\ref{foot:yaw}}} \\
 	\skippedwords \\
 	\wordbox[lrb]{1}{}
 \end{bytefield}
@@ -3820,6 +4065,69 @@ Attack (1 hit) one entity with the current held item.
 \caption{Place block petition structure}
 \end{figure}
 
+\subsection{Change fly status operation}
+Only while in creative. Sets the fly status.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,23,24,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001110}} & \bitbox{8}{\hyperref[type:bool]{is flying}} & \bitbox[lr]{8}[bgcolor=lightgray]{}
+\end{bytefield}
+\caption{Change fly status petition structure}
+\end{figure}
+
+\subsection{Start recording operation}
+Start to record the client's actions.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001111}}
+\end{bytefield}
+\caption{Start recording petition structure}
+\end{figure}
+
+\subsection{Start recording response}
+As a response of the \textit{Start recording operation}, you'll get the camera ID.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000001111}} & \bitbox{16}{camera ID}
+\end{bytefield}
+\caption{Start recording petition response structure}
+\end{figure}
+
+\subsection{Stop recording operation}
+Stop recording the client's actions.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000010000}} & \bitbox{16}{camera ID}
+\end{bytefield}
+\caption{Stop recording petition structure}
+\end{figure}
+
+\subsection{Stop recording response}
+As a response of the \textit{Start recording operation}, you'll get the recording.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000010000}} & \bitbox[tlr]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:file]{recording}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+\end{bytefield}
+\caption{Stop recording petition response structure}
+\end{figure}
+
 \section{Revision history}
 \begin{table}[H]
 	\centering
@@ -3828,7 +4136,11 @@ Attack (1 hit) one entity with the current held item.
 		Date & Revision & WatchWolf version & Changes \\
 		\hline
 		18/03/2023 & 1 & v0.1.15 & Initial public release. \\
+		\hline
 		28/03/2023 & 2 & v0.1.16 & Updated API according to the beta feedback. \\
+		\hline
+		31/05/2023 & 3 & v0.2.0 & Added cameras, player's \textit{change fly status} operation, \\
+						 &  &  & (some of the) timings operations \& WorldGuard operations. \\
 		\hline
 	\end{tabular}
 	\caption{Revision history}
