@@ -3065,7 +3065,7 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 % Extended types NOP's footnote
 \footnotetext{As stated on the  \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}, the all-zeroes operation represents a NOP request.}
 
-If you've implemented an extended type and you believe that it makes sense to be part of the standard contact \href{mailto:contact@watchwolf.dev?subject=WatchWolf - New extended type}{contact@watchwolf.dev} to reserve one of the addresses.
+If you've implemented an extended type and you believe that it makes sense to be part of the API contact \href{mailto:contact@watchwolf.dev?subject=WatchWolf - New extended type}{contact@watchwolf.dev}, or use the \href{https://discord.gg/PCD9MHRJ4W}{Discord} to reserve one of the addresses.
 
 \subsection{Server petition operation} \label{s:server-operation}
 Like the parameter \hyperref[s:operation]{Operation}, it specifies the desired request. For more information, refer to the \hyperref[s:operation]{subsection \getrefnumber{s:operation}, Operation}.
@@ -3644,8 +3644,130 @@ The response of \textit{Stop camera operation} will be the recording.
 \caption{Stop camera response structure}
 \end{figure}
 
+
+\subsubsection{Start timings report operation}
+Starts the timings report.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0004}}
+	\end{bytefield}
+	\caption{Start timings report operation structure}
+\end{figure}
+
+\subsubsection{Stop timings report operation}
+Stops the timings report and retrieves \myworries{the raw file}.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0005}}
+	\end{bytefield}
+	\caption{Stop timings report operation structure}
+\end{figure}
+
+\subsubsection{Stop timings report response}
+The response of \textit{Stop timings operation} will be that report.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000010}} & \bitbox{16}{\hyperref[s:server-operation]{0x0005}} \\
+		\wordbox[lr]{1}{\hyperref[type:file]{report}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Stop timings report response structure}
+\end{figure}
+
 \subsection{WorldGuard operations} \label{g:worldguard}
-\myworries{This section is incomplete. Expect some future work here about creating WorldGuard regions.}
+In this section you'll find some operations to interact with WorldGuard directly with the WatchWolf framework.
+
+\myworries{Some more methods may be needed to fully support WorldGuard's functionalities. You can request them over the \href{https://discord.gg/PCD9MHRJ4W}{Discord}.}
+
+\subsubsection{Create region operation}
+Creates a rectangular region.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0001}} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{region name}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[lr]{1}{\hyperref[type:position]{first coordinate}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+		\wordbox[lr]{1}{\hyperref[type:position]{second coordinate}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Create region operation structure}
+\end{figure}
+
+\subsubsection{Get regions operation}
+Lists all the WorldGuard regions.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0002}}
+	\end{bytefield}
+	\caption{Get regions operation structure}
+\end{figure}
+
+\subsubsection{Get regions response}
+The response of \textit{Get regions operation}. You'll get the name of all the regions.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0002}} \\
+	\wordbox[lr]{1}{\hyperref[type:array]{array of region names}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{} \\
+\end{bytefield}
+\caption{Get regions response structure}
+\end{figure}
+
+\subsubsection{Get regions at position operation}
+Lists all the WorldGuard regions in one position.
+
+WorldGuard allows multiple regions/sub-regions to overlap, so it may be possible to get more than one.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0003}} \\
+		\wordbox[lr]{1}{\hyperref[type:position]{block}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Get regions at position operation structure}
+\end{figure}
+
+\subsubsection{Get regions at position response}
+The response of \textit{Get regions at position operation}. You'll get the name of all the regions present in that block.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15,16,31} \\
+		\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000011}} & \bitbox{16}{\hyperref[s:server-operation]{0x0003}} \\
+		\wordbox[lr]{1}{\hyperref[type:array]{array of region names}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{} \\
+	\end{bytefield}
+	\caption{Get regions at position response structure}
+\end{figure}
 
 \subsection{Residence operations} \label{g:residence}
 \myworries{This section is incomplete. Expect some future work here about creating Residence regions.}
