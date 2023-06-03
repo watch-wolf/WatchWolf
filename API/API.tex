@@ -2826,6 +2826,7 @@ This operation allows WatchWolf Tester to start a server. It provides high custo
 		\wordbox[ltr]{1}{\hyperref[type:plugins]{plugins}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{} \\
+		\bitbox{8}{\hyperref[type:world-type]{world type}} & \bitbox[lrt]{24}{} \\
 		\wordbox[lr]{1}{\hyperref[type:maps]{maps}} \\
 		\skippedwords \\
 		\wordbox[lrb]{1}{} \\
@@ -2867,6 +2868,23 @@ If it's not possible to create it (for example: one argument is invalid, the use
 
 % start-error-response-structure size footnote
 \footnotetext{Being the argument an array, the first 2 bytes specifies its size. As we must return an empty array, the argument should be exactly 16 zeroes.}
+
+\subsubsection{World type}\label{type:world-type}
+Minecraft can generate regular worlds, or superflat ones. Use this property to select the desired one.
+
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{ |c|c| }
+		\hline
+		type & Meaning \\
+		\hline
+		0 & Default \\
+		1 & Flat \\
+		\hline
+	\end{tabular}
+	\caption{World types}
+\end{table}
 
 \subsubsection{Maps}\label{type:maps}
 Array of maps (worlds; Map[]). To have more information about arrays check the \hyperref[type:array]{subsection \ref{type:array}, Array}.
@@ -3015,6 +3033,36 @@ The \textit{Error notification} will contain the full stack trace of the raised 
 %\end{bytefield}
 %\caption{Get coverage response structure}
 %\end{figure}
+
+
+\subsection{Get version operation}
+
+Get the WatchWolf version of the servers manager.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{16}
+		\bitheader{0,2,3,4,15} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b111111111111}}
+	\end{bytefield}
+	\caption{Get version operation structure}
+\end{figure}
+
+\subsection{Get version response}
+
+The response of \textit{Get version operation} will be the WatchWolf version.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15} \\
+		\bitbox{3}{\hyperref[s:dst]{0b000}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b111111111111}} & \bitbox[tlr]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{version}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Get version response structure}
+\end{figure}
 
 \section{Server petition} \label{s:server-petition}
 WathcWolf Server is a Minecraft plugin embedded in a \acrshort{mc} server. It will notify to the Servers manager that the server is ready, and perform all the \acrshort{mc} server-related requests.
@@ -3555,6 +3603,46 @@ The response of \textit{Spawn entity operation} will be that new entity. It shou
 \caption{Spawn entity response structure}
 \end{figure}
 
+\subsubsection{Change difficulty operation}
+Change the server difficulty. You can set it to peaceful (0), easy (1), normal (2) and hard (3).
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0013}} \\
+	\bitbox{16}{difficulty} & \bitbox[lr]{16}[bgcolor=lightgray]{}
+\end{bytefield}
+\caption{Change difficulty operation structure}
+\end{figure}
+
+\subsubsection{Get version operation}
+Get the WatchWolf version of the server.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0xFFFF}}
+\end{bytefield}
+\caption{Get version operation structure}
+\end{figure}
+
+\subsubsection{Get version response}
+The response of \textit{Get version operation} will be the WatchWolf version.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0xFFFF}} \\
+	\wordbox[lr]{1}{\hyperref[type:str]{version}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get version response structure}
+\end{figure}
+
 \subsection{Enhanced information operations} \label{g:performance}
 The \textit{enhanced information} operation provides extra data to be used while reviewing your plugin. Right now there's two type of extra information: a video of what's happening in the world (\hyperref[s:place-camera]{place camera}, \hyperref[s:move-camera]{move camera}, and \hyperref[s:stop-camera]{stop recording}), and getting the timings report\footnote{The ``timings report'' specifies what \% of the CPU is being used on each Minecraft command, so you can see performance problems by reviewing that report.} (\myworries{incomplete section}).
 
@@ -3822,6 +3910,35 @@ As a response to the \textit{Start client operation}, you'll get the IP (IP \& p
 	\wordbox[lrb]{1}{}
 \end{bytefield}
 \caption{Client started petition response structure}
+\end{figure}
+
+\subsection{Get version operation}
+
+Get the WatchWolf version of the clients manager.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{16}
+		\bitheader{0,2,3,4,15} \\
+		\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b111111111111}}
+	\end{bytefield}
+	\caption{Get version operation structure}
+\end{figure}
+
+\subsection{Get version response}
+
+The response of \textit{Get version operation} will be the WatchWolf version.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15} \\
+		\bitbox{3}{\hyperref[s:dst]{0b010}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b111111111111}} & \bitbox[tlr]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{version}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Get version response structure}
 \end{figure}
 
 \section{Client petition}\label{s:client-petition}
@@ -4128,6 +4245,35 @@ As a response of the \textit{Start recording operation}, you'll get the recordin
 \caption{Stop recording petition response structure}
 \end{figure}
 
+\subsection{Get version operation}
+
+Get the WatchWolf version of the client.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{16}
+		\bitheader{0,2,3,4,15} \\
+		\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b111111111111}}
+	\end{bytefield}
+	\caption{Get version operation structure}
+\end{figure}
+
+\subsection{Get version response}
+
+The response of \textit{Get version operation} will be the WatchWolf version.
+
+\begin{figure}[H]
+	\centering
+	\begin{bytefield}{32}
+		\bitheader{0,2,3,4,15} \\
+		\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[g:base]{0b111111111111}} & \bitbox[tlr]{16}{} \\
+		\wordbox[lr]{1}{\hyperref[type:str]{version}} \\
+		\skippedwords \\
+		\wordbox[lrb]{1}{}
+	\end{bytefield}
+	\caption{Get version response structure}
+\end{figure}
+
 \section{Revision history}
 \begin{table}[H]
 	\centering
@@ -4141,6 +4287,8 @@ As a response of the \textit{Start recording operation}, you'll get the recordin
 		\hline
 		31/05/2023 & 3 & v0.2.0 & Added cameras, player's \textit{change fly status} operation, \\
 						 &  &  & (some of the) timings operations \& WorldGuard operations. \\
+		\hline
+		03/06/2023 & 4 & v0.2.0 & Check version, specify world type, and set difficulty. \\
 		\hline
 	\end{tabular}
 	\caption{Revision history}
