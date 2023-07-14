@@ -3099,10 +3099,8 @@ The 0b000000000001 group represents the 'base group'. This group implements some
 		\hline
 		0 & 0b00000000000 & NOP\footnotemark \\
 		0 & 0b00000000001 & \hyperref[g:base]{Base operations} \\
-		0 & 0b00000000010 & \hyperref[g:system]{System operations} \\
-		0 & 0b00000000011 & \hyperref[g:performance]{Performance operations} \\
-		0 & 0b00000010000 & \hyperref[g:worldguard]{WorldGuard operations} \\
-		0 & 0b00000010001 & \hyperref[g:residence]{Residence operations} \\
+		0 & 0b00000000010 & \hyperref[g:system]{Enhanced information operations} \\
+		0 & 0b00000000011 & \hyperref[g:worldguard]{WorldGuard operations} \\
 		\hline
 		1 &   XXXXXXXXXXX & Reserved for internal use \\
 		\hline
@@ -3612,6 +3610,19 @@ Change the server difficulty. You can set it to peaceful (0), easy (1), normal (
 	\bitheader{0,2,3,4,15,16,31} \\
 	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0013}} \\
 	\bitbox{16}{difficulty} & \bitbox[lr]{16}[bgcolor=lightgray]{}
+\end{bytefield}
+\caption{Change difficulty operation structure}
+\end{figure}
+
+\subsubsection{Set invulnerable operation}
+Allows players to be invincible from damage events like mobs hitting them, fall damage, burning... All except a player attacking another player.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0014}} \\
+	\bitbox{8}{\hyperref[type:bool]{invulnerable}} & \bitbox[lr]{24}[bgcolor=lightgray]{}
 \end{bytefield}
 \caption{Change difficulty operation structure}
 \end{figure}
@@ -4189,7 +4200,7 @@ Only while in creative. Sets the fly status.
 \centering
 \begin{bytefield}{32}
 	\bitheader{0,2,3,4,15,16,23,24,31} \\
-	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001110}} & \bitbox{8}{\hyperref[type:bool]{is flying}} & \bitbox[lr]{8}[bgcolor=lightgray]{}
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000001110}} & \bitbox{8}{\hyperref[type:bool]{is flying}} & \bitbox{8}[bgcolor=lightgray]{}
 \end{bytefield}
 \caption{Change fly status petition structure}
 \end{figure}
