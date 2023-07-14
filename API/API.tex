@@ -3614,8 +3614,8 @@ Change the server difficulty. You can set it to peaceful (0), easy (1), normal (
 \caption{Change difficulty operation structure}
 \end{figure}
 
-\subsubsection{Set invulnerable operation}
-Allows players to be invincible from damage events like mobs hitting them, fall damage, burning... All except a player attacking another player.
+\subsubsection{Set invulnerable mode operation}
+Allows all players to be invincible from damage events like mobs hitting them, fall damage, burning... All except a player attacking another player.
 
 \begin{figure}[H]
 \centering
@@ -3624,7 +3624,7 @@ Allows players to be invincible from damage events like mobs hitting them, fall 
 	\bitbox{3}{\hyperref[s:dst]{0b001}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[g:base]{0b000000000001}} & \bitbox{16}{\hyperref[s:server-operation]{0x0014}} \\
 	\bitbox{8}{\hyperref[type:bool]{invulnerable}} & \bitbox[lr]{24}[bgcolor=lightgray]{}
 \end{bytefield}
-\caption{Change difficulty operation structure}
+\caption{Set invulnerable mode operation structure}
 \end{figure}
 
 \subsubsection{Get version operation}
@@ -4300,6 +4300,8 @@ The response of \textit{Get version operation} will be the WatchWolf version.
 						 &  &  & (some of the) timings operations \& WorldGuard operations. \\
 		\hline
 		03/06/2023 & 4 & v0.2.0 & Check version, specify world type, and set difficulty. \\
+		\hline
+		14/07/2023 & 5 & v0.2.0 & Added invulnerability mode. \\
 		\hline
 	\end{tabular}
 	\caption{Revision history}
