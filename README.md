@@ -4,6 +4,9 @@
 ## Standard
 The standard can be seen [here](https://github.com/watch-wolf/WatchWolf/blob/main/Standard/Protocols.pdf). Also, you can see a full implementation example in [WatchWolf-Tester](https://github.com/rogermiranda1000/WatchWolf-Tester), [WatchWolf-ServersManager](https://github.com/rogermiranda1000/WatchWolf-ServersManager), [WatchWolf-Server](https://github.com/rogermiranda1000/WatchWolf-Server), and [WatchWolf-Client](https://github.com/rogermiranda1000/WatchWolf-Client).
 
+### Definitions to HTML
+To convert the API definitions to docs, run `TODO`
+
 ### Build PDF
 `pdflatex -synctex=1 -interaction=nonstopmode %.tex|bibtex "Protocols"|makeglossaries %|pdflatex -synctex=1 -interaction=nonstopmode %.tex|pdflatex -synctex=1 -interaction=nonstopmode %.tex`
 

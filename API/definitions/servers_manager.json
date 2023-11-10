@@ -1,0 +1,99 @@
+{
+    "WatchWolfComponent": {
+        "name": "Servers Manager",
+        "description": "The Servers manager is the responsible for starting the servers with the desired configuration.",
+
+        "DestinyId": 0,
+
+        "petitions": [
+            {
+                "name": "No OPeration",
+                "description": "Do nothing; just send a packet.",
+                "FunctionName": "nop",
+
+                "contents": [
+                    {
+                        "type": "_operation",
+                        "value": 0
+                    }
+                ]
+            },
+            {
+                "name": "Start Server",
+                "description": "This operation allows WatchWolf Tester to start a server. It provides high customization, as you can specify plugins, worlds and config files (among other parameters).\nOnce a 'start server' request is received the program should create a server with the specified arguments, and return its IP:Port. The IP to send the Server Petitions is the same, but the next port (IP:<port+1>).",
+                "FunctionName": "startServer",
+
+                "contents": [
+                    {
+                        "type": "_operation",
+                        "value": 1
+                    },
+                    {
+                        "name": "server type",
+                        "type": "ServerType",
+                        "description": "Type of server to start."
+                    },
+                    {
+                        "name": "server version",
+                        "type": "String",
+                        "description": "Server version to start."
+                    },
+                    {
+                        "name": "plugins",
+                        "type": "Plugin[]",
+                        "description": "Plugins to add to the server."
+                    },
+                    {
+                        "name": "maps",
+                        "type": "Map[]",
+                        "description": "Maps to load to the server."
+                    },
+                    {
+                        "name": "config files",
+                        "type": "File[]",
+                        "description": "Additional server config files."
+                    }
+                ],
+                
+                "return": {
+                    "type": "String",
+                    "description": "Started server IP.\nIf it's not possible to create it (for example: one argument is invalid, the user sent a plugin when it's specified that only Usual Plugins are allowed, or there's no free servers of that type), then an empty string is returned."
+                }
+            }
+        ],
+
+        "AsyncReturns": [
+            {
+                "name": "Server Started",
+                "description": "The requested server was started successfully.",
+                "FunctionName": "serverStarted",
+
+                "RelatesTo": "startServer",
+
+                "contents": [
+                    {
+                        "type": "_operation",
+                        "value": 2
+                    }
+                ]
+            },
+            {
+                "name": "Exception",
+                "description": "The Error notification is an async petition that it is sent to the WatchWolf Tester orchestrator as a response, without any previous petition.",
+                "FunctionName": "capturedException",
+
+                "contents": [
+                    {
+                        "type": "_operation",
+                        "value": 3
+                    },
+                    {
+                        "name": "exception",
+                        "type": "String",
+                        "description": "Full stack trace of the raised error captured by the server console."
+                    }
+                ]
+            }
+        ]
+    }
+}
