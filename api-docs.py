@@ -15,6 +15,12 @@ class Petition:
         self.function_name = function_name
         self.svg_code = svg_code
 
+def _contentToEntry(content: json) -> str:
+    if content["type"] == "String" or content["type"] == "ServerType" or content["type"][-2:] == '[]': # arrays
+        return "(draw-gap \"" + content["name"] + "\")"
+
+    raise Exception(f"Unrecognised type: '{content["type"]}'")
+
 def _formatJSON(data: json) -> List[Petition]:
     to_process = [ (petition,False) for petition in data["WatchWolfComponent"]["petitions"] ] + \
                 [ (petition,True) for petition in data["WatchWolfComponent"]["AsyncReturns"] ]
@@ -24,11 +30,18 @@ def _formatJSON(data: json) -> List[Petition]:
     for petition,is_async_return in to_process:
         current = "(draw-column-headers)\n"
 
-        current += "(draw-box \"0b" + "%03d" % data["WatchWolfComponent"]["DestinyId"] + "\" {:span 3})\n"
+        current += "(draw-box \"0b" + '{0:03b}'.format(data["WatchWolfComponent"]["DestinyId"]) + "\" {:span 3})\n"
         current += "(draw-box \"" + ('1' if is_async_return else '0') + "\")\n"
+        assert len(petition["contents"]) > 0 and petition["contents"][0]["type"] == "_operation"
+        current += "(draw-box \"0b" + '{0:012b}'.format(petition["contents"][0]["value"]) + "\" {:span 12})\n"
+
+        for content in petition["contents"][1:]:
+            current += _contentToEntry(content)
 
         current += "(draw-bottom)"
         r.append(Petition('AsyncReturn' if is_async_return else 'petition', petition["FunctionName"], current))
+
+    # TODO add `wrap-link` to refere to docs
 
     return r
 

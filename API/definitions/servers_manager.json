@@ -56,8 +56,13 @@
                 ],
                 
                 "return": {
-                    "type": "String",
-                    "description": "Started server IP.\nIf it's not possible to create it (for example: one argument is invalid, the user sent a plugin when it's specified that only Usual Plugins are allowed, or there's no free servers of that type), then an empty string is returned."
+                    "contents": [
+                        {
+                            "name": "IP",
+                            "type": "String",
+                            "description": "Started server IP and port.\nIf it's not possible to create it (for example: one argument is invalid, the user sent a plugin when it's specified that only Usual Plugins are allowed, or there's no free servers of that type), then an empty string is returned."
+                        }
+                    ]
                 }
             }
         ],
