@@ -2,7 +2,7 @@ FROM nikolaik/python-nodejs
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
-RUN pip3 install javascript==1!1.0.0
+RUN pip3 install javascript==1!1.0.0 pathlib
 RUN npm install --save bytefield-svg
 
 COPY api-docs.py api-docs.py
