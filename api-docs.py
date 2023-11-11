@@ -41,6 +41,20 @@ def _formatJSON(data: json) -> List[Petition]:
         current += "(draw-bottom)"
         r.append(Petition('AsyncReturn' if is_async_return else 'petition', petition["FunctionName"], current))
 
+        if not is_async_return and "return" in petition:
+            # we have to add the return to the operation
+            current = "(draw-column-headers)\n"
+
+            current += "(draw-box \"0b" + '{0:03b}'.format(data["WatchWolfComponent"]["DestinyId"]) + "\" {:span 3})\n"
+            current += "(draw-box \"1\")\n"
+            current += "(draw-box \"0b" + '{0:012b}'.format(petition["contents"][0]["value"]) + "\" {:span 12})\n"
+
+            for content in petition["return"]["contents"]:
+                current += _contentToEntry(content)
+
+            current += "(draw-bottom)"
+            r.append(Petition('PetitionReturn', petition["FunctionName"], current))
+
     # TODO add `wrap-link` to refere to docs
 
     return r
