@@ -2,6 +2,7 @@
     "WatchWolfComponent": {
         "name": "Servers Manager",
         "description": "The Servers manager is the responsible for starting the servers with the desired configuration.",
+        "version": "0.1.16",
 
         "DestinyId": 0,
 

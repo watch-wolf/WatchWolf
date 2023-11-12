@@ -59,10 +59,10 @@ def _formatJSON(data: json) -> List[Petition]:
 
     return r
 
-def generateSVG(component: str, out: str):
+def generateSVG(componentPath: str, out: str):
     Path(out).mkdir(parents=True, exist_ok=True)
 
-    with open(component) as f:
+    with open(componentPath) as f:
         c = json.load(f)
     sources = _formatJSON(c)
     for source in sources:
@@ -72,13 +72,88 @@ def generateSVG(component: str, out: str):
         with open(source_out_path, "w") as f:
             f.write(diagram)
 
+def _generateComponentsDescriptor(contents: List[json]) -> str:
+    if len(contents) > 0 and contents[0]["type"] == "_operation":
+        contents = contents[1:]
+
+    if len(contents) == 0:
+        return ""
+
+    r = "<table class='componentsDescriptor'>\n"
+    r += "<thead>\n<tr>\n"
+    r += "<th>Argument</th>\n"
+    r += "<th>Type</th>\n"
+    r += "<th>Description</th>\n"
+    r += "</tr>\n</thead>\n"
+
+    r += "<tbody>\n"
+    for arg in contents:
+        r += "<tr>\n"
+
+        r += f"<td>{arg["name"]}</td>\n"
+        r += f"<td>{arg["type"]}</td>\n"
+        r += f"<td>{arg["description"]}</td>\n" # TODO replace inner '\n' by '<br>'?
+
+        r += "</tr>\n"
+    r += "</tbody>\n"
+
+    r += "</table>\n"
+    return r
+
+def generateMD(componentPath: str, remoteSvgPath: str, out: str):
+    with open(componentPath) as f:
+        c = json.load(f)
+    with open(out, "w") as f:
+        f.write("<!-- This .md file was auto-generated; Do not modify. -->")
+        f.write(f"{c["WatchWolfComponent"]["name"]}\n")
+        f.write(("=" * len(c["WatchWolfComponent"]["name"])) + '\n')
+        f.write(f"{c["WatchWolfComponent"]["description"]}\n")
+        
+        f.write("\n\nPetitions\n")
+        f.write("---------\n")
+
+        idToName = {}
+        for petition in c["WatchWolfComponent"]["petitions"]:
+            idToName[petition["FunctionName"]] = petition["name"]
+
+            f.write(f"\n\n### {petition["name"]}\n")
+            f.write(f"{petition["description"]}\n")
+
+            f.write(f"![{c["WatchWolfComponent"]["name"]} - {petition["name"]} petition]({remoteSvgPath}/petition_{petition["FunctionName"]}.svg)\n")
+
+            f.write(_generateComponentsDescriptor(petition["contents"]))
+            
+            if "return" in petition:
+                f.write(f"\n#### {petition["name"]} return\n")
+                if "description" in petition["return"]:
+                    f.write(f"{petition["return"]["description"]}\n")
+
+                f.write(f"![{c["WatchWolfComponent"]["name"]} - {petition["name"]} petition]({remoteSvgPath}/PetitionReturn_{petition["FunctionName"]}.svg)\n")
+
+                f.write(_generateComponentsDescriptor(petition["return"]["contents"]))
+        
+        f.write("\n\nAsync Returns\n")
+        f.write("-------------\n")
+
+        for petition in c["WatchWolfComponent"]["AsyncReturns"]:
+            f.write(f"\n\n### {petition["name"]}\n")
+            f.write(f"{petition["description"]}\n")
+            if "RelatesTo" in petition:
+                f.write(f"<span class='relatesTo'>This return is sent as a response for calling <a href='javascript:void(0);'>{petition["RelatesTo"] if not petition["RelatesTo"] in idToName else idToName[petition["RelatesTo"]]}</a></span>\n") # TODO href reference
+
+            f.write(f"![{c["WatchWolfComponent"]["name"]} - {petition["name"]} petition]({remoteSvgPath}/AsyncReturn_{petition["FunctionName"]}.svg)\n")
+
+            f.write(_generateComponentsDescriptor(petition["contents"]))
+
 def main():
     components_path = './API/definitions'
     components = [ os.path.join(components_path, f) for f in os.listdir(components_path) if f.endswith('.json') ]
     
     for component in components:
         svgFolder = component[:component.rfind('.')]
+        mdPath = component[:component.rfind('.')] + '.md'
         generateSVG(component, svgFolder)
+        generateMD(component, 'https://watchwolf.dev/assets/javadocs/api/' + component[component.find('/')+1:component.rfind('.')], mdPath)
 
 if __name__ == '__main__':
     main()
