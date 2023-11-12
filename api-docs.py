@@ -15,6 +15,12 @@ class Petition:
         self.function_name = function_name
         self.svg_code = svg_code
 
+def htmlParser(text: str) -> str:
+    text = text.replace('<', '&lt;')
+    text = text.replace('>', '&gt;')
+    text = text.replace('\n', '<br/>')
+    return text
+
 def _contentToEntry(content: json) -> str:
     if content["type"] == "String" or content["type"] == "ServerType" or content["type"][-2:] == '[]': # arrays
         return "(draw-gap \"" + content["name"] + "\")"
@@ -92,7 +98,7 @@ def _generateComponentsDescriptor(contents: List[json]) -> str:
 
         r += f"<td>{arg["name"]}</td>\n"
         r += f"<td>{arg["type"]}</td>\n"
-        r += f"<td>{arg["description"]}</td>\n" # TODO replace inner '\n' by '<br>'?
+        r += f"<td>{htmlParser(arg["description"])}</td>\n" # TODO replace inner '\n' by '<br>'?
 
         r += "</tr>\n"
     r += "</tbody>\n"
@@ -107,7 +113,7 @@ def generateMD(componentPath: str, remoteSvgPath: str, out: str):
         f.write("<!-- This .md file was auto-generated; Do not modify. -->")
         f.write(f"{c["WatchWolfComponent"]["name"]}\n")
         f.write(("=" * len(c["WatchWolfComponent"]["name"])) + '\n')
-        f.write(f"{c["WatchWolfComponent"]["description"]}\n")
+        f.write(f"{htmlParser(c["WatchWolfComponent"]["description"])}\n")
         
         f.write("\n\nPetitions\n")
         f.write("---------\n")
@@ -117,7 +123,7 @@ def generateMD(componentPath: str, remoteSvgPath: str, out: str):
             idToName[petition["FunctionName"]] = petition["name"]
 
             f.write(f"\n\n### {petition["name"]}\n")
-            f.write(f"{petition["description"]}\n")
+            f.write(f"{htmlParser(petition["description"])}\n")
 
             f.write(f"![{c["WatchWolfComponent"]["name"]} - {petition["name"]} petition]({remoteSvgPath}/petition_{petition["FunctionName"]}.svg)\n")
 
@@ -126,7 +132,7 @@ def generateMD(componentPath: str, remoteSvgPath: str, out: str):
             if "return" in petition:
                 f.write(f"\n#### {petition["name"]} return\n")
                 if "description" in petition["return"]:
-                    f.write(f"{petition["return"]["description"]}\n")
+                    f.write(f"{htmlParser(petition["return"]["description"])}\n")
 
                 f.write(f"![{c["WatchWolfComponent"]["name"]} - {petition["name"]} petition]({remoteSvgPath}/PetitionReturn_{petition["FunctionName"]}.svg)\n")
 
@@ -137,9 +143,9 @@ def generateMD(componentPath: str, remoteSvgPath: str, out: str):
 
         for petition in c["WatchWolfComponent"]["AsyncReturns"]:
             f.write(f"\n\n### {petition["name"]}\n")
-            f.write(f"{petition["description"]}\n")
+            f.write(f"{htmlParser(petition["description"])}\n")
             if "RelatesTo" in petition:
-                f.write(f"<span class='relatesTo'>This return is sent as a response for calling <a href='javascript:void(0);'>{petition["RelatesTo"] if not petition["RelatesTo"] in idToName else idToName[petition["RelatesTo"]]}</a></span>\n") # TODO href reference
+                f.write(f"<span class='relatesTo'>This return is sent as a response for calling <a href='javascript:void(0);'>{petition["RelatesTo"] if not petition["RelatesTo"] in idToName else idToName[petition["RelatesTo"]]}</a>.</span>\n") # TODO href reference
 
             f.write(f"![{c["WatchWolfComponent"]["name"]} - {petition["name"]} petition]({remoteSvgPath}/AsyncReturn_{petition["FunctionName"]}.svg)\n")
 
