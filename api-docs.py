@@ -153,7 +153,7 @@ def main():
         svgFolder = component[:component.rfind('.')]
         mdPath = component[:component.rfind('.')] + '.md'
         generateSVG(component, svgFolder)
-        generateMD(component, 'https://watchwolf.dev/assets/javadocs/api/' + component[component.find('/')+1:component.rfind('.')], mdPath)
+        generateMD(component, 'https://watchwolf.dev/assets/javadocs/api/' + component[component.rfind('/')+1:component.rfind('.')], mdPath)
 
 if __name__ == '__main__':
     main()
