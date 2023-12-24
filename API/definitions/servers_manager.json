@@ -45,6 +45,11 @@
                         "description": "Plugins to add to the server."
                     },
                     {
+                        "name": "world type",
+                        "type": "WorldType",
+                        "description": "Defines if the world needs to be a regular one, or superflat."
+                    },
+                    {
                         "name": "maps",
                         "type": "Map[]",
                         "description": "Maps to load to the server."
