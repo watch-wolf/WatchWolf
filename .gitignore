@@ -7,3 +7,5 @@ A-Blocks.*
 !A-Blocks.tex
 diagram.*
 !diagram.tex
+!api-docs.py
+!api-docs.Dockerfile
