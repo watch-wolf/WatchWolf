@@ -50,6 +50,11 @@
                         "description": "Defines if the world needs to be a regular one, or superflat."
                     },
                     {
+                        "name": "seed",
+                        "type": "String",
+                        "description": "Defines the world seed.\nSet an empty string for it to be random."
+                    },
+                    {
                         "name": "maps",
                         "type": "Map[]",
                         "description": "Maps to load to the server."
