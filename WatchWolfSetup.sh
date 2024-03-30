@@ -33,6 +33,8 @@ fi
 
 # target paths
 servers_manager_path="$base_path/ServersManager"
+server_builders_path="$servers_manager_path/src/tools"
+servers_manager_ci_path="$servers_manager_path/ci/release"
 clients_manager_path="$base_path/ClientsManager"
 
 # ask for sudo
@@ -55,11 +57,12 @@ case "$opt" in
 		git clone --branch "$branch" https://github.com/rogermiranda1000/WatchWolf-Client.git "$clients_manager_path"
 		
 		# restore back previous servers/plugins (if any)
-		cp -r "$tmpdir/server-types/" "$servers_manager_path" 2>/dev/null
-		cp -r "$tmpdir/usual-plugins/" "$servers_manager_path" 2>/dev/null
+		# keep current files if they are updated in comparison to the old ones
+		cp -r -u "$tmpdir/server-types/" "$servers_manager_path" 2>/dev/null
+		cp -r -u "$tmpdir/usual-plugins/" "$servers_manager_path" 2>/dev/null
 		
-		mkdir -p "$servers_manager_path/server-types/Spigot"
-		mkdir -p "$servers_manager_path/server-types/Paper"
+		mkdir -p "$servers_manager_ci_path/server-types/Spigot"
+		mkdir -p "$servers_manager_ci_path/server-types/Paper"
 
 		if [ `docker -v >/dev/null 2>&1 ; echo $?` -ne 0 ]; then
 			echo "[e] Docker is not installed, or is currently stopped. Check https://docs.docker.com/get-docker/." >&2
@@ -70,19 +73,19 @@ case "$opt" in
 		sudo docker pull openjdk:8
 		sudo docker pull openjdk:16
 		sudo docker pull openjdk:17
-		sudo docker pull ubuntu
 
 		if [ $no_spigot -eq 0 ]; then
-			dos2unix "$servers_manager_path/SpigotBuilder.sh" "$servers_manager_path/PaperBuilder.sh"
+			dos2unix "$server_builders_path/SpigotBuilder.sh" "$server_builders_path/PaperBuilder.sh"
 			
-			source "$servers_manager_path/SpigotBuilder.sh" # getAllVersions/buildVersion
-			source "$servers_manager_path/PaperBuilder.sh" # getAllPaperVersions/buildPaperVersion
+			source "$server_builders_path/SpigotBuilder.sh" # getAllVersions/buildVersion
+			source "$server_builders_path/PaperBuilder.sh" # getAllPaperVersions/buildPaperVersion
 			
 			# download the first <num_processes> Spigot versions
+			echo "[v] Will download Spigot: $(getAllVersions)"
 			num_downloading_containers=`getAllVersions | grep -c $'\n'`
 			num_pending_containers=$(($num_downloading_containers > $num_processes ? $num_downloading_containers - $num_processes : 0))
 			while read version; do
-				buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1
+				buildVersion "$servers_manager_ci_path/server-types/Spigot" "$version" >/dev/null 2>&1
 			done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
 		fi
 
@@ -94,7 +97,7 @@ case "$opt" in
 			# @ref https://github.com/rogermiranda1000/WatchWolf-ServersManager/blob/fdd45da8fa787b201a48ccca565a4e9f1415b7c3/ServersManager.sh#L56
 			spigot_id=`echo "$usual_plugin_url" | grep -o -P '(?<=spigotmc.org/resources/)[^/]+' | grep -o -P '\d+$'`
 			if [ -z "$spigot_id" ]; then
-				wget -O "$servers_manager_path/usual-plugins/$usual_plugin_name" "$usual_plugin_url"
+				wget -O "$servers_manager_ci_path/usual-plugins/$usual_plugin_name" "$usual_plugin_url"
 			else
 				# Spigot plugin; get plugin from Spiget website
 				spigot_plugin_name=`wget -q -O - "https://api.spiget.org/v2/resources/$spigot_id" | jq -r .name`
@@ -107,16 +110,22 @@ case "$opt" in
 				#	usual_plugin_url="https://api.spiget.org/v2/resources/$spigot_id/versions/$spigot_plugin_version/download"
 				#fi
 				
-				wget -O "$servers_manager_path/usual-plugins/$usual_plugin_name" "$usual_plugin_url"
+				wget -O "$servers_manager_ci_path/usual-plugins/$usual_plugin_name" "$usual_plugin_url"
 			fi
-		done <<< `curl -s -N https://watchwolf.dev/api/v1/usual-plugins | jq -c '."usual-plugins" | .[]'` # all usual plugins urls
+		done <<< `curl -k -s -N https://watchwolf.dev/api/v1/usual-plugins | jq -c '."usual-plugins" | .[]'` # all usual plugins urls
 		
 		# WatchWolf Server as usual-plugins
 		watchwolf_server_versions_base_path="https://watchwolf.dev/versions"
-		web_contents=`wget -q -O - "$watchwolf_server_versions_base_path"`
+		web_contents=`wget --no-check-certificate -q -O - "$watchwolf_server_versions_base_path"`
 		higher_version=`echo "$web_contents" | grep -o -P '(?<=WatchWolf-)[\d.]+(?=-)' | sort --reverse --version-sort --field-separator=. | head -1` # get the current higher version
-		higher_version_file=`echo "$web_contents" | grep -o -P "WatchWolf-${higher_version//./\\.}-[\d.]+-[\d.]+\.jar"`
-		wget "$watchwolf_server_versions_base_path/$higher_version_file" -P "$servers_manager_path/usual-plugins"
+		echo "[v] Will download highest WW-Server: $higher_version"
+		higher_version_file=`echo "$web_contents" | grep -o -P "WatchWolf-${higher_version//./\\.}-[\d.]+-(([\d.]+)|(LATEST))\.jar"`
+		wget --no-check-certificate --max-redirect=2 "$watchwolf_server_versions_base_path/$higher_version_file" -P "$servers_manager_ci_path/usual-plugins/"
+
+		# Install WatchWolf ServersManager
+		cd "$servers_manager_ci_path"
+		dos2unix "build.sh"
+		sudo bash "build.sh"
 
 		# ClientsManager dependencies
 		sudo docker pull nikolaik/python-nodejs
@@ -149,6 +158,7 @@ case "$opt" in
 			done
 			# Spigot ended, now wait for Paper
 			
+			echo "[v] Will download Paper: $(getAllPaperVersions)"
 			while read version; do
 				if [ ! -z "$version" ]; then
 					# still versions remaining, and there's a place to run them
@@ -157,7 +167,7 @@ case "$opt" in
 			done <<< "$(getAllPaperVersions)"
 		fi
 		
-		echo -ne '\nWatchWolf built.\n'
+		echo -ne '\n[i] WatchWolf built.\n'
 		;;
 		
 	"install" )
@@ -220,6 +230,7 @@ case "$opt" in
 				fi
 			fi
 		fi
+		echo "[i] WatchWolf installed."
 		;;
 	
 	"uninstall" )
@@ -251,12 +262,12 @@ case "$opt" in
 		echo ""
 		
 		# run ServersManager
-		wsl_mode(){ echo "echo 'Hello world'" | powershell.exe >/dev/null 2>&1; return $?; }
-		get_ip(){ wsl_mode; if [ $? -eq 0 ]; then echo "(Get-NetIPAddress -AddressFamily IPv4 -InterfaceAlias Ethernet).IPAddress" | powershell.exe 2>/dev/null | tail -n2 | head -n1; else hostname -I | awk '{print $1}';fi }
-		sudo docker run --privileged=true -i --rm --name ServersManager -p 8000:8000 -v /var/run/docker.sock:/var/run/docker.sock -v "$servers_manager_path":"$servers_manager_path" --env MACHINE_IP=$(get_ip) --env PUBLIC_IP=$(curl ifconfig.me) --env WSL_MODE=$(wsl_mode ; echo $? | grep -c 0) ubuntu:latest sh -c "echo '[*] Preparing ServersManager...' ; apt-get -qq update ; DEBIAN_FRONTEND=noninteractive apt-get install -y socat docker.io gawk procmail dos2unix jq unzip wget >/dev/null ; echo '[*] ServersManager ready.' ; cd $servers_manager_path ; dos2unix ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh PaperBuilder.sh ConnectorHelper.sh ; chmod +x ServersManager.sh ServersManagerConnector.sh SpigotBuilder.sh PaperBuilder.sh ConnectorHelper.sh ; rm ServersManager.lock 2>/dev/null ; socat -d -d tcp-l:8000,pktinfo,keepalive,keepidle=10,keepintvl=10,keepcnt=100,ignoreeof,fork system:'bash ./ServersManagerConnector.sh'" >/dev/null 2>&1 & disown
+		cd "$servers_manager_ci_path"
+		dos2unix "run.sh"
+		sudo bash "run.sh"
 		
 		# run ClientsManager
-		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 --env MACHINE_IP=$(get_ip) --env PUBLIC_IP=$(curl ifconfig.me) clients-manager:latest >/dev/null 2>&1 & disown
+		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 --env MACHINE_IP=$(hostname -I | awk '{print $1}') --env PUBLIC_IP=$(curl ifconfig.me) clients-manager:latest >/dev/null 2>&1 & disown
 		
 		dots=""
 		while [ `sudo docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
