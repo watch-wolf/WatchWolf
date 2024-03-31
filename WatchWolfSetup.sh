@@ -6,7 +6,7 @@ opt=""
 branch="master"
 no_startup=0
 no_spigot=0
-num_processes=$((`nproc --all` - 2))
+num_processes=1
 base_path="$HOME/WatchWolf"
 
 while [[ "$#" -gt 0 ]]; do
