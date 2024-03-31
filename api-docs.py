@@ -24,6 +24,8 @@ def htmlParser(text: str) -> str:
 def _contentToEntry(content: json) -> str:
     if content["type"] == "String" or content["type"] == "ServerType" or content["type"][-2:] == '[]': # arrays
         return "(draw-gap \"" + content["name"] + "\")"
+    if content["type"] == "WorldType": # short
+        return "(draw-box \"" + content["name"] + "\" {:span 16})\n"
 
     raise Exception(f"Unrecognised type: '{content["type"]}'")
 
