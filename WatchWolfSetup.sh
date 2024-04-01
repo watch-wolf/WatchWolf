@@ -45,8 +45,8 @@ case "$opt" in
 	"build" )
 		# keep previous servers/plugins
 		tmpdir=`mktemp -d`
-		cp -r "$servers_manager_path/server-types/" "$tmpdir" 2>/dev/null
-		cp -r "$servers_manager_path/usual-plugins/" "$tmpdir" 2>/dev/null
+		cp -r "$servers_manager_ci_path/server-types/" "$tmpdir" 2>/dev/null
+		cp -r "$servers_manager_ci_path/usual-plugins/" "$tmpdir" 2>/dev/null
 		
 		# git needs empty folders
 		sudo rm -rf "$servers_manager_path" 2>/dev/null
@@ -58,8 +58,8 @@ case "$opt" in
 		
 		# restore back previous servers/plugins (if any)
 		# keep current files if they are updated in comparison to the old ones
-		cp -r -u "$tmpdir/server-types/" "$servers_manager_path" 2>/dev/null
-		cp -r -u "$tmpdir/usual-plugins/" "$servers_manager_path" 2>/dev/null
+		cp -r -u "$tmpdir/server-types/" "$servers_manager_ci_path" 2>/dev/null
+		cp -r -u "$tmpdir/usual-plugins/" "$servers_manager_ci_path" 2>/dev/null
 		
 		mkdir -p "$servers_manager_ci_path/server-types/Spigot"
 		mkdir -p "$servers_manager_ci_path/server-types/Paper"
@@ -139,7 +139,7 @@ case "$opt" in
 				while read version; do
 					if [ ! -z "$version" ]; then
 						# still versions remaining, and there's a place to run them
-						buildVersion "$servers_manager_path/server-types/Spigot" "$version" >/dev/null 2>&1
+						buildVersion "$servers_manager_ci_path/server-types/Spigot" "$version" >/dev/null 2>&1
 						((num_pending_containers--))
 						((current_downloading_containers++))
 					fi
@@ -162,7 +162,7 @@ case "$opt" in
 			while read version; do
 				if [ ! -z "$version" ]; then
 					# still versions remaining, and there's a place to run them
-					buildPaperVersion "$servers_manager_path/server-types/Paper" "$version" #>/dev/null 2>&1
+					buildPaperVersion "$servers_manager_ci_path/server-types/Paper" "$version" #>/dev/null 2>&1
 				fi
 			done <<< "$(getAllPaperVersions)"
 		fi
