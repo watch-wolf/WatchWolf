@@ -73,6 +73,7 @@ case "$opt" in
 		sudo docker pull openjdk:8
 		sudo docker pull openjdk:16
 		sudo docker pull openjdk:17
+		sudo docker pull openjdk:21
 
 		if [ $no_spigot -eq 0 ]; then
 			dos2unix "$server_builders_path/SpigotBuilder.sh" "$server_builders_path/PaperBuilder.sh"
