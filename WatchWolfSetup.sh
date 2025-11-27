@@ -70,10 +70,10 @@ case "$opt" in
 		fi
 
 		# ServersManager dependencies
-		sudo docker pull openjdk:8
-		sudo docker pull openjdk:16
-		sudo docker pull openjdk:17
-		sudo docker pull openjdk:21
+		sudo docker pull eclipse-temurin:8-jdk
+		sudo docker pull eclipse-temurin:16-jdk
+		sudo docker pull eclipse-temurin:17-jdk
+		sudo docker pull eclipse-temurin:21-jdk
 
 		if [ $no_spigot -eq 0 ]; then
 			dos2unix "$server_builders_path/SpigotBuilder.sh" "$server_builders_path/PaperBuilder.sh"
