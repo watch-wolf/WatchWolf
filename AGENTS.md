@@ -95,3 +95,12 @@ Four passes are required (glossaries + apacite). `.gitignore` keeps every interm
 - The setup script's `--build` mode **deletes** `$HOME/WatchWolf/ServersManager` and
   `.../ClientsManager` before cloning (it backs up `server-types/` and `usual-plugins/` to a
   temp dir first). Do not run it against a path holding anything else.
+
+## Git conventions
+
+- **`dev` is the working branch.** Every WatchWolf repo integrates and releases from `dev`.
+  `master` (`main` in the WatchWolf standard repo) is downstream of it — never commit there
+  directly, and never open a PR against it.
+- **One branch per change, named for its kind:** `fix/<topic>` for defects, `feature/<topic>` for
+  new work. Branch from `dev`.
+- **Always open a PR into `dev`.** Do not push straight to `dev`, even for a one-line change.
