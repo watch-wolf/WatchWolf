@@ -1,0 +1,80 @@
+@startuml watchwolf-update
+title "watchwolf update" -- self-update this checkout, then any install's clones
+
+actor User
+participant "cli/watchwolf\n(launcher, on the host)" as Launcher
+participant "UpdateCommand\n(in the container)" as Update
+participant "GitRepository" as Git
+participant "origin\n(git remote)" as Origin
+participant "DockerFacade" as Docker
+participant "ServersManager /\nClientsManager clones" as Clones
+
+User -> Launcher: bash cli/watchwolf update
+activate Launcher
+Launcher -> Launcher: compute REPO_ROOT (parent of cli/),\nidentity-mount it, set WW_REPO_ROOT
+Launcher -> Update: docker run ... -e WW_REPO_ROOT=<repoRoot> watchwolf-cli:local update
+activate Update
+
+== this checkout ==
+
+Update -> Update: read WW_REPO_ROOT
+alt WW_REPO_ROOT unset or not a git checkout
+    Update --> Launcher: "[i] nothing to self-update" (not a failure)
+else identity-mounted checkout found
+    Update -> Git: currentBranch()
+    Git --> Update: <branch>
+    Update -> Git: pullFastForwardOnly(<branch>)
+    activate Git
+    Git -> Origin: git fetch --prune origin <branch>
+    Git -> Git: rev-parse HEAD / origin/<branch>\ngit merge-base --is-ancestor (both directions)
+    alt HEAD == origin, or origin is an ancestor of HEAD
+        Git --> Update: UpToDate
+        note right
+          local may be AHEAD of an unmoved
+          origin (active development) --
+          reported as up to date, untouched
+        end note
+    else HEAD is an ancestor of origin (clean fast-forward)
+        Git -> Git: git merge --ff-only origin/<branch>
+        Git --> Update: FastForwarded(fromSha, toSha)
+    else neither is an ancestor of the other
+        Git --> Update: Diverged(localSha, remoteSha)
+        note right: never merged, rebased,\nor touched -- reported only
+    else fetch or merge failed
+        Git --> Update: Failed(reason)
+    end
+    deactivate Git
+
+    Update -> Update: report outcome to stdout
+    note right
+      the rebuild below is UNCONDITIONAL --
+      not gated on FastForwarded -- the working
+      tree can carry local/unpushed edits a
+      pull would never see (see AGENTS.md)
+    end note
+    Update -> Docker: buildImage(<repoRoot>/cli, WW_IMAGE)
+    activate Docker
+    Docker -> Docker: docker build (classic builder,\nnot BuildKit -- ~1 minute even if unchanged)
+    Docker --> Update: image rebuilt
+    deactivate Docker
+end
+
+== any install's clones ==
+
+Update -> Clones: is <base>/ServersManager (or ClientsManager) a git checkout?
+alt installed
+    Update -> Git: currentBranch() (the clone's OWN branch, not a stored config)
+    Git --> Update: <branch>
+    Update -> Git: pullFastForwardOnly(<branch>)
+    Git --> Update: UpToDate / FastForwarded / Diverged / Failed
+    Update -> Update: report outcome
+else not installed
+    Update -> Update: "[i] no install found -- nothing there to update"
+end
+
+Update --> Launcher: exit code (OK, or ERROR on any hard failure)
+deactivate Update
+Launcher --> User: (an exit-10 host-action prompt only applies to other commands;\nupdate needs no root)
+deactivate Launcher
+
+@enduml

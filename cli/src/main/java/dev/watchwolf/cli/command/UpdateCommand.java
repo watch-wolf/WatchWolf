@@ -21,6 +21,12 @@ import java.util.concurrent.Callable;
  * conflict against. A checkout that has simply drifted ahead of an unmoved origin is reported as
  * up to date; a checkout that has genuinely diverged (both sides hold commits the other lacks) is
  * reported and left exactly as it is, never merged.
+ *
+ * <p>The image is rebuilt after checking this checkout specifically -- unconditionally, not only
+ * when the pull actually fast-forwarded. "Make the image match what's on disk" is the point of
+ * running this here, and the working tree can carry local edits (committed or not, pushed or not)
+ * that {@code git fetch} would never see; gating the rebuild on a fast-forward having happened
+ * would silently skip exactly that case.
  */
 @Command(name = "update",
         header = "Update this checkout, and any install's ServersManager/ClientsManager clones.",
@@ -83,9 +89,14 @@ public class UpdateCommand implements Callable<Integer> {
 
         GitRepository.PullOutcome outcome = repo.pullFastForwardOnly(branch, cli.progress());
         boolean ok = this.report("WatchWolf CLI (this checkout)", outcome);
-        if (outcome instanceof GitRepository.PullOutcome.FastForwarded) {
-            this.rebuildImage(cli, repoRoot);
-        }
+        // Always rebuild, not only after a fast-forward: the point of running this on THIS
+        // checkout is "make the image match what's on disk right now", and the working tree can
+        // carry local, uncommitted changes -- or committed-but-unpushed ones -- that a pull would
+        // never see in the first place. Not free -- docker-java's buildImageCmd goes through the
+        // classic builder, not BuildKit, so it does not reuse a `docker build` CLI run's cache and
+        // takes about a minute even with nothing changed -- but skipping it when something did
+        // change is the real cost, and this command is not run in a tight loop.
+        this.rebuildImage(cli, repoRoot);
         return ok;
     }
 

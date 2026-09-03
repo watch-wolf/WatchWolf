@@ -18,6 +18,7 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
 | `src/integration-test/java` | System tests (`IT*`) — need a reachable Docker daemon. Asserts correctness. |
 | `src/validation-test/java` | Code checks (`*Should`) — naming conventions, the pure-logic boundary, the Core drift check. Asserts repo conventions. |
 | `src/nonfunctional-test/java` | Non-functional tests (`NF*`), hermetic — no Docker, no real terminal (driven over a Lanterna `DefaultVirtualTerminal`). Asserts **wall-clock timing**, not correctness — its own category, its own Maven profile (`-P nonfunctional-test`), its own report directory; never folded into the unit suite. |
+| `docs/` | Architecture diagrams as **PlantUML** (`.puml`) source, not images — render with any PlantUML tool/plugin rather than committing a picture that silently goes stale next to the code it describes. One file per flow (e.g. `build-server-jars.puml`, `watchwolf-update.puml`); add a new one for a flow that's genuinely hard to follow from the code alone, not for every class. |
 
 ## Package map
 
@@ -140,10 +141,17 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   next to `cli/`) at its own path and passes it as `WW_REPO_ROOT`, the same identity-mount trick
   used for `WW_BASE`/`$HOME/.m2`/`$PWD` -- see the launcher's own header comment. Without this the
   container has no filesystem access to the checkout that built its own image, which is why every
-  other command never needed it. `UpdateCommand` rebuilds the image afterwards via
+  other command never needed it. `UpdateCommand` rebuilds the image via
   `DockerFacade.buildImage(repoRoot/cli, WW_IMAGE, ...)`, reusing the exact mechanism
   `BuildClientsManagerImageStep` uses -- it only works because `repoRoot` is identity-mounted, so
   the daemon resolves that build context on the host.
+  **The rebuild is unconditional**, not gated on the pull having fast-forwarded: the point of
+  running this on the CLI's own checkout is "make the image match what's on disk right now", and
+  the working tree can carry local edits (committed or not, pushed or not) that `git fetch` would
+  never see -- gating the rebuild on a fast-forward would silently skip exactly that case, which is
+  what actually happened the first time this was tried (see the commit that fixed it). Not free
+  either way: `buildImageCmd` goes through the classic Docker builder, not BuildKit, so it does not
+  reuse a `docker build` CLI run's cache and takes about a minute even with nothing changed.
 - **`GitRepository.pullFastForwardOnly` must never call `git merge` without first proving the
   fast-forward is clean.** It exists specifically so `watchwolf update` is safe to run on a
   checkout with active, uncommitted-or-not development on it: commits local to the checkout that
@@ -152,6 +160,40 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   merge, a rebase, or a branch switch. If you touch this, re-run
   `ITGitRepositoryPullFastForwardOnlyShould`, which proves all three outcomes against a real local
   `git`, not just a scripted fake.
+- **Spigot and Paper are submenus of individually selectable versions, the same shape as Usual
+  plugins** -- `ID_SPIGOT`/`ID_PAPER` are `MenuNode.submenu(...)`, not a flat on/off checkbox the
+  way they used to be. `BuildPlan.buildSpigot()`/`buildPaper()` are derived from
+  `!selectedVersions(ID_X).isEmpty()`, not a separate flag, for the same reason server jars needed
+  fixing in the first place: a `MenuNode.check(...)` never descends on Enter (only `SUBMENU` does),
+  so the per-version children `populateVersions` was already writing into it were completely
+  unreachable in the actual TUI -- selectable in the model, invisible on screen. **Whatever
+  fetch-failure handling you add to Spigot/Paper must also run on `spigotLoading`/`paperLoading`,
+  not only `spigotFailed`/`paperFailed`.** `populateInstalledOnly` (called from both) is what makes
+  the failure remedy's own claim -- "versions already on disk are still selectable" -- actually
+  true instead of the submenu going empty the moment hub.spigotmc.org is unreachable; it has to run
+  at `*Loading` too so that promise already holds while still waiting, not only once the fetch has
+  failed. `MenuConfigScreenFailureHandlingShould` drives the real screen loop with a fetcher that
+  fails immediately and proves the submenu stays populated, selectable and navigable -- reverting
+  either `populateInstalledOnly` call independently makes it fail.
+- **Every fetched Spigot/Paper version (and every usual plugin) starts selected, except one
+  already built/downloaded.** `populateVersions` no longer takes a "preselect the newest N"
+  count -- it never had a real caller passing anything but 0 -- and unconditionally checks
+  everything not in `withInstalled`'s set. The install default is "get everything you don't
+  already have" with one keypress, not "you must go pick each version by hand".
+- **Spigot's and Paper's live version lists changed API/shape once already; the parsers now guard
+  against it happening silently again.** `api.papermc.io/v2` stopped receiving builds at the end
+  of 2025, replaced by `fill.papermc.io/v3` (see `PaperApiClient`/`PaperVersionListParser`'s own
+  Javadoc for the exact shape and why family keys are never read as versions). Separately, Spigot
+  changed its own numbering after 1.21 (`26.1`, `26.2`, ...), which broke the old parser two ways
+  at once: it never matched anything not starting with `"1."`, **and** its unanchored regex matched
+  the phantom substring `"1.1.json"`/`"1.2.json"` embedded inside `26.1.1.json`/`26.1.2.json`,
+  inventing versions that were never really listed. `SpigotVersionListParser` now anchors to
+  `href="..."` so a match always consumes the whole filename via backtracking, never an inner
+  substring. `ITSpigotHubClientShould`/`ITPaperApiClientShould` are deliberate canaries: they
+  hardcode the exact live version list and fail loudly the moment it drifts, rather than silently
+  adapting -- when one fails because the list legitimately changed, update the hardcoded list, do
+  not loosen the assertion. `McVersion.MIN_SUPPORTED` (1.8) is applied in both parsers, since both
+  services still list versions WatchWolf was never meant to run.
 
 ## Git conventions
 
