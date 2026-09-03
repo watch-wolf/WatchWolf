@@ -20,7 +20,7 @@ public final class BuildPlan {
     private final boolean cloneClientsManager;
     private final boolean cloneTester;
     private final boolean pullJdkImages;
-    private final boolean downloadUsualPlugins;
+    private final Set<String> selectedUsualPlugins;
     private final boolean downloadWatchWolfServer;
     private final boolean buildServersManagerImage;
     private final boolean buildClientsManagerImage;
@@ -41,7 +41,7 @@ public final class BuildPlan {
         this.cloneClientsManager = builder.cloneClientsManager;
         this.cloneTester = builder.cloneTester;
         this.pullJdkImages = builder.pullJdkImages;
-        this.downloadUsualPlugins = builder.downloadUsualPlugins;
+        this.selectedUsualPlugins = builder.selectedUsualPlugins;   // already copied, or null
         this.downloadWatchWolfServer = builder.downloadWatchWolfServer;
         this.buildServersManagerImage = builder.buildServersManagerImage;
         this.buildClientsManagerImage = builder.buildClientsManagerImage;
@@ -61,7 +61,6 @@ public final class BuildPlan {
     public boolean cloneClientsManager()      { return this.cloneClientsManager; }
     public boolean cloneTester()              { return this.cloneTester; }
     public boolean pullJdkImages()            { return this.pullJdkImages; }
-    public boolean downloadUsualPlugins()     { return this.downloadUsualPlugins; }
     public boolean downloadWatchWolfServer()  { return this.downloadWatchWolfServer; }
     public boolean buildServersManagerImage() { return this.buildServersManagerImage; }
     public boolean buildClientsManagerImage() { return this.buildClientsManagerImage; }
@@ -72,6 +71,24 @@ public final class BuildPlan {
     public List<McVersion> spigotVersions()   { return this.spigotVersions; }
     public List<McVersion> paperVersions()    { return this.paperVersions; }
     public Set<String> selfTestSuites()       { return this.selfTestSuites; }
+
+    /**
+     * Which usual plugins (by {@code UsualPluginJar.fileName()}) to download, when known.
+     *
+     * <p>{@code null} internally means <b>unresolved</b>: nobody picked a specific subset, so
+     * {@link dev.watchwolf.cli.step.build.DownloadUsualPluginsStep} downloads everything
+     * watchwolf.dev lists -- the flags-only path's default, unchanged from before per-plugin
+     * selection existed, and requiring no network call just to build the plan. A non-null value
+     * (menu-only today, possibly empty if every plugin was explicitly deselected) is honoured
+     * exactly: it is the whole set, not a hint on top of "everything".
+     */
+    public Set<String> selectedUsualPlugins() {
+        return this.selectedUsualPlugins == null ? Set.of() : this.selectedUsualPlugins;
+    }
+
+    public boolean usualPluginsSelectionResolved() {
+        return this.selectedUsualPlugins != null;
+    }
 
     /**
      * The self-test needs the Tester checkout, so unticking that clone disables it. Enforced here
@@ -108,7 +125,7 @@ public final class BuildPlan {
         private boolean cloneClientsManager = true;
         private boolean cloneTester = true;
         private boolean pullJdkImages = true;
-        private boolean downloadUsualPlugins = true;
+        private Set<String> selectedUsualPlugins;   // null default: unresolved, see the getter's Javadoc
         private boolean downloadWatchWolfServer = true;
         private boolean buildServersManagerImage = true;
         private boolean buildClientsManagerImage = true;
@@ -132,7 +149,7 @@ public final class BuildPlan {
             this.cloneClientsManager = plan.cloneClientsManager;
             this.cloneTester = plan.cloneTester;
             this.pullJdkImages = plan.pullJdkImages;
-            this.downloadUsualPlugins = plan.downloadUsualPlugins;
+            this.selectedUsualPlugins = plan.selectedUsualPlugins;
             this.downloadWatchWolfServer = plan.downloadWatchWolfServer;
             this.buildServersManagerImage = plan.buildServersManagerImage;
             this.buildClientsManagerImage = plan.buildClientsManagerImage;
@@ -153,7 +170,13 @@ public final class BuildPlan {
         public Builder cloneClientsManager(boolean on)     { this.cloneClientsManager = on; return this; }
         public Builder cloneTester(boolean on)             { this.cloneTester = on; return this; }
         public Builder pullJdkImages(boolean on)           { this.pullJdkImages = on; return this; }
-        public Builder downloadUsualPlugins(boolean on)    { this.downloadUsualPlugins = on; return this; }
+
+        /** {@code null} resets to "unresolved" -- see {@link BuildPlan#selectedUsualPlugins()}. */
+        public Builder selectedUsualPlugins(Set<String> plugins) {
+            this.selectedUsualPlugins = plugins == null ? null : Set.copyOf(plugins);
+            return this;
+        }
+
         public Builder downloadWatchWolfServer(boolean on) { this.downloadWatchWolfServer = on; return this; }
         public Builder buildServersManagerImage(boolean on){ this.buildServersManagerImage = on; return this; }
         public Builder buildClientsManagerImage(boolean on){ this.buildClientsManagerImage = on; return this; }

@@ -126,6 +126,15 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   `DefaultVirtualTerminal`) is what actually catches a caller regressing to `clear()`+`addAll()`
   here. Relatedly, `logIsLive()` on `EntityView` gates both this periodic reload and the `f` key —
   a finished server's log file will never grow again, so "following" it is offered nowhere.
+- **`BuildPlan.selectedUsualPlugins()` distinguishes "unresolved" from "explicitly empty".**
+  Internally the field is `null` until the menu's async fetch to watchwolf.dev actually loads
+  (`MenuModel.usualPluginsLoaded`); the getter turns that into `Set.of()` for callers, but
+  `usualPluginsSelectionResolved()` is what `DownloadUsualPluginsStep.isApplicable`/`perform`
+  actually branch on. Collapsing the two (e.g. treating an empty set as "not resolved") would make
+  the flags-only path's default of "download every usual plugin" indistinguishable from someone
+  deselecting all of them with F9 in the menu — one must download everything, the other nothing.
+  See `MenuModel.selectedUsualPluginsOrNullIfUnresolved` and `BuildPlan.selectedUsualPlugins`'s
+  Javadoc before changing either side of this.
 
 ## Git conventions
 

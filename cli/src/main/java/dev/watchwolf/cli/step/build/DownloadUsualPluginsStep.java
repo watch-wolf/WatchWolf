@@ -1,6 +1,7 @@
 package dev.watchwolf.cli.step.build;
 
 import dev.watchwolf.cli.io.JarInspector;
+import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.model.UsualPluginJar;
 import dev.watchwolf.cli.remote.WatchWolfWebClient;
 import dev.watchwolf.cli.step.*;
@@ -35,7 +36,11 @@ public final class DownloadUsualPluginsStep implements Step {
 
     @Override
     public boolean isApplicable(StepContext context) {
-        return context.plan().downloadUsualPlugins();
+        // Unresolved (the flags-only path, which never fetches the list up front) means "download
+        // everything" -- the same default as before per-plugin selection existed. A resolved but
+        // empty set means the menu explicitly deselected every plugin, so there is nothing to do.
+        BuildPlan plan = context.plan();
+        return !plan.usualPluginsSelectionResolved() || !plan.selectedUsualPlugins().isEmpty();
     }
 
     @Override
@@ -48,8 +53,8 @@ public final class DownloadUsualPluginsStep implements Step {
         } catch (RuntimeException ex) {
             throw new StepFailedException("fetching the usual-plugins list",
                     ex.getMessage(),
-                    "Check this machine can reach watchwolf.dev. To install without them, "
-                            + "deselect 'Usual plugins' in 'watchwolf build'.");
+                    "Check this machine can reach watchwolf.dev. To install without them, open "
+                            + "'Usual plugins' in 'watchwolf build' and press F9 to deselect all.");
         }
 
         if (plugins.isEmpty()) {
@@ -59,9 +64,13 @@ public final class DownloadUsualPluginsStep implements Step {
                             + "https://github.com/watch-wolf/WatchWolf/issues.");
         }
 
+        boolean filterToSelection = context.plan().usualPluginsSelectionResolved();
+        Set<String> selected = context.plan().selectedUsualPlugins();
+
         List<String> failures = new ArrayList<>();
         for (WatchWolfWebClient.UsualPlugin plugin : plugins) {
             String fileName = plugin.fileName();
+            if (filterToSelection && !selected.contains(fileName)) continue;   // not picked in the menu
 
             // fail early rather than write a name the ServersManager cannot parse
             if (!UsualPluginJar.isValidName(fileName)) {

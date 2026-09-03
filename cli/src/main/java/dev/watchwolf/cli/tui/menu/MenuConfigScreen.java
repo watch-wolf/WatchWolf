@@ -9,6 +9,7 @@ import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 
 import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.model.McVersion;
+import dev.watchwolf.cli.remote.WatchWolfWebClient;
 import dev.watchwolf.cli.tui.Async;
 import dev.watchwolf.cli.tui.Painter;
 import dev.watchwolf.cli.tui.Theme;
@@ -49,11 +50,14 @@ public final class MenuConfigScreen implements AutoCloseable {
     private boolean showHelp = true;
     private boolean cancelled;
 
-    /** Supplies the two remote version lists, on a thread of its own. */
+    /** Supplies the remote lists, each on a thread of its own. */
     public interface VersionFetcher {
         void fetchSpigot(java.util.function.Consumer<Async<List<McVersion>>> onState);
 
         void fetchPaper(java.util.function.Consumer<Async<List<McVersion>>> onState);
+
+        void fetchUsualPlugins(
+                java.util.function.Consumer<Async<List<WatchWolfWebClient.UsualPlugin>>> onState);
 
         void cancel();
     }
@@ -116,6 +120,7 @@ public final class MenuConfigScreen implements AutoCloseable {
     private void startFetches() {
         this.model.spigotLoading(Instant.now());
         this.model.paperLoading(Instant.now());
+        this.model.usualPluginsLoading(Instant.now());
 
         this.versionFetcher.fetchSpigot(state -> {
             if (state.isLoaded()) {
@@ -130,6 +135,14 @@ public final class MenuConfigScreen implements AutoCloseable {
                 this.model.paperLoaded(state.value().orElse(List.of()), 0);
             } else if (state.hasFailed()) {
                 this.model.paperFailed(state.failureDetail().orElse("unknown"),
+                        state.failureRemedy().orElse(null));
+            }
+        });
+        this.versionFetcher.fetchUsualPlugins(state -> {
+            if (state.isLoaded()) {
+                this.model.usualPluginsLoaded(state.value().orElse(List.of()));
+            } else if (state.hasFailed()) {
+                this.model.usualPluginsFailed(state.failureDetail().orElse("unknown"),
                         state.failureRemedy().orElse(null));
             }
         });
@@ -307,7 +320,7 @@ public final class MenuConfigScreen implements AutoCloseable {
 
     /** Names the host being waited on -- never a blank pane while the network answers. */
     private void drawStatusLine(Painter painter, MenuNode current, int width, int row) {
-        Async<List<McVersion>> pending = null;
+        Async<?> pending = null;
         String what = null;
 
         if (MenuModel.ID_SPIGOT.equals(current.id())) {
@@ -316,6 +329,9 @@ public final class MenuConfigScreen implements AutoCloseable {
         } else if (MenuModel.ID_PAPER.equals(current.id())) {
             pending = this.model.paperVersions();
             what = "Polling Paper versions from api.papermc.io";
+        } else if (MenuModel.ID_USUAL_PLUGINS.equals(current.id())) {
+            pending = this.model.usualPlugins();
+            what = "Fetching the usual-plugins list from watchwolf.dev";
         }
         if (pending == null) return;
 

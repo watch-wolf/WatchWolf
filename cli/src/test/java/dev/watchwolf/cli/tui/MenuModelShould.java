@@ -2,6 +2,7 @@ package dev.watchwolf.cli.tui;
 
 import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.model.McVersion;
+import dev.watchwolf.cli.remote.WatchWolfWebClient;
 import dev.watchwolf.cli.tui.menu.MenuModel;
 import dev.watchwolf.cli.tui.menu.MenuNode;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,11 @@ public class MenuModelShould {
     @BeforeEach
     void setUp() {
         this.menu = new MenuModel(BuildPlan.defaults(), "/home/someone/WatchWolf");
+    }
+
+    private static WatchWolfWebClient.UsualPlugin plugin(String name) {
+        return new WatchWolfWebClient.UsualPlugin(name, "1.0",
+                McVersion.of("1.8"), McVersion.of("LATEST"), "https://example.invalid/" + name);
     }
 
     @Test
@@ -144,17 +150,87 @@ public class MenuModelShould {
     }
 
     @Test
+    public void selectEveryUsualPluginByDefaultOnceFetched() {
+        this.menu.usualPluginsLoaded(List.of(plugin("WorldGuard"), plugin("EssentialsX")));
+
+        MenuNode usualPlugins = this.menu.node(MenuModel.ID_USUAL_PLUGINS).orElseThrow();
+        assertEquals(2, usualPlugins.children().size());
+        assertTrue(usualPlugins.children().stream().allMatch(MenuNode::isChecked),
+                "usual plugins must default to all selected");
+        assertEquals(2, this.menu.toBuildPlan().selectedUsualPlugins().size());
+    }
+
+    @Test
+    public void deselectOneUsualPluginWithSpace() {
+        this.menu.usualPluginsLoaded(List.of(plugin("WorldGuard"), plugin("EssentialsX")));
+        MenuNode worldGuard = this.menu.node(MenuModel.ID_USUAL_PLUGINS).orElseThrow()
+                .children().get(0);
+
+        this.menu.toggle(worldGuard.id());
+
+        assertFalse(worldGuard.isChecked());
+        assertEquals(1, this.menu.toBuildPlan().selectedUsualPlugins().size());
+    }
+
+    @Test
+    public void selectAndDeselectAllUsualPluginsOnly() {
+        this.menu.usualPluginsLoaded(List.of(plugin("WorldGuard"), plugin("EssentialsX")));
+
+        this.menu.deselectAll(MenuModel.ID_USUAL_PLUGINS);
+        assertTrue(this.menu.toBuildPlan().selectedUsualPlugins().isEmpty());
+        assertTrue(this.menu.isChecked(MenuModel.ID_PULL_IMAGES), "other lists are untouched");
+
+        this.menu.selectAll(MenuModel.ID_USUAL_PLUGINS);
+        assertEquals(2, this.menu.toBuildPlan().selectedUsualPlugins().size());
+    }
+
+    @Test
+    public void respectExplicitlyDeselectingEveryUsualPlugin() {
+        // must not be indistinguishable from "never fetched" -- that would silently download
+        // everything despite the explicit choice
+        this.menu.usualPluginsLoaded(List.of(plugin("WorldGuard")));
+        this.menu.deselectAll(MenuModel.ID_USUAL_PLUGINS);
+
+        BuildPlan plan = this.menu.toBuildPlan();
+        assertTrue(plan.usualPluginsSelectionResolved());
+        assertTrue(plan.selectedUsualPlugins().isEmpty());
+    }
+
+    @Test
+    public void leaveUsualPluginsUnresolvedUntilTheListLoads() {
+        // the step falls back to "download everything" for an unresolved plan -- starting the
+        // build before the fetch finishes (or after it failed) must not silently mean "none"
+        assertFalse(this.menu.toBuildPlan().usualPluginsSelectionResolved());
+
+        this.menu.usualPluginsLoading(Instant.now());
+        assertFalse(this.menu.toBuildPlan().usualPluginsSelectionResolved());
+
+        this.menu.usualPluginsFailed("watchwolf.dev unreachable", "retry later");
+        assertFalse(this.menu.toBuildPlan().usualPluginsSelectionResolved());
+
+        this.menu.usualPluginsLoaded(List.of(plugin("WorldGuard")));
+        assertTrue(this.menu.toBuildPlan().usualPluginsSelectionResolved());
+    }
+
+    @Test
+    public void annotateUsualPluginsWhenNothingIsSelected() {
+        this.menu.usualPluginsLoaded(List.of(plugin("WorldGuard")));
+        this.menu.deselectAll(MenuModel.ID_USUAL_PLUGINS);
+
+        MenuNode usualPlugins = this.menu.node(MenuModel.ID_USUAL_PLUGINS).orElseThrow();
+        assertEquals("nothing selected", usualPlugins.annotation().orElseThrow());
+    }
+
+    @Test
     public void carryEverySelectionIntoTheBuildPlan() {
         this.menu.toggle(MenuModel.ID_BRANCH_DEV);
         this.menu.setValue(MenuModel.ID_THREADS, "4");
-        this.menu.toggle(MenuModel.ID_USUAL_PLUGINS);
         this.menu.paperLoaded(List.of(McVersion.of("1.20.4")), 1);
 
         BuildPlan plan = this.menu.toBuildPlan();
 
         assertEquals("dev", plan.branch());
         assertEquals(4, plan.parallelBuilders());
-        assertFalse(plan.downloadUsualPlugins());
         assertEquals(List.of(McVersion.of("1.20.4")), plan.paperVersions());
     }
 

@@ -5,6 +5,7 @@ import dev.watchwolf.cli.progress.ProgressSink;
 import dev.watchwolf.cli.remote.HttpFetcher;
 import dev.watchwolf.cli.remote.PaperApiClient;
 import dev.watchwolf.cli.remote.SpigotHubClient;
+import dev.watchwolf.cli.remote.WatchWolfWebClient;
 import dev.watchwolf.cli.tui.Async;
 import dev.watchwolf.cli.tui.menu.MenuConfigScreen;
 
@@ -14,15 +15,16 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
- * Fetches the two remote version lists off the UI thread.
+ * Fetches the remote lists off the UI thread.
  *
- * <p>This is what stops the menu going white for several seconds when someone opens "Server jars".
- * The screen renders whichever {@link Async} state is current; this only hands it the next one.
+ * <p>This is what stops the menu going white for several seconds when someone opens "Server jars"
+ * or "Usual plugins". The screen renders whichever {@link Async} state is current; this only hands
+ * it the next one.
  */
 final class BackgroundVersionFetcher implements MenuConfigScreen.VersionFetcher {
     private final HttpFetcher http;
     private final ExecutorService executor =
-            Executors.newFixedThreadPool(2, runnable -> {
+            Executors.newFixedThreadPool(3, runnable -> {
                 Thread thread = new Thread(runnable, "watchwolf-version-fetch");
                 thread.setDaemon(true);
                 return thread;
@@ -61,6 +63,25 @@ final class BackgroundVersionFetcher implements MenuConfigScreen.VersionFetcher 
             } catch (RuntimeException ex) {
                 onState.accept(Async.failed("api.papermc.io: " + ex.getMessage(),
                         "Versions already on disk are still selectable."));
+            }
+        });
+    }
+
+    @Override
+    public void fetchUsualPlugins(
+            Consumer<Async<List<WatchWolfWebClient.UsualPlugin>>> onState) {
+        this.executor.submit(() -> {
+            try {
+                onState.accept(Async.loaded(
+                        new WatchWolfWebClient(this.http).usualPlugins(ProgressSink.discarding())));
+            } catch (HttpFetcher.FetchFailedException ex) {
+                onState.accept(Async.failed(ex.getMessage(),
+                        "Deselect all with F9 to install without them, or retry once the "
+                                + "connection is back."));
+            } catch (RuntimeException ex) {
+                onState.accept(Async.failed("watchwolf.dev: " + ex.getMessage(),
+                        "Deselect all with F9 to install without them, or retry once the "
+                                + "connection is back."));
             }
         });
     }

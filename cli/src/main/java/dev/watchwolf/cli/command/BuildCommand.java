@@ -235,7 +235,9 @@ public class BuildCommand implements Callable<Integer> {
         System.out.println("pull JDK images        " + plan.pullJdkImages());
         System.out.println("spigot versions        " + plan.spigotVersions());
         System.out.println("paper versions         " + plan.paperVersions());
-        System.out.println("usual plugins          " + plan.downloadUsualPlugins());
+        System.out.println("usual plugins          " + (plan.usualPluginsSelectionResolved()
+                ? plan.selectedUsualPlugins().size() + " selected"
+                : "all (unresolved until the build runs)"));
         System.out.println("WatchWolf-Server       " + plan.downloadWatchWolfServer());
         System.out.println("build images           " + plan.buildServersManagerImage());
         System.out.println("register at startup    " + plan.registerStartup());

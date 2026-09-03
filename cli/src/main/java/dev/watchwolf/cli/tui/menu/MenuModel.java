@@ -3,6 +3,7 @@ package dev.watchwolf.cli.tui.menu;
 import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.model.McVersion;
 import dev.watchwolf.cli.model.TesterSuiteCatalog;
+import dev.watchwolf.cli.remote.WatchWolfWebClient;
 import dev.watchwolf.cli.tui.Async;
 
 import java.time.Instant;
@@ -46,6 +47,7 @@ public final class MenuModel {
     private final MenuNode root;
     private Async<List<McVersion>> spigotVersions = Async.notStarted();
     private Async<List<McVersion>> paperVersions = Async.notStarted();
+    private Async<List<WatchWolfWebClient.UsualPlugin>> usualPlugins = Async.notStarted();
     private Set<McVersion> spigotInstalled = Set.of();
     private Set<McVersion> paperInstalled = Set.of();
 
@@ -100,9 +102,9 @@ public final class MenuModel {
         serverJars.add(MenuNode.check(ID_PAPER, "Paper", initial.buildPaper()));
         this.root.add(serverJars);
 
-        this.root.add(MenuNode.check(ID_USUAL_PLUGINS,
-                        "Usual plugins (WorldGuard, EssentialsX, ...)", initial.downloadUsualPlugins())
-                .withHelp("Fetched from watchwolf.dev. Tests can name any of them in their config."));
+        this.root.add(MenuNode.submenu(ID_USUAL_PLUGINS, "Usual plugins (WorldGuard, EssentialsX, ...)")
+                .withHelp("Fetched from watchwolf.dev, all selected by default. Tests can name "
+                        + "any of them in their config."));
         this.root.add(MenuNode.check(ID_WATCHWOLF_SERVER,
                         "WatchWolf-Server plugin (newest published)",
                         initial.downloadWatchWolfServer())
@@ -212,6 +214,12 @@ public final class MenuModel {
             boolean anySelected = this.isChecked(ID_SPIGOT) || this.isChecked(ID_PAPER);
             serverJars.setAnnotation(anySelected ? null : "nothing selected");
         });
+
+        this.node(ID_USUAL_PLUGINS).ifPresent(usualPlugins -> {
+            boolean fetched = !usualPlugins.children().isEmpty();
+            boolean anySelected = usualPlugins.children().stream().anyMatch(MenuNode::isChecked);
+            usualPlugins.setAnnotation(fetched && !anySelected ? "nothing selected" : null);
+        });
     }
 
     public boolean isChecked(String id) {
@@ -247,6 +255,47 @@ public final class MenuModel {
 
     public void paperFailed(String detail, String remedy) {
         this.paperVersions = Async.failed(detail, remedy);
+    }
+
+    public Async<List<WatchWolfWebClient.UsualPlugin>> usualPlugins() { return this.usualPlugins; }
+
+    public void usualPluginsLoading(Instant startedAt) {
+        this.usualPlugins = Async.loading(startedAt);
+    }
+
+    /** Every plugin starts selected -- "download the usual plugins" means all of them by default. */
+    public void usualPluginsLoaded(List<WatchWolfWebClient.UsualPlugin> plugins) {
+        this.usualPlugins = Async.loaded(plugins);
+        MenuNode parent = this.root.find(ID_USUAL_PLUGINS).orElse(null);
+        if (parent != null) {
+            parent.children().clear();
+            for (WatchWolfWebClient.UsualPlugin plugin : plugins) {
+                parent.add(MenuNode.check(plugin.fileName(),
+                        plugin.name() + " " + plugin.version(), true));
+            }
+        }
+        this.applyConstraints();
+    }
+
+    public void usualPluginsFailed(String detail, String remedy) {
+        this.usualPlugins = Async.failed(detail, remedy);
+    }
+
+    /**
+     * The checked plugins' file names, or {@code null} while the list is still not-started,
+     * loading, or failed -- {@link BuildPlan#selectedUsualPlugins()} treats {@code null} as
+     * "unresolved, download everything" rather than "nothing was fetched to select from".
+     */
+    public Set<String> selectedUsualPluginsOrNullIfUnresolved() {
+        if (!this.usualPlugins.isLoaded()) return null;
+        MenuNode parent = this.root.find(ID_USUAL_PLUGINS).orElse(null);
+        if (parent == null) return null;
+
+        Set<String> selected = new LinkedHashSet<>();
+        for (MenuNode child : parent.children()) {
+            if (child.kind() == MenuNode.Kind.CHECK && child.isChecked()) selected.add(child.id());
+        }
+        return selected;
     }
 
     /** Versions already on disk: listed immediately, so the pane is useful before the network is. */
@@ -308,7 +357,7 @@ public final class MenuModel {
                 .buildPaper(this.isChecked(ID_PAPER))
                 .spigotVersions(this.selectedVersions(ID_SPIGOT))
                 .paperVersions(this.selectedVersions(ID_PAPER))
-                .downloadUsualPlugins(this.isChecked(ID_USUAL_PLUGINS))
+                .selectedUsualPlugins(this.selectedUsualPluginsOrNullIfUnresolved())
                 .downloadWatchWolfServer(this.isChecked(ID_WATCHWOLF_SERVER))
                 .buildServersManagerImage(this.isChecked(ID_BUILD_IMAGES))
                 .buildClientsManagerImage(this.isChecked(ID_BUILD_IMAGES))

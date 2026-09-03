@@ -9,6 +9,7 @@ import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 
 import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.model.McVersion;
+import dev.watchwolf.cli.remote.WatchWolfWebClient;
 import dev.watchwolf.cli.tui.Async;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,8 @@ public class NFMenuConfigScreenResponsivenessShould {
             new MenuConfigScreen.VersionFetcher() {
                 @Override public void fetchSpigot(Consumer<Async<List<McVersion>>> onState) { }
                 @Override public void fetchPaper(Consumer<Async<List<McVersion>>> onState) { }
+                @Override public void fetchUsualPlugins(
+                        Consumer<Async<List<WatchWolfWebClient.UsualPlugin>>> onState) { }
                 @Override public void cancel() { }
             };
 
