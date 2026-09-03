@@ -18,12 +18,9 @@ public class GlobalOptions {
             description = "Install base directory. Default: ${DEFAULT-VALUE}")
     public String path = defaultBase();
 
-    @Option(names = "--dev",
-            description = "Use the 'dev' branch of every repository instead of 'master'.")
-    public boolean dev;
-
     @Option(names = "--branch",
-            description = "Explicit branch to clone. Overrides --dev.")
+            description = "Branch to clone. Default: dev. 'master' is not selectable in the "
+                    + "menu yet, but works here as an explicit override.")
     public String branch;
 
     @Option(names = "--verbose", description = "Print per-operation detail.")
@@ -48,7 +45,9 @@ public class GlobalOptions {
 
     public String resolvedBranch() {
         if (this.branch != null && !this.branch.isBlank()) return this.branch;
-        return this.dev ? "dev" : "master";
+        // 'dev' for now: every repo integrates there first, and 'master' is not yet in a state
+        // this CLI can rely on. --branch stays as the explicit escape hatch.
+        return "dev";
     }
 
     /**

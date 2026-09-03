@@ -29,7 +29,7 @@ the image itself from this checkout's own `Dockerfile` (cached after the first r
 | Command | Does |
 | --- | --- |
 | `watchwolf` | Prints help. The dashboard is never opened by surprise — see `monitor`. |
-| `watchwolf build` | Clone/update the repos, pull JDK images, build Spigot/Paper jars, fetch plugins, build the two Docker images. Opens a menuconfig-style checkbox screen on a TTY with no flags; fully flag-driven otherwise (`--dev`, `--path`, `--threads`, `--skip-spigot-build`, ...). |
+| `watchwolf build` | Clone/update the repos, pull JDK images, build Spigot/Paper jars, fetch plugins, build the two Docker images. Opens a menuconfig-style checkbox screen on a TTY with no flags; fully flag-driven otherwise (`--branch`, `--path`, `--threads`, `--skip-spigot-build`, ...). |
 | `watchwolf install` | Registers the startup service and the `/usr/local/bin/watchwolf` symlink, then runs the self-diagnosis unless `--skip-self-test`. |
 | `watchwolf uninstall` | Undoes `install`. |
 | `watchwolf run` / `stop` | Lifecycle. `run` checks the environment first unless `--skip-checks`; `stop` also sweeps up leftover `MC_Server-*` containers. |

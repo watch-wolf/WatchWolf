@@ -57,8 +57,13 @@ public final class MenuModel {
                         + "ClientsManager clones, the server jars, the plugins and the logs."));
 
         boolean dev = "dev".equals(initial.branch());
-        this.root.add(MenuNode.radio(ID_BRANCH_MASTER, "master", "branch", !dev)
-                .withHelp("The released branch of every WatchWolf repository."));
+        MenuNode branchMaster = MenuNode.radio(ID_BRANCH_MASTER, "master", "branch", !dev)
+                .withHelp("The released branch of every WatchWolf repository.");
+        // not selectable here yet -- 'master' is not in a state this CLI can rely on. Shown
+        // rather than hidden, so it's clear the choice exists and why it can't be made right now;
+        // still reachable as an explicit 'watchwolf build --branch master' if you know you want it.
+        branchMaster.disable("not supported yet -- use --branch master to override");
+        this.root.add(branchMaster);
         this.root.add(MenuNode.radio(ID_BRANCH_DEV, "dev", "branch", dev)
                 .withHelp("The development branch. Every WatchWolf repo integrates from 'dev'."));
 

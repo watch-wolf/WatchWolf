@@ -39,6 +39,23 @@ public class MenuModelShould {
     }
 
     @Test
+    public void defaultToDevAndKeepMasterVisibleButUnselectable() {
+        // master is not in a state this CLI can rely on yet -- shown so the choice is visible
+        // (never hidden), but toggling it must be a no-op
+        assertEquals("dev", this.menu.toBuildPlan().branch());
+
+        MenuNode master = this.menu.node(MenuModel.ID_BRANCH_MASTER).orElseThrow();
+        assertFalse(master.isEnabled());
+        assertTrue(master.disabledReason().isPresent());
+
+        this.menu.toggle(MenuModel.ID_BRANCH_MASTER);
+
+        assertFalse(this.menu.isChecked(MenuModel.ID_BRANCH_MASTER));
+        assertTrue(this.menu.isChecked(MenuModel.ID_BRANCH_DEV));
+        assertEquals("dev", this.menu.toBuildPlan().branch());
+    }
+
+    @Test
     public void disableTheSelfTestWhenTheTesterIsNotCloned() {
         // the suites can only run from a Tester checkout, so the menu must not accept a
         // selection it would silently drop later

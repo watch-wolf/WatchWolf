@@ -94,13 +94,15 @@ public final class BuildPlan {
         return new Builder();
     }
 
-    /** The sensible defaults: a full install on master, no startup registration, one builder. */
+    /** The sensible defaults: a full install on dev, no startup registration, one builder. */
     public static BuildPlan defaults() {
         return builder().build();
     }
 
     public static final class Builder {
-        private String branch = "master";
+        // 'dev' for now: 'master' is not yet in a state this CLI can rely on -- see MenuModel,
+        // where the branch radio shows it but keeps it disabled.
+        private String branch = "dev";
         private int parallelBuilders = 1;
         private boolean cloneServersManager = true;
         private boolean cloneClientsManager = true;
