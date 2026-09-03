@@ -67,7 +67,7 @@ public final class SelfTestStep implements Step {
         try {
             return new BundleWriter(context.docker(), context.files(), context.layout(),
                     new HostInterfaces(), context.clock())
-                    .write(context.layout().base().resolve("watchwolf-selftest-failure.tar.gz"),
+                    .write(context.layout().exportedLogsDir().resolve("watchwolf-selftest-failure.tar.gz"),
                             BundleWriter.Selection.everything(), context.progress());
         } catch (RuntimeException ex) {
             context.progress().warn("Could not write a diagnostics bundle: " + ex.getMessage());

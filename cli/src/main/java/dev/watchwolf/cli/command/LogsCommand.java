@@ -40,13 +40,14 @@ public class LogsCommand implements Callable<Integer> {
     @Option(names = "--since", description = "Only sessions newer than this (e.g. 2h, 30m).")
     String since;
 
-    @Option(names = "--out", description = "Where to write. Default: ./watchwolf-logs-<time>.tar.gz")
+    @Option(names = "--out",
+            description = "Where to write. Default: <install base>/logs/watchwolf-logs-<time>.tar.gz")
     String out;
 
     @Override
     public Integer call() {
         try (CliContext cli = new CliContext(this.options)) {
-            Path destination = this.destination();
+            Path destination = this.destination(cli.layout().exportedLogsDir());
 
             BundleWriter.Selection selection = this.selection();
             BundleWriter writer = new BundleWriter(cli.docker(), cli.files(), cli.layout(),
@@ -74,13 +75,15 @@ public class LogsCommand implements Callable<Integer> {
         return BundleWriter.Selection.everything();
     }
 
-    private Path destination() {
+    /**
+     * {@code --out} always wins. Otherwise {@code <install base>/logs/} -- one predictable place
+     * regardless of which directory the command happened to be run from, and the same place
+     * {@code doctor}'s failure bundle and the dashboard's {@code e} key already write to.
+     */
+    private Path destination(Path exportedLogsDir) {
         if (this.out != null) return Paths.get(this.out).toAbsolutePath();
         String stamp = String.valueOf(System.currentTimeMillis());
-        // WW_HOST_PWD is where the user actually stood; the launcher mounts it at the same path
-        String cwd = System.getenv().getOrDefault("WW_HOST_PWD",
-                System.getProperty("user.dir", "."));
-        return Paths.get(cwd, "watchwolf-logs-" + stamp + ".tar.gz");
+        return exportedLogsDir.resolve("watchwolf-logs-" + stamp + ".tar.gz");
     }
 
     /** Accepts {@code 90s}, {@code 30m}, {@code 2h}, {@code 3d}. */

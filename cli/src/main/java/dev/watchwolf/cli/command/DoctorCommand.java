@@ -106,7 +106,7 @@ public class DoctorCommand implements Callable<Integer> {
             try {
                 Path bundle = new BundleWriter(cli.docker(), cli.files(), cli.layout(),
                         cli.interfaces(), cli.clock())
-                        .write(cli.layout().base().resolve("watchwolf-doctor-failure.tar.gz"),
+                        .write(cli.layout().exportedLogsDir().resolve("watchwolf-doctor-failure.tar.gz"),
                                 BundleWriter.Selection.last(5), cli.progress());
                 System.out.println("[i] Diagnostics bundle: " + bundle);
             } catch (RuntimeException ex) {

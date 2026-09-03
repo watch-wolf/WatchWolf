@@ -102,6 +102,16 @@ public final class BundleWriter {
         ManifestBuilder manifest = new ManifestBuilder(this.clock.instant());
         progress.begin("Collecting diagnostics into " + destination.getFileName());
 
+        try {
+            Path parent = destination.getParent();
+            if (parent != null) Files.createDirectories(parent);
+        } catch (IOException ex) {
+            progress.end("failed");
+            throw new BundleFailedException(
+                    "Could not create " + destination.getParent() + " to write the bundle into",
+                    "Check the install base is writable, or pass --out with another path.", ex);
+        }
+
         try (OutputStream out = Files.newOutputStream(destination);
              GzipCompressorOutputStream gzip = new GzipCompressorOutputStream(out);
              TarArchiveOutputStream tar = new TarArchiveOutputStream(gzip)) {

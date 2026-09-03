@@ -68,6 +68,15 @@ public class InstallLayoutShould {
     }
 
     @Test
+    public void exportBundlesUnderTheInstallBaseNotTheServersManagersOwnLogs() {
+        // <base>/logs -- one predictable place for `watchwolf logs`, a failed doctor/self-test,
+        // and the dashboard's e/s keys, distinct from logs() (the ServersManager's own per-session
+        // storage three levels deeper inside the runtime directory)
+        assertEquals(Path.of("/home/someone/WatchWolf/logs"), layout.exportedLogsDir());
+        assertNotEquals(layout.logs(), layout.exportedLogsDir());
+    }
+
+    @Test
     public void deriveTheComposeProjectAndImageFromTheFlavour() {
         // the image name comes from the compose project, which defaults to the directory name
         assertEquals("release", RuntimeFlavor.RELEASE.composeProject());

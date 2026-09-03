@@ -303,7 +303,7 @@ public final class MonitorScreen implements AutoCloseable {
     private void exportEverything() {
         this.setStatusMessage("exporting all logs...");
         try {
-            Path destination = this.layout.base()
+            Path destination = this.layout.exportedLogsDir()
                     .resolve("watchwolf-logs-" + System.currentTimeMillis() + ".tar.gz");
             Path written = this.bundleWriter.write(destination,
                     BundleWriter.Selection.everything(), ProgressSink.discarding());
@@ -317,7 +317,7 @@ public final class MonitorScreen implements AutoCloseable {
         EntityView view = this.model.entityView().orElse(null);
         if (view == null) return;
         try {
-            Path destination = this.layout.base()
+            Path destination = this.layout.exportedLogsDir()
                     .resolve(view.title().replaceAll("[^A-Za-z0-9_.-]", "_") + ".log");
             this.files.writeString(destination, String.join("\n", this.logs.window(100000)) + "\n");
             this.setStatusMessage("saved " + destination);

@@ -91,6 +91,18 @@ public class BundleWriterShould {
     }
 
     @Test
+    public void createTheDestinationDirectoryWhenItDoesNotExistYet() throws IOException {
+        // callers point this at <install base>/logs/, which is not guaranteed to exist yet --
+        // e.g. a fresh install that has never run `watchwolf logs` before
+        Path destination = this.base.resolve("logs").resolve("fresh-install.tar.gz");
+        assertFalse(Files.isDirectory(destination.getParent()));
+
+        this.writer().write(destination, BundleWriter.Selection.everything(), ProgressSink.discarding());
+
+        assertTrue(Files.exists(destination));
+    }
+
+    @Test
     public void neverIncludeAJarEvenWhenOneIsPresent() throws IOException {
         InstallLayout layout = this.layout();
         Files.createDirectories(layout.serverTypes("Spigot"));

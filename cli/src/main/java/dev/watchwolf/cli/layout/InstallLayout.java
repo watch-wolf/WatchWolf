@@ -67,6 +67,18 @@ public final class InstallLayout {
         return this.stateDir().resolve("host-action.needs-root");
     }
 
+    /**
+     * Where {@code watchwolf logs}, a failed {@code doctor}/self-test, and the dashboard's
+     * {@code e}/{@code s} keys write what they export -- {@code <base>/logs}, e.g.
+     * {@code ~/WatchWolf/logs}. Not to be confused with {@link #logs()}, the ServersManager's own
+     * per-session log storage three levels deeper inside the runtime directory; this is where the
+     * CLI's own exported artefacts land, one predictable place regardless of which command made
+     * them or what the current working directory happened to be.
+     */
+    public Path exportedLogsDir() {
+        return this.base.resolve("logs");
+    }
+
     public Path buildPlanFile() {
         return this.stateDir().resolve("install.yaml");
     }

@@ -35,7 +35,7 @@ the image itself from this checkout's own `Dockerfile` (cached after the first r
 | `watchwolf run` / `stop` | Lifecycle. `run` checks the environment first unless `--skip-checks`; `stop` also sweeps up leftover `MC_Server-*` containers. |
 | `watchwolf status` | One-shot plain-text picture of what's running. Safe to pipe. |
 | `watchwolf monitor` | The live dashboard — a btop-style view of the managers, their servers and their bots, with per-entity logs. |
-| `watchwolf logs` | Exports one `tar.gz` diagnostics bundle (`--session`, `--last`, `--since`, `--out`). |
+| `watchwolf logs` | Exports one `tar.gz` diagnostics bundle to `<install base>/logs/` by default (`--session`, `--last`, `--since`, `--out` to override). |
 | `watchwolf doctor` | Self-tests: fast static checks (tier 1), then the real WatchWolf-Tester integration suites against a live environment (tier 2, `--quick` to skip). |
 
 Every command accepts `--path <dir>` (default `$HOME/WatchWolf`) to point at a different install.
