@@ -44,6 +44,9 @@ public final class MenuConfigScreen implements AutoCloseable {
 
     private Screen screen;
     private final Deque<MenuNode> path = new ArrayDeque<>();
+    /** One saved cursor position per level in {@link #path}, so ascending returns to it rather
+     *  than always landing back on row 0. */
+    private final Deque<Integer> cursorHistory = new ArrayDeque<>();
     private int cursor;
     private String editingId;
     private String editBuffer;
@@ -189,8 +192,7 @@ public final class MenuConfigScreen implements AutoCloseable {
             case ArrowUp -> this.moveCursor(rows, -1);
             case Enter -> this.row(rows).ifPresent(row -> {
                 if (row.kind() == MenuNode.Kind.SUBMENU && row.isEnabled()) {
-                    this.path.push(row);
-                    this.cursor = 0;
+                    this.descend(row);
                 } else if (row.kind() == MenuNode.Kind.TEXT) {
                     this.beginEditing(row);
                 } else {
@@ -208,8 +210,7 @@ public final class MenuConfigScreen implements AutoCloseable {
             }
             case ArrowRight -> this.row(rows).ifPresent(row -> {
                 if (row.kind() == MenuNode.Kind.SUBMENU && row.isEnabled()) {
-                    this.path.push(row);
-                    this.cursor = 0;
+                    this.descend(row);
                 }
             });
             // bulk selection is a keybind, never a row in the list. F8 rather than F10: F10
@@ -225,9 +226,15 @@ public final class MenuConfigScreen implements AutoCloseable {
         return Decision.CONTINUE;
     }
 
+    private void descend(MenuNode row) {
+        this.cursorHistory.push(this.cursor);
+        this.path.push(row);
+        this.cursor = 0;
+    }
+
     private void ascend() {
         this.path.pop();
-        this.cursor = 0;
+        this.cursor = this.cursorHistory.isEmpty() ? 0 : this.cursorHistory.pop();
     }
 
     private void beginEditing(MenuNode row) {
