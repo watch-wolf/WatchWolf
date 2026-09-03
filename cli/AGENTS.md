@@ -13,6 +13,7 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
 | `watchwolf` | The launcher script. Always builds the CLI's image itself from this checkout's `Dockerfile` -- deliberately no fallback to a published image, since there isn't one and defaulting to a guessable registry name would be a supply-chain risk. Must be run from a checkout, not fetched standalone. |
 | `Dockerfile` | Multi-stage: `maven:3.9-eclipse-temurin-17` builder → `eclipse-temurin:17-jre` runtime with `docker` CLI + compose plugin (Docker's static binaries, not a distro apt repo — see the Dockerfile's own comment for why) and `git`. |
 | `ci/{build,tests,validator}.sh` | Dockerized build/test verbs, same shape as every other WatchWolf repo's `ci/`. See [`ci/README.md`](ci/README.md). |
+| `ci/tests-external.sh` | Builds the Docker image and runs only the `IT*` classes that check an *external* dependency still responds as expected (published versions/plugins, JDK images) -- never the slow per-version build/download itself. See `ci/README.md`'s own section on it. |
 | `src/main/java/dev/watchwolf/cli/` | The application. See the package map below. |
 | `src/test/java` | Unit tests (`*Should`), hermetic — no Docker, no network, no filesystem beyond a temp dir. Asserts correctness. |
 | `src/integration-test/java` | System tests (`IT*`) — need a reachable Docker daemon. Asserts correctness. |

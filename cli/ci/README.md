@@ -14,6 +14,7 @@ Java 8 (`maven:3.8.4-openjdk-8`).
 | `./ci/tests.sh --integration [--tests <pattern>]` | Run the system tests (**needs a reachable Docker daemon**, see below) |
 | `./ci/tests.sh --integration --skip-preflight` | ...without first checking the daemon is reachable |
 | `./ci/validator.sh` | Alias for `./ci/tests.sh --validation` |
+| `./ci/tests-external.sh` | Smoke-test every **external** dependency: build the Docker image (Maven Central, the base images, Docker's static binaries, apt), then run the system tests that list published Spigot/Paper versions, list watchwolf.dev's usual plugins and newest WatchWolf-Server jar, and pull the JDK images. Deliberately skips actually building/downloading every published server version -- see below. |
 
 Flags combine: `./ci/tests.sh --unit --validation --nonfunctional --integration` runs everything.
 
@@ -120,6 +121,27 @@ maven image has no `docker` CLI, so this probes the daemon's HTTP API directly o
 ```
 
 If the daemon is reachable only in some other way, pass `--skip-preflight`.
+
+### External dependencies (`./ci/tests-external.sh`)
+
+This module leans on several things it does not control: watchwolf.dev, hub.spigotmc.org,
+fill.papermc.io, the `eclipse-temurin` JDK images, and everything the `Dockerfile` itself pulls at
+build time (Maven Central, Docker's own static `docker`/`docker compose` binaries, apt packages).
+Any of them can change shape or go away with no warning from inside this repo -- which is exactly
+what happened once already: `api.papermc.io/v2` was retired for `fill.papermc.io/v3`, and Spigot's
+own numbering changed after 1.21 (`26.1`, `26.2`, ...), both silently, until the version pickers
+were checked against the real thing.
+
+`./ci/tests-external.sh` exists to catch the next one of those quickly: it builds the Docker image
+(covering every build-time dependency) and runs a curated set of `IT*` classes that only *list*
+things -- Spigot/Paper's published versions, watchwolf.dev's usual-plugin list and newest
+WatchWolf-Server jar -- plus `ITPullJdkImagesShould`, which really does pull all four JDK images
+since a stale tag there is exactly the kind of thing a fake can never catch. It deliberately never
+builds a Spigot version or downloads every published Paper jar -- that is what `BuildSpigotJarsStep`/
+`DownloadPaperJarsStep` do for real, and Spigot alone takes about an hour per version, which is far
+too slow for a check meant to run often. If you add a remote client or another external image
+dependency with no system test yet, give it one and add its class to
+`external_dependency_tests` in `ci/tests-external.sh`.
 
 ### A note on this filesystem
 
