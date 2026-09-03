@@ -91,40 +91,43 @@ Two supporting repositories complete the picture:
 ## Quick start
 
 The [`cli/`](cli/) module installs and runs everything the Tester needs (the Servers Manager and
-the Clients Manager) from one Docker image — the host needs **Docker** and nothing else, on Linux,
-macOS, Windows or WSL.
+the Clients Manager) from one Docker image — the host needs **`git`** and **Docker** and nothing
+else, on Linux, macOS, Windows or WSL. There is no published `watchwolf` image to fetch (defaulting
+to a guessable registry name would be a supply-chain risk — see `cli/watchwolf`'s own header); the
+launcher always builds the image itself from the checkout, so it needs to run from one.
 
-1. **Download the launcher** *(the only file that has to exist on the host)*
+1. **Clone the repository**
 
    ```bash
-   wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf
-   chmod +x watchwolf
+   git clone https://github.com/watch-wolf/WatchWolf
+   cd WatchWolf
    ```
 
 2. **Build**
 
    ```bash
-   ./watchwolf build
+   ./cli/watchwolf build
    ```
 
-   On a terminal, this opens a menuconfig-style checkbox screen (space to toggle, Enter to open a
-   submenu) for choosing the branch, the Spigot/Paper versions, the usual plugins and whether to
-   register a startup service; pass flags instead for a non-interactive run. It clones the Servers
-   Manager and Clients Manager, pulls the JDK images, downloads the "usual plugins" and builds the
-   Spigot/Paper jars, verifying every step as it goes. Have at least **1.5 GB** free; building the
-   Spigot servers can take up to an hour.
+   The first run builds the CLI's own image (a few minutes, cached after); on a terminal, it then
+   opens a menuconfig-style checkbox screen (space to toggle, Enter to open a submenu) for choosing
+   the branch, the Spigot/Paper versions, the usual plugins and whether to register a startup
+   service — pass flags instead for a non-interactive run. It clones the Servers Manager and
+   Clients Manager, pulls the JDK images, downloads the "usual plugins" and builds the Spigot/Paper
+   jars, verifying every step as it goes. Have at least **1.5 GB** free; building the Spigot
+   servers can take up to an hour.
 
 3. **Install** *(optional — makes `watchwolf` available everywhere, starts it at boot, and runs a
    self-diagnosis against a real server)*
 
    ```bash
-   ./watchwolf install
+   ./cli/watchwolf install
    ```
 
 4. **Run**
 
    ```bash
-   ./watchwolf run
+   ./cli/watchwolf run
    ```
 
 Once it is up, point your tests at the machine running it (see the Tester's
@@ -134,8 +137,11 @@ live dashboard of the managers, their servers and their bots, and `watchwolf doc
 logs` for diagnosing a broken environment.
 
 `WatchWolfSetup.sh` — the Bash script this replaces — is kept for one release as a
-[deprecated shim](WatchWolfSetup.sh) that forwards to the CLI, so the previously documented
-`wget … && bash WatchWolfSetup.sh --build` path keeps working.
+[deprecated shim](WatchWolfSetup.sh) that forwards to the CLI, so `bash WatchWolfSetup.sh --build`
+and its flags keep working **from a checkout**. The previously documented single-file
+`wget .../WatchWolfSetup.sh` download no longer works on its own: the CLI has no published image to
+fall back to and always builds itself from this repository's `Dockerfile`, so a lone downloaded
+script has nothing to build from and fails with a message pointing at `git clone` instead.
 
 ---
 

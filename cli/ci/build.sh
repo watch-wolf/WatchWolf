@@ -40,12 +40,17 @@ fi
 echo "[i] Built $WW_BASE_PATH/target/watchwolf-cli.jar"
 
 if [ $build_image -eq 1 ]; then
+    # "watchwolf-cli:local" -- no namespace prefix, matching cli/watchwolf's own tag. There is no
+    # published WatchWolf CLI image; a namespaced tag like "watchwolf/cli:latest" would look like
+    # one, and defaulting anything to that name is a supply-chain risk (see cli/watchwolf's
+    # header). Also tag with the pom version, purely for keeping local builds apart -- still no
+    # registry namespace implied.
     version=$(grep -m1 -oP '(?<=<version>)[^<]+' "$WW_BASE_PATH/pom.xml")
-    echo "[v] Building Docker image watchwolf/cli:$version ..."
-    docker build --tag "watchwolf/cli:$version" --tag "watchwolf/cli:latest" "$WW_BASE_PATH"
+    echo "[v] Building Docker image watchwolf-cli:local ..."
+    docker build --tag "watchwolf-cli:local" --tag "watchwolf-cli:$version" "$WW_BASE_PATH"
     if [ $? -ne 0 ]; then
         echo "[e] Exception while building the WW-CLI image" >&2
         exit 1
     fi
-    echo "[i] Built image watchwolf/cli:$version"
+    echo "[i] Built image watchwolf-cli:local (also tagged watchwolf-cli:$version)"
 fi

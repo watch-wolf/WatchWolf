@@ -9,18 +9,20 @@ Replaces [`WatchWolfSetup.sh`](../WatchWolfSetup.sh), which stays around for one
 ## Quick start
 
 ```bash
-wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf
-chmod +x watchwolf
+git clone https://github.com/watch-wolf/WatchWolf
+cd WatchWolf
 
-./watchwolf build      # menuconfig-style checkbox screen on a TTY; flags otherwise
-./watchwolf install    # optional: register at startup, then self-test
-./watchwolf run
-./watchwolf monitor    # the live dashboard
+./cli/watchwolf build      # menuconfig-style checkbox screen on a TTY; flags otherwise
+./cli/watchwolf install    # optional: register at startup, then self-test
+./cli/watchwolf run
+./cli/watchwolf monitor    # the live dashboard
 ```
 
-That `watchwolf` file is the **only** thing that has to exist on the host. It pulls (or builds, if
-not yet published) the CLI's own image and runs everything inside it — the host needs Docker and
-nothing else: no `git`, `wget`, `jq`, `dos2unix`, Maven or JDK.
+There is no published `watchwolf` image, and `cli/watchwolf` never defaults to pulling one —
+defaulting to a guessable registry name would let anyone who registers it first have this launcher
+pull and run their image, on every user's machine, with a mounted Docker socket. It always builds
+the image itself from this checkout's own `Dockerfile` (cached after the first run), so beyond
+`git` and Docker, the host needs nothing else: no `jq`, `wget`, `dos2unix`, Maven or JDK.
 
 ## Commands
 

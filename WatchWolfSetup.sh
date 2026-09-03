@@ -6,12 +6,17 @@
 # `watchwolf monitor` (a live dashboard) and `watchwolf doctor`/`watchwolf logs` for diagnosing a
 # broken environment.
 #
-# This script is kept for one release so the previously documented
+# This script is kept for one release so scripts and bookmarks pointing at it keep working. It
+# does nothing itself: it translates this script's flags into the CLI's and execs cli/watchwolf.
+# See cli/README.md for the full command reference; see cli/AGENTS.md for the design.
+#
+# NOTE the previously documented single-file download path no longer works:
 #     wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/WatchWolfSetup.sh
 #     bash WatchWolfSetup.sh --build
-# path keeps working. It does nothing itself: it downloads cli/watchwolf (the CLI's own launcher)
-# next to itself if not already present, translates this script's flags into the CLI's, and execs
-# it. See cli/README.md for the full command reference; see cli/AGENTS.md for the design.
+# The CLI has no published image to fall back to (see cli/watchwolf's own header for why -- in
+# short, defaulting to an unclaimed registry name is a supply-chain risk) and always builds itself
+# from this repository's Dockerfile, so a lone downloaded script has nothing to build from. Clone
+# the repository instead: git clone https://github.com/watch-wolf/WatchWolf
 #
 # Two behaviours worth knowing about if you were relying on the old script specifically:
 #   - `--build` no longer deletes ServersManager/ClientsManager before cloning. Every step is
@@ -28,23 +33,14 @@ launcher="$script_dir/cli/watchwolf"
 echo "[w] WatchWolfSetup.sh is deprecated. Forwarding to cli/watchwolf -- see cli/README.md." >&2
 echo "[w] Update any scripts or bookmarks to use that directly." >&2
 
-# A bare download of this file (the documented `wget .../WatchWolfSetup.sh` path) won't have
-# cli/watchwolf sitting next to it, since that only exists inside a full checkout. Fetch it.
 if [ ! -f "$launcher" ]; then
-    echo "[v] Fetching cli/watchwolf next to this script..." >&2
-    if command -v wget >/dev/null 2>&1; then
-        wget -q -O "$script_dir/watchwolf" \
-            https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf
-    elif command -v curl >/dev/null 2>&1; then
-        curl -fsSL -o "$script_dir/watchwolf" \
-            https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf
-    else
-        echo "[e] Neither wget nor curl is available to fetch cli/watchwolf." >&2
-        echo "[e] Download it yourself: https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf" >&2
-        exit 1
-    fi
-    chmod +x "$script_dir/watchwolf"
-    launcher="$script_dir/watchwolf"
+    echo "[e] cli/watchwolf was not found next to this script ($script_dir/cli)." >&2
+    echo "[e] The CLI builds its own image from this repository's Dockerfile -- there is no" >&2
+    echo "[e] published image to fetch instead -- so a standalone copy of this script can no" >&2
+    echo "[e] longer set itself up. Clone the full repository instead:" >&2
+    echo "[e]     git clone https://github.com/watch-wolf/WatchWolf" >&2
+    echo "[e]     cd WatchWolf && bash WatchWolfSetup.sh --build" >&2
+    exit 1
 fi
 
 # translate this script's flags into the CLI's -- almost all of them are already the same

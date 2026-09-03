@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 #
-# WatchWolf launcher. The only file that has to exist on the host; everything else lives in the
-# CLI's Docker image.
+# WatchWolf launcher. Run from a checkout of the WatchWolf repo -- it builds the CLI's image from
+# the Dockerfile sitting next to it (git clone https://github.com/watch-wolf/WatchWolf, then
+# bash cli/watchwolf build) and runs everything inside that image.
 #
-#   wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf
-#   bash watchwolf build
+# There is no published WatchWolf CLI image, and this deliberately never invents a name to pull
+# one from. Defaulting to a guessable registry name (e.g. "watchwolf/cli:latest") would mean
+# anyone who registers that name on Docker Hub first gets this launcher to pull and run their
+# image, on every WatchWolf user's machine, with a mounted Docker socket. Building locally from a
+# source checkout has no such trust-on-first-use problem: the image is exactly what is in the repo.
 #
 # The scheme is "identity mounts": every host path the CLI will hand to the Docker daemon is
 # mounted inside the container AT THE SAME ABSOLUTE PATH. A path computed by Java is then valid
@@ -14,7 +18,8 @@
 
 set -euo pipefail
 
-IMAGE="${WATCHWOLF_CLI_IMAGE:-watchwolf/cli:latest}"
+# Fixed, purely local tag -- see the header above for why this is never a registry name.
+IMAGE="watchwolf-cli:local"
 BASE="${WATCHWOLF_PATH:-$HOME/WatchWolf}"
 
 # --path wins over the env var; peek at argv without consuming it
@@ -58,16 +63,11 @@ case "$PWD_REAL/" in
 esac
 
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-    echo "[v] Fetching the WatchWolf CLI image ($IMAGE)..."
-    if ! docker pull "$IMAGE" 2>/dev/null; then
-        cli_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-        if [ -f "$cli_dir/Dockerfile" ]; then
-            echo "[v] Not published yet; building it from $cli_dir (this takes a few minutes the first time)..."
-            docker build --tag "$IMAGE" "$cli_dir" || die "Could not build the CLI image."
-        else
-            die "Could not fetch '$IMAGE', and no Dockerfile next to this launcher to build it from."
-        fi
-    fi
+    cli_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+    [ -f "$cli_dir/Dockerfile" ] \
+        || die "No Dockerfile next to this launcher ($cli_dir). Run it from a checkout of the WatchWolf repo: git clone https://github.com/watch-wolf/WatchWolf, then bash cli/watchwolf ..."
+    echo "[v] Building the WatchWolf CLI image from $cli_dir (this takes a few minutes the first time; cached after)..."
+    docker build --tag "$IMAGE" "$cli_dir" || die "Could not build the CLI image."
 fi
 
 STATE="$BASE/.watchwolf"

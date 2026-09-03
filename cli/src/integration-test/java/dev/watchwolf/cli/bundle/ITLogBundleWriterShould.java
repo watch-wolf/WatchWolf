@@ -214,10 +214,19 @@ public class ITLogBundleWriterShould {
                 "Could not produce a genuinely unreadable logs/ from inside this test runner -- "
                         + "see this method's comment for why. Skipping rather than failing.");
 
+        // This is the launcher's own tag ("watchwolf-cli:local" -- no namespace, never a
+        // published image; see cli/watchwolf's header for why). Nothing in ci/tests.sh builds it,
+        // so it is only present when someone has separately run `ci/build.sh --image` or the
+        // launcher itself; skip rather than fail when it is not there.
+        String image = "watchwolf-cli:local";
+        Assumptions.assumeTrue(docker.imageExists(image),
+                "The '" + image + "' image is not built. Run 'bash ci/build.sh --image', or "
+                        + "'./watchwolf build' once, then re-run this test.");
+
         Path destination = base.resolve("bundle-recovered.tar.gz");
         try {
             RootHelperConfig helper = new RootHelperConfig(
-                    "watchwolf/cli:latest", String.valueOf(unixUid()), String.valueOf(unixGid()));
+                    image, String.valueOf(unixUid()), String.valueOf(unixGid()));
 
             new BundleWriter(docker, new NioFileGateway(), layout, new HostInterfaces(),
                     Clock.systemUTC(), helper)

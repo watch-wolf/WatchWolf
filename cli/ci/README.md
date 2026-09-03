@@ -7,7 +7,7 @@ Java 8 (`maven:3.8.4-openjdk-8`).
 
 | Script | Does |
 | --- | --- |
-| `./ci/build.sh [--preclean] [--image]` | Build `target/watchwolf-cli.jar`; `--image` also builds the `watchwolf/cli` Docker image |
+| `./ci/build.sh [--preclean] [--image]` | Build `target/watchwolf-cli.jar`; `--image` also builds the `watchwolf-cli:local` Docker image |
 | `./ci/tests.sh --unit [--tests <pattern>]` | Run the unit tests — hermetic, no Docker socket, no network, no `$HOME/WatchWolf` |
 | `./ci/tests.sh --validation` | Run the code checks (naming conventions, the pure-logic boundary, the Core drift check) |
 | `./ci/tests.sh --integration [--tests <pattern>]` | Run the system tests (**needs a reachable Docker daemon**, see below) |
