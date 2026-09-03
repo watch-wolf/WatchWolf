@@ -194,6 +194,24 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   adapting -- when one fails because the list legitimately changed, update the hardcoded list, do
   not loosen the assertion. `McVersion.MIN_SUPPORTED` (1.8) is applied in both parsers, since both
   services still list versions WatchWolf was never meant to run.
+- **A submenu's `[ ]`/`[o]`/`[*]` marker is computed live, never stored.**
+  `MenuNode.aggregateState()` walks every `CHECK` descendant at any depth (so `Server jars`, which
+  holds no checkboxes of its own -- Spigot and Paper are themselves submenus -- still rolls up
+  correctly) and `marker()` reads it on every draw. This replaced a hand-maintained "nothing
+  selected" annotation that had to be refreshed by remembering to call `applyConstraints()` after
+  every mutation to the right list; the live version cannot go stale, so don't reintroduce a stored
+  copy. The `--->` suffix that marks a row as a submenu is unrelated and still appended separately
+  in `MenuConfigScreen.drawRows`.
+- **A `TEXT` field's `Enter` is rejected, not silently patched over.** `MenuNode.withValidator(...)`
+  attaches a `String -> Optional<String>` check (empty = valid); `MenuConfigScreen.handleTextInput`
+  refuses to call `MenuModel.setValue` and leaves edit mode open when it returns an error, so
+  "Parallel Spigot builders" can no longer take an empty box or letters and have them quietly
+  become 1 the moment the plan is built -- the user sees the rejection and stays in the field to
+  fix it. `MenuModel.toBuildPlan()`'s `parseIntOr` fallback stays as a second line of defence for
+  any caller that sets a value directly, bypassing the screen (as tests do) -- the two are not
+  redundant, they guard different paths. See `MenuConfigScreenTextValidationShould` for the
+  screen-level proof; a `MenuModel`-only test would not have caught a regression in the rejection,
+  since that logic lives in the screen.
 
 ## Git conventions
 

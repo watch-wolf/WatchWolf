@@ -238,15 +238,35 @@ public class MenuModelShould {
     }
 
     @Test
-    public void annotateSpigotWhenNothingIsSelected() {
-        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
-        this.menu.deselectAll(MenuModel.ID_SPIGOT);
-
+    public void markSpigotsAggregateStateAsItsSelectionChanges() {
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
         MenuNode spigot = this.menu.node(MenuModel.ID_SPIGOT).orElseThrow();
-        assertEquals("nothing selected", spigot.annotation().orElseThrow());
+        assertEquals(MenuNode.AggregateState.ALL, spigot.aggregateState(), "all selected by default");
+        assertEquals("[*]", spigot.marker());
 
         this.menu.toggle("spigot:1.8.8");
-        assertTrue(this.menu.node(MenuModel.ID_SPIGOT).orElseThrow().annotation().isEmpty());
+        assertEquals(MenuNode.AggregateState.SOME, spigot.aggregateState());
+        assertEquals("[o]", spigot.marker());
+
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+        assertEquals(MenuNode.AggregateState.NONE, spigot.aggregateState());
+        assertEquals("[ ]", spigot.marker());
+    }
+
+    @Test
+    public void rollUpServerJarsAggregateStateAcrossBothSpigotAndPaper() {
+        // "Server jars" holds no checkboxes of its own -- Spigot and Paper are themselves
+        // submenus -- so its marker must roll up every CHECK descendant at any depth
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
+        this.menu.paperLoaded(List.of(McVersion.of("1.20.4")));
+        MenuNode serverJars = this.menu.node(MenuModel.ID_SERVER_JARS).orElseThrow();
+        assertEquals(MenuNode.AggregateState.ALL, serverJars.aggregateState());
+
+        this.menu.deselectAll(MenuModel.ID_PAPER);
+        assertEquals(MenuNode.AggregateState.SOME, serverJars.aggregateState());
+
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+        assertEquals(MenuNode.AggregateState.NONE, serverJars.aggregateState());
     }
 
     @Test
@@ -313,12 +333,13 @@ public class MenuModelShould {
     }
 
     @Test
-    public void annotateUsualPluginsWhenNothingIsSelected() {
+    public void markUsualPluginsAggregateStateWhenNothingIsSelected() {
         this.menu.usualPluginsLoaded(List.of(plugin("WorldGuard")));
         this.menu.deselectAll(MenuModel.ID_USUAL_PLUGINS);
 
         MenuNode usualPlugins = this.menu.node(MenuModel.ID_USUAL_PLUGINS).orElseThrow();
-        assertEquals("nothing selected", usualPlugins.annotation().orElseThrow());
+        assertEquals(MenuNode.AggregateState.NONE, usualPlugins.aggregateState());
+        assertEquals("[ ]", usualPlugins.marker());
     }
 
     @Test
@@ -338,6 +359,29 @@ public class MenuModelShould {
     public void fallBackToOneBuilderWhenTheThreadCountIsNotANumber() {
         this.menu.setValue(MenuModel.ID_THREADS, "lots");
         assertEquals(1, this.menu.toBuildPlan().parallelBuilders());
+    }
+
+    @Test
+    public void rejectAnInvalidThreadCountBeforeItReachesTheModel() {
+        // MenuConfigScreen is what actually refuses to commit an invalid edit (see
+        // MenuConfigScreenTextValidationShould) -- this is the rule it enforces
+        MenuNode threads = this.menu.node(MenuModel.ID_THREADS).orElseThrow();
+
+        assertTrue(threads.validate("").isPresent(), "empty must be rejected");
+        assertTrue(threads.validate("   ").isPresent(), "blank must be rejected");
+        assertTrue(threads.validate("abc").isPresent(), "non-numeric must be rejected");
+        assertTrue(threads.validate("0").isPresent(), "zero must be rejected");
+        assertTrue(threads.validate("-1").isPresent(), "negative must be rejected");
+        assertTrue(threads.validate("4").isEmpty(), "a positive whole number must be accepted");
+    }
+
+    @Test
+    public void rejectAnEmptyInstallPath() {
+        MenuNode installPath = this.menu.node(MenuModel.ID_INSTALL_PATH).orElseThrow();
+
+        assertTrue(installPath.validate("").isPresent());
+        assertTrue(installPath.validate("   ").isPresent());
+        assertTrue(installPath.validate("/home/someone/WatchWolf").isEmpty());
     }
 
     @Test

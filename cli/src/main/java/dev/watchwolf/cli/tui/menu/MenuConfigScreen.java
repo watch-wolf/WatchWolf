@@ -251,8 +251,16 @@ public final class MenuConfigScreen implements AutoCloseable {
                 }
             }
             case Enter -> {
-                this.model.setValue(this.editingId, this.editBuffer);
-                this.editingId = null;
+                // rejected here, not silently replaced with a default once the plan is built --
+                // an invalid value stays on screen, in edit mode, so the user sees it was refused
+                // and why, rather than typing "abc" and having it quietly become 1 later
+                boolean valid = this.model.node(this.editingId)
+                        .map(node -> node.validate(this.editBuffer).isEmpty())
+                        .orElse(true);
+                if (valid) {
+                    this.model.setValue(this.editingId, this.editBuffer);
+                    this.editingId = null;
+                }
             }
             case Escape -> this.editingId = null;
             default -> { }
@@ -315,8 +323,12 @@ public final class MenuConfigScreen implements AutoCloseable {
         }
 
         if (this.editingId != null) {
-            painter.row(0, height - 1, width, " value: " + this.editBuffer + "_",
-                    Theme.TEXT, Theme.SELECTED_BACKGROUND);
+            Optional<String> error = this.model.node(this.editingId)
+                    .flatMap(node -> node.validate(this.editBuffer));
+            String line = " value: " + this.editBuffer + "_"
+                    + error.map(message -> "   (" + message + ")").orElse("");
+            painter.row(0, height - 1, width, line, Theme.TEXT,
+                    error.isPresent() ? Theme.BAD : Theme.SELECTED_BACKGROUND);
         } else {
             painter.text(1, height - 1,
                     "space toggle · ⏎ enter/edit · esc back · s start · ? help · q quit",

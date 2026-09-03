@@ -56,7 +56,8 @@ public final class MenuModel {
 
         this.root.add(MenuNode.text(ID_INSTALL_PATH, "Install base", basePath)
                 .withHelp("Everything is installed under here: the ServersManager and "
-                        + "ClientsManager clones, the server jars, the plugins and the logs."));
+                        + "ClientsManager clones, the server jars, the plugins and the logs.")
+                .withValidator(MenuModel::validateInstallPath));
 
         boolean dev = "dev".equals(initial.branch());
         MenuNode branchMaster = MenuNode.radio(ID_BRANCH_MASTER, "master", "branch", !dev)
@@ -72,7 +73,8 @@ public final class MenuModel {
         this.root.add(MenuNode.text(ID_THREADS, "Parallel Spigot builders",
                         String.valueOf(initial.parallelBuilders()))
                 .withHelp("BuildTools is slow and mostly single-threaded, so several containers "
-                        + "at once help a lot. Each needs about 1.5GB free."));
+                        + "at once help a lot. Each needs about 1.5GB free.")
+                .withValidator(MenuModel::validateThreads));
 
         this.root.add(MenuNode.check(ID_CLONE_SERVERS_MANAGER,
                         "Clone/update WatchWolf-ServersManager", initial.cloneServersManager())
@@ -198,44 +200,24 @@ public final class MenuModel {
      * <p>The one that matters: without the Tester checkout there is nothing to run the self-test
      * suites from, so that submenu is greyed out <em>with the reason shown</em> rather than
      * silently accepting a selection that would be dropped later.
+     *
+     * <p>This used to also stamp a "nothing selected" annotation onto Server jars/Spigot/Paper/
+     * Usual plugins by hand, which meant remembering to call this again every time one of those
+     * lists changed. {@link MenuNode#aggregateState()} replaces that: every submenu's
+     * {@code [ ]}/{@code [o]}/{@code [*]} marker is computed live from the tree whenever it is
+     * drawn, so nothing here needs to keep it in sync.
      */
     public void applyConstraints() {
         boolean tester = this.isChecked(ID_CLONE_TESTER);
         this.node(ID_SELF_TEST).ifPresent(selfTest -> {
             if (tester) {
                 selfTest.enable();
-                selfTest.setAnnotation(null);
                 selfTest.children().forEach(MenuNode::enable);
             } else {
                 selfTest.disable("needs WatchWolf-Tester");
-                selfTest.setAnnotation("needs WatchWolf-Tester");
                 selfTest.children().forEach(
                         child -> child.disable("needs WatchWolf-Tester"));
             }
-        });
-
-        this.node(ID_SERVER_JARS).ifPresent(serverJars -> {
-            boolean anySelected = !this.selectedVersions(ID_SPIGOT).isEmpty()
-                    || !this.selectedVersions(ID_PAPER).isEmpty();
-            serverJars.setAnnotation(anySelected ? null : "nothing selected");
-        });
-        this.annotateIfNothingSelected(ID_SPIGOT);
-        this.annotateIfNothingSelected(ID_PAPER);
-        this.annotateIfNothingSelected(ID_USUAL_PLUGINS);
-    }
-
-    /**
-     * Marks a fetched, per-item checkbox submenu (Spigot/Paper versions, usual plugins) with
-     * "nothing selected" once it has something to select and none of it is checked. Silent while
-     * the list is still empty -- not fetched yet, still loading, or the fetch failed -- so a
-     * network problem shows as the status line's own failure message, not a misleading blanket
-     * "nothing selected" that reads like a user mistake.
-     */
-    private void annotateIfNothingSelected(String submenuId) {
-        this.node(submenuId).ifPresent(submenu -> {
-            boolean fetched = !submenu.children().isEmpty();
-            boolean anySelected = submenu.children().stream().anyMatch(MenuNode::isChecked);
-            submenu.setAnnotation(fetched && !anySelected ? "nothing selected" : null);
         });
     }
 
@@ -266,13 +248,11 @@ public final class MenuModel {
     public void spigotLoaded(List<McVersion> versions) {
         this.spigotVersions = Async.loaded(versions);
         this.populateVersions(ID_SPIGOT, "spigot", versions, this.spigotInstalled);
-        this.applyConstraints();
     }
 
     public void paperLoaded(List<McVersion> versions) {
         this.paperVersions = Async.loaded(versions);
         this.populateVersions(ID_PAPER, "paper", versions, this.paperInstalled);
-        this.applyConstraints();
     }
 
     /**
@@ -310,7 +290,6 @@ public final class MenuModel {
                         plugin.name() + " " + plugin.version(), true));
             }
         }
-        this.applyConstraints();
     }
 
     public void usualPluginsFailed(String detail, String remedy) {
@@ -371,7 +350,6 @@ public final class MenuModel {
             node.setAnnotation("installed");
             parent.add(node);
         }
-        this.applyConstraints();
     }
 
     public List<McVersion> selectedVersions(String parentId) {
@@ -438,5 +416,27 @@ public final class MenuModel {
         } catch (RuntimeException ex) {
             return fallback;
         }
+    }
+
+    /**
+     * Rejected in {@code MenuConfigScreen} rather than silently replaced with a default once the
+     * plan is built -- an empty box or "abc" used to just quietly become 1 builder with no word
+     * to the user that what they typed was ignored.
+     */
+    private static Optional<String> validateThreads(String text) {
+        if (text == null || text.isBlank()) return Optional.of("must be a number, e.g. 4");
+        int parsed;
+        try {
+            parsed = Integer.parseInt(text.strip());
+        } catch (NumberFormatException ex) {
+            return Optional.of("must be a whole number, e.g. 4");
+        }
+        if (parsed < 1) return Optional.of("must be at least 1");
+        return Optional.empty();
+    }
+
+    private static Optional<String> validateInstallPath(String text) {
+        if (text == null || text.isBlank()) return Optional.of("must not be empty");
+        return Optional.empty();
     }
 }

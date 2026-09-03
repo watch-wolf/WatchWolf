@@ -3,6 +3,7 @@ package dev.watchwolf.cli.tui.menu;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * One row of the menuconfig screen.
@@ -35,6 +36,8 @@ public final class MenuNode {
     private boolean enabled = true;
     private String disabledReason;
     private String annotation;
+    /** {@code TEXT} only. Returns an error message for an invalid value, or empty when it's fine. */
+    private Function<String, Optional<String>> validator = ignored -> Optional.empty();
 
     public MenuNode(String id, Kind kind, String label) {
         this.id = id;
@@ -77,6 +80,18 @@ public final class MenuNode {
     public MenuNode withAnnotation(String annotation) {
         this.annotation = annotation;
         return this;
+    }
+
+    /** {@code TEXT} only -- rejected in {@link MenuConfigScreen} rather than silently accepted
+     *  and papered over later (e.g. by falling back to a default when the plan is built). */
+    public MenuNode withValidator(Function<String, Optional<String>> validator) {
+        this.validator = validator;
+        return this;
+    }
+
+    /** @return an error message if {@code candidate} is invalid for this field, else empty */
+    public Optional<String> validate(String candidate) {
+        return this.validator.apply(candidate);
     }
 
     public MenuNode with(MenuNode... children) {
@@ -131,13 +146,52 @@ public final class MenuNode {
         return Optional.empty();
     }
 
-    /** Rendered prefix: {@code [*]}, {@code [ ]}, {@code (*)}, {@code --->} ... */
+    /**
+     * Rendered prefix: {@code [*]}, {@code [ ]}, {@code (*)} ... A {@code SUBMENU} gets one too --
+     * {@code [ ]}/{@code [o]}/{@code [*]} for none/some/all of its {@code CHECK} descendants, at
+     * any depth, currently checked -- so a list's state is visible without opening it. The
+     * {@code --->} that also marks it a submenu is appended separately, in
+     * {@code MenuConfigScreen.drawRows}.
+     */
     public String marker() {
         return switch (this.kind) {
             case CHECK -> this.checked ? "[*]" : "[ ]";
             case RADIO -> this.checked ? "(*)" : "( )";
-            case SUBMENU -> "   ";
+            case SUBMENU -> switch (this.aggregateState()) {
+                case NONE -> "[ ]";
+                case SOME -> "[o]";
+                case ALL -> "[*]";
+            };
             case TEXT, LABEL -> "   ";
         };
+    }
+
+    public enum AggregateState { NONE, SOME, ALL }
+
+    /** Over every {@code CHECK} descendant anywhere in this subtree, not just direct children --
+     *  a submenu can itself hold submenus (Server jars -&gt; Spigot -&gt; versions). */
+    public AggregateState aggregateState() {
+        int total = 0;
+        int checkedCount = 0;
+        for (MenuNode descendant : this.checkDescendants()) {
+            total++;
+            if (descendant.checked) checkedCount++;
+        }
+        if (checkedCount == 0) return AggregateState.NONE;
+        if (checkedCount == total) return AggregateState.ALL;
+        return AggregateState.SOME;
+    }
+
+    private List<MenuNode> checkDescendants() {
+        List<MenuNode> found = new ArrayList<>();
+        this.collectCheckDescendants(found);
+        return found;
+    }
+
+    private void collectCheckDescendants(List<MenuNode> out) {
+        for (MenuNode child : this.children) {
+            if (child.kind == Kind.CHECK) out.add(child);
+            child.collectCheckDescendants(out);
+        }
     }
 }
