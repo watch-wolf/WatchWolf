@@ -9,9 +9,16 @@ import java.util.List;
  * <b>file</b> {@code logs/<id>/latest.log}, not {@code docker logs}: those containers run with
  * {@code --autoRemove}, so Docker discards their output the instant the server stops, while the
  * file survives. Reading the wrong one is how a finished run looks like it produced nothing.
+ *
+ * <p>{@link #logIsLive()} answers a different question from "is there a log source at all"
+ * ({@link LogSource.None} already covers that): whether the source can still produce <em>new</em>
+ * lines. A finished MC server's {@code latest.log} still exists and reads fine, but nothing will
+ * ever be appended to it again -- "following" it is meaningless, and the screen should not offer
+ * or claim to do it. {@code false} for a stopped manager or a finished server; {@code true} for a
+ * bot, which by construction is only shown while its port is still listening.
  */
 public record EntityView(String title, List<String> facts, LogSource logSource,
-                         String unavailableReason) {
+                         String unavailableReason, boolean logIsLive) {
 
     /** Where this entity's output lives. */
     public sealed interface LogSource {

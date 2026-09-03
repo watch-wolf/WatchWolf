@@ -213,10 +213,10 @@ public final class MonitorModel {
         if (!manager.isUp()) {
             return new EntityView(manager.name(), facts,
                     new EntityView.LogSource.None("the container is not running"),
-                    "Start it with 'watchwolf run'.");
+                    "Start it with 'watchwolf run'.", false);
         }
         return new EntityView(manager.name(), facts,
-                new EntityView.LogSource.ContainerLog(manager.name()), null);
+                new EntityView.LogSource.ContainerLog(manager.name()), null, true);
     }
 
     private EntityView serverView(McServerStatus server) {
@@ -238,11 +238,13 @@ public final class MonitorModel {
                     new EntityView.LogSource.None("logs/" + server.sessionId()
                             + "/latest.log is not readable by this user"),
                     "It is owned by root (the ServersManager container wrote it). Press 'e', or "
-                            + "run 'watchwolf logs --session " + server.sessionId() + "'.");
+                            + "run 'watchwolf logs --session " + server.sessionId() + "'.", false);
         }
+        // A finished server's log file still reads fine -- it just will never grow again, so
+        // "following" it is meaningless. isRunning() is exactly the signal for that.
         return new EntityView(server.name(), facts,
                 new EntityView.LogSource.FileLog(this.layout.sessionLogFile(server.sessionId())),
-                null);
+                null, server.isRunning());
     }
 
     private EntityView clientView(ClientStatus client) {
@@ -259,14 +261,17 @@ public final class MonitorModel {
                             "this bot's username is unknown, so its lines cannot be picked out of "
                             + "the ClientsManager's shared output"),
                     "Bots are threads inside one container, not containers of their own, so their "
-                    + "only output is that shared stream. Open ClientsManager to read all of it.");
+                    + "only output is that shared stream. Open ClientsManager to read all of it.",
+                    false);
         }
-        // one shared stream for every bot; the line prefix is the only way to separate them
+        // one shared stream for every bot; the line prefix is the only way to separate them. A bot
+        // only appears in the model at all while its port is still listening (see
+        // SocketAndLogClientDiscovery), so reaching this branch already means it is live.
         return new EntityView(client.displayName(), facts,
                 new EntityView.LogSource.FilteredContainerLog(
                         this.snapshot.clientsManager().name(),
                         "[" + client.username().orElseThrow() + " - "),
-                null);
+                null, true);
     }
 
     static String human(Duration duration) {

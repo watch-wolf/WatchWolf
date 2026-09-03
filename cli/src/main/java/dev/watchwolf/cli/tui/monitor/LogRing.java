@@ -36,6 +36,26 @@ public final class LogRing {
         this.scrollBack = 0;
     }
 
+    /**
+     * Swaps in a freshly re-read tail (a file log has no push notification, so its content is
+     * periodically re-read wholesale) <b>without</b> resetting {@code scrollBack}.
+     *
+     * <p>{@link #clear()} intentionally resets it -- entering a different entity should start at
+     * the live edge. But calling {@code clear()} on every periodic re-read, as an earlier version
+     * of this did, snapped the view back to "following" and jumped to the bottom every ~1s even
+     * while someone was mid-scroll reading history; a viewer stops being useful for reading
+     * anything if it keeps yanking itself back to the tail. Keeping {@code scrollBack} means
+     * staying the same distance from the live edge as new lines arrive, matching what a "scroll
+     * back N lines from the tail" viewer is expected to do.
+     */
+    public synchronized void replaceAll(List<String> newLines) {
+        this.lines.clear();
+        for (String line : newLines) {
+            if (this.lines.size() == this.capacity) this.lines.removeFirst();
+            this.lines.addLast(line);
+        }
+    }
+
     public synchronized void setFilter(String filter) {
         this.filter = filter == null ? "" : filter;
         this.scrollBack = 0;

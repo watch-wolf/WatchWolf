@@ -114,6 +114,18 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   `frame` counter incremented once per loop iteration; when the idle-poll interval dropped (see
   above) those all sped up by the same factor. They are wall-clock-based now
   (`System.currentTimeMillis()`), independent of however fast the loop actually polls.
+- **A file log's periodic re-read must use `LogRing.replaceAll()`, never `clear()`+`addAll()`.**
+  `MonitorScreen.reloadFileLog` runs on every ~1s re-read of `logs/<id>/latest.log` (no push
+  notification exists for a file), and `clear()` resets `scrollBack` to 0 — which used to snap the
+  view back to "following" and jump to the tail on that same ~1s cadence even while someone was
+  mid-scroll reading history. `replaceAll()` swaps the buffered lines in place and leaves
+  `scrollBack` untouched. `clear()` is still correct (and still used) when switching to a
+  *different* entity, where starting at the live edge is exactly what's wanted — the two calls are
+  not interchangeable. `LogRingShould` only tests `LogRing`'s own contract and would pass either
+  way; `MonitorScreenLogViewingShould` (`src/test/java`, drives the real loop over a
+  `DefaultVirtualTerminal`) is what actually catches a caller regressing to `clear()`+`addAll()`
+  here. Relatedly, `logIsLive()` on `EntityView` gates both this periodic reload and the `f` key —
+  a finished server's log file will never grow again, so "following" it is offered nowhere.
 
 ## Git conventions
 

@@ -56,6 +56,13 @@ public class MonitorModelShould {
                 true, true, null);
     }
 
+    /** No container -- the run is over; only logs/<id>/ survives. isRunning() is false. */
+    private static McServerStatus finishedServer(String id, String type, String version) {
+        return new McServerStatus(id, null,
+                new SessionInfo(id, Map.of("serverType", type, "serverVersion", version)),
+                false, true, null);
+    }
+
     @Test
     public void showNoLogLinesOnTheOverview() {
         // logs belong to one entity; the overview is an inventory, so its whole height goes to
@@ -128,6 +135,23 @@ public class MonitorModelShould {
         assertInstanceOf(EntityView.LogSource.FileLog.class, view.logSource());
         assertEquals(LAYOUT.sessionLogFile("1772387923303"),
                 ((EntityView.LogSource.FileLog) view.logSource()).path());
+        assertTrue(view.logIsLive(), "a running server can still produce new lines");
+    }
+
+    @Test
+    public void markAFinishedServersLogAsNotLive() {
+        // the bug report: "following" implied more output was coming even for a server that had
+        // already exited -- nothing will ever be appended to its logs/<id>/latest.log again once
+        // the container (which wrote it) is gone
+        MonitorModel model = new MonitorModel(LAYOUT, snapshot(
+                List.of(finishedServer("1772387923303", "Spigot", "1.8.8")), List.of(), null));
+
+        model.moveDown();
+        assertTrue(model.enter());
+
+        EntityView view = model.entityView().orElseThrow();
+        assertInstanceOf(EntityView.LogSource.FileLog.class, view.logSource());
+        assertFalse(view.logIsLive(), "a finished server's log file will never grow again");
     }
 
     @Test
@@ -140,6 +164,23 @@ public class MonitorModelShould {
         assertInstanceOf(EntityView.LogSource.ContainerLog.class, view.logSource());
         assertEquals("ServersManager",
                 ((EntityView.LogSource.ContainerLog) view.logSource()).containerName());
+        assertTrue(view.logIsLive(), "an up manager is still streaming output");
+    }
+
+    @Test
+    public void markAStoppedManagersLogAsNotLive() {
+        EnvironmentSnapshot stopped = new EnvironmentSnapshot(NOW, true, "29.4.3", null, true,
+                new ManagerStatus(ManagerStatus.Kind.SERVERS_MANAGER, null, false, null),
+                new ManagerStatus(ManagerStatus.Kind.CLIENTS_MANAGER,
+                        container("ClientsManager", "running"), true, null),
+                List.of(), ClientDiscovery.Result.unavailable("not running"), "192.168.1.193");
+
+        MonitorModel model = new MonitorModel(LAYOUT, stopped);
+        assertTrue(model.enter());   // ServersManager is the first row
+
+        EntityView view = model.entityView().orElseThrow();
+        assertInstanceOf(EntityView.LogSource.None.class, view.logSource());
+        assertFalse(view.logIsLive());
     }
 
     @Test
@@ -158,6 +199,9 @@ public class MonitorModelShould {
                 assertInstanceOf(EntityView.LogSource.FilteredContainerLog.class, view.logSource());
         assertEquals("ClientsManager", source.containerName());
         assertEquals("[Alice - ", source.linePrefix());
+        // a bot only appears in the model at all while its port is still listening, so reaching
+        // this branch already means it is live
+        assertTrue(view.logIsLive());
     }
 
     @Test
@@ -172,6 +216,7 @@ public class MonitorModelShould {
         EntityView view = model.entityView().orElseThrow();
         assertInstanceOf(EntityView.LogSource.None.class, view.logSource());
         assertTrue(view.unavailableReason().contains("threads inside one container"));
+        assertFalse(view.logIsLive());
     }
 
     @Test

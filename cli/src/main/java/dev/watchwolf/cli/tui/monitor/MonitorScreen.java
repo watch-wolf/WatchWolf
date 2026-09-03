@@ -147,7 +147,12 @@ public final class MonitorScreen implements AutoCloseable {
                 case 'r' -> this.setStatusMessage("refreshed");
                 case 'e' -> this.exportEverything();
                 case 'f' -> {
-                    if (this.model.isInEntityView()) {
+                    // "following" means something will still arrive to follow -- for a stopped
+                    // manager or a finished server nothing ever will again, so the key does
+                    // nothing rather than claim a following state that can't be true. The footer
+                    // hint and the log title omit "follow" entirely in that case (see draw()).
+                    if (this.model.isInEntityView()
+                            && this.model.entityView().map(EntityView::logIsLive).orElse(false)) {
                         this.logs.scrollToTail();
                         this.setStatusMessage("following");
                     }
@@ -246,7 +251,12 @@ public final class MonitorScreen implements AutoCloseable {
             // on wall-clock time, not a frame count: the loop now runs far faster than any
             // sensible reload cadence, and coupling this to the loop's own polling rate would
             // either reload needlessly often or drift if that rate ever changes again.
-            if (view.logSource() instanceof EntityView.LogSource.FileLog file
+            //
+            // Only when logIsLive(): a finished server's file will never change again (the
+            // container that would append to it is gone), so re-reading it on a timer is both
+            // pointless and, before replaceAll() existed, was the exact mechanism that kept
+            // yanking the view back to the tail -- see LogRing.replaceAll's Javadoc.
+            if (view.logIsLive() && view.logSource() instanceof EntityView.LogSource.FileLog file
                     && System.currentTimeMillis() - this.lastFileLogReloadAtMillis >= 1000) {
                 this.reloadFileLog(file.path());
                 this.lastFileLogReloadAtMillis = System.currentTimeMillis();
@@ -273,14 +283,22 @@ public final class MonitorScreen implements AutoCloseable {
 
         } else if (view.logSource() instanceof EntityView.LogSource.FileLog file) {
             this.reloadFileLog(file.path());
+            // otherwise lastFileLogReloadAtMillis is left over from whatever was last viewed (or 0,
+            // the first time), and the periodic branch above sees an already-elapsed interval and
+            // reloads again on the very next loop tick instead of after a full cadence
+            this.lastFileLogReloadAtMillis = System.currentTimeMillis();
         }
     }
 
     private void reloadFileLog(Path path) {
         try {
             List<String> tail = this.files.readLastLines(path, 1000);
-            this.logs.clear();
-            this.logs.addAll(tail);
+            // replaceAll, not clear()+addAll(): this runs on every periodic re-read (a file log
+            // has no push notification), and clear() resets scrollBack -- which used to snap the
+            // view back to "following" and jump to the bottom every ~1s even mid-scroll. The
+            // initial population (syncLogStream, on first entering the entity) already cleared
+            // scrollBack to 0 itself, so this still starts at the tail there too.
+            this.logs.replaceAll(tail);
         } catch (IOException ex) {
             this.logs.clear();
             this.logs.add("[could not read " + path + ": " + ex.getMessage() + "]");
@@ -328,7 +346,9 @@ public final class MonitorScreen implements AutoCloseable {
 
     private String helpText() {
         if (this.model.isInEntityView()) {
-            return "f follow · / filter · PgUp/PgDn scroll · s save this log · e export all · Esc back";
+            boolean live = this.model.entityView().map(EntityView::logIsLive).orElse(false);
+            return (live ? "f follow · " : "")
+                    + "/ filter · PgUp/PgDn scroll · s save this log · e export all · Esc back";
         }
         return "Bots are threads inside the ClientsManager container, not containers, so their "
                 + "ports are read from it and their names from its output.";
@@ -473,7 +493,11 @@ public final class MonitorScreen implements AutoCloseable {
 
         String title = "logs";
         if (!this.logs.filter().isEmpty()) title += "  ·  filter \"" + this.logs.filter() + "\"";
-        if (this.logs.isFollowing()) title += "  ·  following";
+        // "following" implies more could still arrive -- for a stopped manager or a finished
+        // server nothing ever will again, so the label (and the 'f' key, and the footer hint
+        // below) are all withheld rather than claim a state that can't be true.
+        if (view.logIsLive() && this.logs.isFollowing()) title += "  ·  following";
+        else if (!view.logIsLive()) title += "  ·  finished (no more output)";
         painter.panel(0, logTop, width, logHeight, title);
 
         if (view.logSource() instanceof EntityView.LogSource.None none) {
@@ -483,10 +507,12 @@ public final class MonitorScreen implements AutoCloseable {
             }
         } else {
             List<String> window = this.logs.window(logHeight - 2);
-            if (window.isEmpty()) {
+            if (window.isEmpty() && view.logIsLive()) {
                 String spinner = String.valueOf(
                         SPINNER.charAt((int) ((System.currentTimeMillis() / 100) % SPINNER.length())));
                 painter.text(2, logTop + 1, spinner + " waiting for output...", Theme.DIM);
+            } else if (window.isEmpty()) {
+                painter.text(2, logTop + 1, "(empty log)", Theme.DIM);
             }
             for (int i = 0; i < window.size(); i++) {
                 painter.text(2, logTop + 1 + i, window.get(i), Theme.TEXT);
@@ -497,9 +523,9 @@ public final class MonitorScreen implements AutoCloseable {
             painter.row(0, height - 1, width, " filter: " + this.filterBeingTyped + "_",
                     Theme.TEXT, Theme.SELECTED_BACKGROUND);
         } else {
-            this.drawFooter(painter, height - 1,
-                    "f follow   / filter   PgUp/PgDn scroll   s save this log   "
-                    + "e export all   Esc back");
+            String hint = (view.logIsLive() ? "f follow   " : "")
+                    + "/ filter   PgUp/PgDn scroll   s save this log   e export all   Esc back";
+            this.drawFooter(painter, height - 1, hint);
         }
     }
 
@@ -525,6 +551,11 @@ public final class MonitorScreen implements AutoCloseable {
     /** Package-visible for {@code NFMonitorScreenResponsivenessShould}. */
     MonitorModel modelForTesting() {
         return this.model;
+    }
+
+    /** Package-visible for {@code MonitorScreenLogViewingShould}. */
+    LogRing logsForTesting() {
+        return this.logs;
     }
 
     @Override
