@@ -94,7 +94,7 @@ public class MenuModelShould {
 
     @Test
     public void selectAndDeselectEveryRowOfOneListOnly() {
-        // F10/F9 are scoped to the focused list -- there is no "< All >" row anywhere, because
+        // F8/F9 are scoped to the focused list -- there is no "< All >" row anywhere, because
         // those read as options and get mis-clicked
         this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.19.4"),
                 McVersion.of("1.8.8")), 0);

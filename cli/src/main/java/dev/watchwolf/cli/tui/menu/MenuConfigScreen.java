@@ -25,7 +25,7 @@ import java.util.Optional;
  * The kernel-{@code menuconfig}-style install screen.
  *
  * <p>Space toggles, arrows navigate, Enter descends into a submenu, Escape goes back, {@code ?}
- * shows help for the highlighted row, and <b>F10 selects all / F9 deselects all</b> within the
+ * shows help for the highlighted row, and <b>F8 selects all / F9 deselects all</b> within the
  * focused list -- hinted in that list's own footer. There is deliberately no {@code < All >} row
  * anywhere: pseudo-entries in a checkbox list read as options and get mis-clicked.
  *
@@ -212,8 +212,9 @@ public final class MenuConfigScreen implements AutoCloseable {
                     this.cursor = 0;
                 }
             });
-            // bulk selection is a keybind, never a row in the list
-            case F10 -> this.model.selectAll(current.id());
+            // bulk selection is a keybind, never a row in the list. F8 rather than F10: F10
+            // opens the window menu in GNOME/Ubuntu terminals and never reaches the app.
+            case F8 -> this.model.selectAll(current.id());
             case F9 -> this.model.deselectAll(current.id());
             case EOF -> {
                 this.cancelled = true;
@@ -382,7 +383,7 @@ public final class MenuConfigScreen implements AutoCloseable {
         boolean hasCheckboxes = current.children().stream()
                 .anyMatch(child -> child.kind() == MenuNode.Kind.CHECK);
         String hint = "space toggle";
-        if (hasCheckboxes) hint += " · F10 select all · F9 deselect all";
+        if (hasCheckboxes) hint += " · F8 select all · F9 deselect all";
         if (this.path.size() > 1) hint += " · esc back";
         else hint += " · s start build";
         return hint;

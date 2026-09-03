@@ -22,7 +22,7 @@ import java.util.Set;
  * keys into calls.
  *
  * <p><b>Bulk selection is a keybind, not a row.</b> There is no {@code < All >} pseudo-entry
- * anywhere: those read as options and get mis-clicked. {@code F10} selects all and {@code F9}
+ * anywhere: those read as options and get mis-clicked. {@code F8} selects all and {@code F9}
  * deselects all, scoped to the focused list, and the screen prints that hint in the list's own
  * footer.
  */
@@ -167,7 +167,7 @@ public final class MenuModel {
         this.applyConstraints();
     }
 
-    /** F10 on the focused list. Scoped to that list, never the whole screen. */
+    /** F8 on the focused list. Scoped to that list, never the whole screen. */
     public void selectAll(String parentId) {
         this.setAllUnder(parentId, true);
     }
