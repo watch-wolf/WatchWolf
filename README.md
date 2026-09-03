@@ -90,54 +90,52 @@ Two supporting repositories complete the picture:
 
 ## Quick start
 
-The [`WatchWolfSetup.sh`](WatchWolfSetup.sh) script installs and runs everything the Tester needs
-(the Servers Manager and the Clients Manager). It requires **Ubuntu** and **Docker**; on Windows,
-see [how to install Linux on Windows with WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+The [`cli/`](cli/) module installs and runs everything the Tester needs (the Servers Manager and
+the Clients Manager) from one Docker image — the host needs **Docker** and nothing else, on Linux,
+macOS, Windows or WSL.
 
-1. **Download the script**
+1. **Download the launcher** *(the only file that has to exist on the host)*
 
    ```bash
-   wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/WatchWolfSetup.sh
+   wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf
+   chmod +x watchwolf
    ```
 
 2. **Build**
 
    ```bash
-   bash WatchWolfSetup.sh --build
+   ./watchwolf build
    ```
 
-   This clones the Servers Manager and Clients Manager, pulls the JDK images, downloads the
-   "usual plugins" and builds the Spigot/Paper jars. Have at least **1.5 GB** free; building the
+   On a terminal, this opens a menuconfig-style checkbox screen (space to toggle, Enter to open a
+   submenu) for choosing the branch, the Spigot/Paper versions, the usual plugins and whether to
+   register a startup service; pass flags instead for a non-interactive run. It clones the Servers
+   Manager and Clients Manager, pulls the JDK images, downloads the "usual plugins" and builds the
+   Spigot/Paper jars, verifying every step as it goes. Have at least **1.5 GB** free; building the
    Spigot servers can take up to an hour.
 
-3. **Install** *(optional — makes `watchwolf` available everywhere and starts it at boot)*
+3. **Install** *(optional — makes `watchwolf` available everywhere, starts it at boot, and runs a
+   self-diagnosis against a real server)*
 
    ```bash
-   bash WatchWolfSetup.sh --install
+   ./watchwolf install
    ```
 
 4. **Run**
 
    ```bash
-   bash WatchWolfSetup.sh --run
+   ./watchwolf run
    ```
 
 Once it is up, point your tests at the machine running it (see the Tester's
-[configuration file](https://github.com/miranda1000/WatchWolf-Tester)) and you are ready to go.
+[configuration file](https://github.com/miranda1000/WatchWolf-Tester)) and you are ready to go. See
+[`cli/README.md`](cli/README.md) for the full command reference — including `watchwolf monitor`, a
+live dashboard of the managers, their servers and their bots, and `watchwolf doctor`/`watchwolf
+logs` for diagnosing a broken environment.
 
-### Script options
-
-| Flag | Applies to | Meaning |
-| --- | --- | --- |
-| `--build` | — | Clone, compile and prepare the environment |
-| `--install` | — | Symlink to `/bin/watchwolf` and register the startup service |
-| `--uninstall` | — | Undo `--install` |
-| `--run` | — | Start the Servers Manager and Clients Manager containers |
-| `--path <dir>` | all | Base directory (default `$HOME/WatchWolf`) |
-| `--dev` | `--build` | Clone the `dev` branches instead of `master` |
-| `--threads <n>` | `--build` | Parallel Spigot build containers (default `1`) |
-| `--skip-spigot-build` | `--build` | Skip building Spigot; drop the jars in `<path>/ServersManager/ci/release/server-types/Spigot` yourself |
-| `--disable-startup` | `--install` | Do not launch WatchWolf at boot |
+`WatchWolfSetup.sh` — the Bash script this replaces — is kept for one release as a
+[deprecated shim](WatchWolfSetup.sh) that forwards to the CLI, so the previously documented
+`wget … && bash WatchWolfSetup.sh --build` path keeps working.
 
 ---
 
@@ -247,7 +245,10 @@ A full reference implementation of every module is available:
 │   └── definitions/        # machine-readable API (JSON) + generated .md/.svg
 ├── api-docs.py             # definitions -> SVG/Markdown renderer
 ├── api-docs.Dockerfile     # container that runs api-docs.py
-├── WatchWolfSetup.sh       # build / install / run the environment
+├── cli/                    # the `watchwolf` CLI: build / install / run / monitor / diagnose
+│   ├── watchwolf           #   the launcher (the only file needed on the host)
+│   └── src/                #   Java 17, picocli + Lanterna, see cli/AGENTS.md
+├── WatchWolfSetup.sh       # deprecated shim -> forwards to cli/watchwolf
 └── Diagram.mdj             # StarUML model
 ```
 

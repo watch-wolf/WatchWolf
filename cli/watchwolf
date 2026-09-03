@@ -1,0 +1,118 @@
+#!/usr/bin/env bash
+#
+# WatchWolf launcher. The only file that has to exist on the host; everything else lives in the
+# CLI's Docker image.
+#
+#   wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/cli/watchwolf
+#   bash watchwolf build
+#
+# The scheme is "identity mounts": every host path the CLI will hand to the Docker daemon is
+# mounted inside the container AT THE SAME ABSOLUTE PATH. A path computed by Java is then valid
+# both for reading files (container view) and for `docker run -v <path>` (host view, because the
+# daemon resolves bind sources on the host). The ServersManager solves the same problem with
+# PARENT_PWD; this is that trick with the substitution set to the identity function.
+
+set -euo pipefail
+
+IMAGE="${WATCHWOLF_CLI_IMAGE:-watchwolf/cli:latest}"
+BASE="${WATCHWOLF_PATH:-$HOME/WatchWolf}"
+
+# --path wins over the env var; peek at argv without consuming it
+prev=""
+for a in "$@"; do
+    [ "$prev" = "--path" ] && BASE="$a"
+    prev="$a"
+done
+
+die() { echo "[e] $*" >&2; exit 1; }
+
+command -v docker >/dev/null 2>&1 \
+    || die "Docker is not installed, or is not on PATH. Check https://docs.docker.com/get-docker/."
+
+SOCK="${DOCKER_HOST:-}"
+SOCK="${SOCK#unix://}"
+[ -n "$SOCK" ] || SOCK=/var/run/docker.sock
+[ -S "$SOCK" ] || die "No Docker socket at $SOCK. Is the daemon running?"
+if [ ! -w "$SOCK" ]; then
+    echo "[w] $SOCK is not writable by $(id -un). You may need:" >&2
+    echo "[w]     sudo usermod -aG docker $(id -un)   # then log out and back in" >&2
+fi
+DOCKER_GID="$(stat -c '%g' "$SOCK" 2>/dev/null || echo 0)"
+
+mkdir -p "$BASE" || die "Cannot create the install base '$BASE'."
+# Identity mounts must not cross a symlink: the daemon would resolve the source differently.
+BASE="$(cd "$BASE" && pwd -P)"
+
+M2="$HOME/.m2"
+mkdir -p "$M2"
+
+TTY_FLAGS=""
+if [ -t 0 ] && [ -t 1 ]; then TTY_FLAGS="-it"; fi
+
+# Mount the cwd so `--out ./bundle.tar.gz` lands where the user is standing -- unless it is
+# already covered by one of the other identity mounts, which would be a duplicate mount error.
+PWD_REAL="$(pwd -P)"
+PWD_MOUNT=(-v "$PWD_REAL:$PWD_REAL" -w "$PWD_REAL")
+case "$PWD_REAL/" in
+    "$BASE"/*|"$M2"/*|"$BASE"|"$M2") PWD_MOUNT=(-w "$PWD_REAL") ;;
+esac
+
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    echo "[v] Fetching the WatchWolf CLI image ($IMAGE)..."
+    if ! docker pull "$IMAGE" 2>/dev/null; then
+        cli_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+        if [ -f "$cli_dir/Dockerfile" ]; then
+            echo "[v] Not published yet; building it from $cli_dir (this takes a few minutes the first time)..."
+            docker build --tag "$IMAGE" "$cli_dir" || die "Could not build the CLI image."
+        else
+            die "Could not fetch '$IMAGE', and no Dockerfile next to this launcher to build it from."
+        fi
+    fi
+fi
+
+STATE="$BASE/.watchwolf"
+mkdir -p "$STATE"
+
+set +e
+docker run --rm $TTY_FLAGS                                  \
+    --network host                                          \
+    --user "$(id -u):$(id -g)" --group-add "$DOCKER_GID"    \
+    -v "$SOCK":/var/run/docker.sock                         \
+    -v "$BASE":"$BASE"                                      \
+    -v "$M2":"$M2"                                          \
+    "${PWD_MOUNT[@]}"                                       \
+    -e HOME="$HOME"                                         \
+    -e WW_BASE="$BASE"                                      \
+    -e WW_UID="$(id -u)" -e WW_GID="$(id -g)"               \
+    -e WW_HOST_PWD="$PWD_REAL"                              \
+    -e WW_LAUNCHER=2                                        \
+    -e WW_IMAGE="$IMAGE"                                    \
+    -e TERM -e COLUMNS -e LINES -e DOCKER_HOST              \
+    "$IMAGE" "$@"
+rc=$?
+set -e
+
+# Exit 10 means "host action required": the CLI cannot write /etc or drive systemd from inside an
+# unprivileged container, so it renders those commands into a script for the host to run. We show
+# it in full before running anything -- no hidden sudo.
+if [ $rc -eq 10 ] && [ -f "$STATE/host-action.sh" ]; then
+    echo
+    echo "[i] These commands must run on the host (the container cannot write /etc or drive systemd):"
+    echo
+    sed 's/^/    /' "$STATE/host-action.sh"
+    echo
+    if [ -f "$STATE/host-action.needs-root" ]; then
+        read -r -p "Run them with sudo? [y/N] " answer
+        case "${answer,,}" in y|yes) ;; *) echo "[i] Skipped. Nothing was changed."; exit 1 ;; esac
+        sudo bash "$STATE/host-action.sh"
+        rc=$?
+    else
+        read -r -p "Run them? [y/N] " answer
+        case "${answer,,}" in y|yes) ;; *) echo "[i] Skipped. Nothing was changed."; exit 1 ;; esac
+        bash "$STATE/host-action.sh"
+        rc=$?
+    fi
+    rm -f "$STATE/host-action.sh" "$STATE/host-action.needs-root"
+fi
+
+exit $rc
