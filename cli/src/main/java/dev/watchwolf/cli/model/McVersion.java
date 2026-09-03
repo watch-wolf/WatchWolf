@@ -19,6 +19,14 @@ public final class McVersion implements Comparable<McVersion> {
     /** Upper bound meaning "every version from here on", as used in usual-plugin filenames. */
     public static final McVersion LATEST = new McVersion(null);
 
+    /**
+     * The floor WatchWolf supports. Spigot and Paper both still list jars/builds older than this
+     * (Spigot back to 1.7.10, Paper to 1.8.8); {@code SpigotVersionListParser}/
+     * {@code PaperVersionListParser} drop anything below it so the version pickers never offer
+     * something the rest of the toolchain was never meant to run.
+     */
+    public static final McVersion MIN_SUPPORTED = of("1.8");
+
     private final List<Integer> components;
 
     private McVersion(List<Integer> components) {

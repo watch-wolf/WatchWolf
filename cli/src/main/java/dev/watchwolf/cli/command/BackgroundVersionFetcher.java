@@ -61,7 +61,7 @@ final class BackgroundVersionFetcher implements MenuConfigScreen.VersionFetcher 
                 onState.accept(Async.failed(ex.getMessage(),
                         "Versions already on disk are still selectable."));
             } catch (RuntimeException ex) {
-                onState.accept(Async.failed("api.papermc.io: " + ex.getMessage(),
+                onState.accept(Async.failed("fill.papermc.io: " + ex.getMessage(),
                         "Versions already on disk are still selectable."));
             }
         });

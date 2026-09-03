@@ -8,7 +8,7 @@ import java.util.Optional;
  * A value being fetched in the background, with all four states the UI must render.
  *
  * <p>This exists so a menu never goes white and unresponsive while the network answers. Opening
- * "Server jars" needs version lists from hub.spigotmc.org and api.papermc.io, which takes seconds;
+ * "Server jars" needs version lists from hub.spigotmc.org and fill.papermc.io, which takes seconds;
  * the screen paints {@link State#LOADING} with a spinner and an elapsed count, stays navigable, and
  * lets Escape cancel -- rather than freezing until the request returns.
  *

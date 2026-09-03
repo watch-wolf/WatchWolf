@@ -65,7 +65,7 @@ public final class DownloadPaperJarsStep implements Step {
         if (!failures.isEmpty()) {
             throw new StepFailedException("downloading Paper",
                     String.join("; ", failures),
-                    "Check this machine can reach api.papermc.io, then run 'watchwolf build' again.");
+                    "Check this machine can reach fill.papermc.io, then run 'watchwolf build' again.");
         }
     }
 

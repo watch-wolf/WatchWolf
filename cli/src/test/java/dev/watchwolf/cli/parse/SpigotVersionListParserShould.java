@@ -34,9 +34,9 @@ public class SpigotVersionListParserShould {
 
     @Test
     public void deduplicateRepeatedVersions() {
-        List<McVersion> versions =
-                SpigotVersionListParser.parse("1.8.8.json 1.8.8.json 1.8.8.json");
-        assertEquals(List.of(McVersion.of("1.8.8")), versions);
+        String html = "<a href=\"1.8.8.json\">x</a> <a href=\"1.8.8.json\">x</a> "
+                + "<a href=\"1.8.8.json\">x</a>";
+        assertEquals(List.of(McVersion.of("1.8.8")), SpigotVersionListParser.parse(html));
     }
 
     @Test
@@ -44,5 +44,43 @@ public class SpigotVersionListParserShould {
         assertTrue(SpigotVersionListParser.parse("").isEmpty());
         assertTrue(SpigotVersionListParser.parse(null).isEmpty());
         assertTrue(SpigotVersionListParser.parse("<html>503 Service Unavailable</html>").isEmpty());
+    }
+
+    @Test
+    public void includeVersionsInSpigotsNewerNonOneXNumbering() {
+        // Spigot moved away from "1.x" numbering after 1.21 (e.g. 26.1, 26.2); the old pattern
+        // required a leading "1." and silently dropped every one of these
+        assertEquals(List.of(McVersion.of("26.1")),
+                SpigotVersionListParser.parse("<a href=\"26.1.json\">26.1.json</a>"));
+    }
+
+    @Test
+    public void neverInventAPhantomVersionFromInsideALongerFileName() {
+        // the real bug report: hub.spigotmc.org now lists 26.1.1.json and 26.1.2.json, and the
+        // old unanchored pattern's find() matched the EMBEDDED substring "1.1.json"/"1.2.json"
+        // inside them, reporting versions 1.1 and 1.2 that were never actually listed anywhere
+        String html = "<a href=\"26.1.1.json\">26.1.1.json</a> <a href=\"26.1.2.json\">26.1.2.json</a>";
+        List<McVersion> versions = SpigotVersionListParser.parse(html);
+
+        assertEquals(List.of(McVersion.of("26.1.2"), McVersion.of("26.1.1")), versions);
+        assertFalse(versions.contains(McVersion.of("1.1")), "1.1 was never really listed");
+        assertFalse(versions.contains(McVersion.of("1.2")), "1.2 was never really listed");
+    }
+
+    @Test
+    public void excludeBuildToolsOwnPerBuildMetadataFiles() {
+        // the index also lists thousands of bare-integer files like 2600.json, 4617.json -- these
+        // are BuildTools' own Jenkins build numbers, not Minecraft versions, and have no dot
+        String html = "<a href=\"1.8.8.json\">1.8.8.json</a> <a href=\"2600.json\">2600.json</a> "
+                + "<a href=\"263.json\">263.json</a>";
+        assertEquals(List.of(McVersion.of("1.8.8")), SpigotVersionListParser.parse(html));
+    }
+
+    @Test
+    public void dropVersionsBelowTheMinimumSupported() {
+        // WatchWolf does not support anything older than 1.8, regardless of what the index lists
+        String html = "<a href=\"1.8.json\">1.8.json</a> <a href=\"1.7.10.json\">1.7.10.json</a> "
+                + "<a href=\"1.2.json\">1.2.json</a>";
+        assertEquals(List.of(McVersion.of("1.8")), SpigotVersionListParser.parse(html));
     }
 }

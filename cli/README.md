@@ -41,6 +41,25 @@ the image itself from this checkout's own `Dockerfile` (cached after the first r
 
 Every command accepts `--path <dir>` (default `$HOME/WatchWolf`) to point at a different install.
 
+## Downloading a single server version
+
+The menu (`watchwolf build` on a TTY with no flags) lets you pick individual Spigot/Paper versions
+under `Server jars --->`. From flags, name the version directly:
+
+```bash
+./cli/watchwolf build --paper 1.20.4     # downloaded from fill.papermc.io -- seconds
+./cli/watchwolf build --spigot 1.20.4    # built locally with BuildTools -- about an hour
+```
+
+Either accepts a comma list, `all`, or `newest:<n>` (e.g. `--paper newest:3`) in place of one
+version. Naming only `--paper` (or only `--spigot`) leaves the other untouched — nothing is built
+or downloaded for it, since neither defaults to any version without being asked. The jar lands in
+`<install base>/ServersManager/ci/release/server-types/{Spigot,Paper}/<version>.jar`.
+
+This still runs the rest of `build` (cloning the managers, pulling JDK images, plugins, the two
+Docker images) unless you skip those too, e.g. `--skip-tester --skip-self-test`. `--dry-run` lists
+every step a given set of flags would actually perform, so nothing runs by surprise.
+
 ## The dashboard
 
 `watchwolf monitor` is two levels, deliberately:
