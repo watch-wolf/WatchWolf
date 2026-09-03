@@ -127,7 +127,7 @@ public final class MenuConfigScreen implements AutoCloseable {
 
         this.versionFetcher.fetchSpigot(state -> {
             if (state.isLoaded()) {
-                this.model.spigotLoaded(state.value().orElse(List.of()), 0);
+                this.model.spigotLoaded(state.value().orElse(List.of()));
             } else if (state.hasFailed()) {
                 this.model.spigotFailed(state.failureDetail().orElse("unknown"),
                         state.failureRemedy().orElse(null));
@@ -135,7 +135,7 @@ public final class MenuConfigScreen implements AutoCloseable {
         });
         this.versionFetcher.fetchPaper(state -> {
             if (state.isLoaded()) {
-                this.model.paperLoaded(state.value().orElse(List.of()), 0);
+                this.model.paperLoaded(state.value().orElse(List.of()));
             } else if (state.hasFailed()) {
                 this.model.paperFailed(state.failureDetail().orElse("unknown"),
                         state.failureRemedy().orElse(null));
@@ -336,7 +336,7 @@ public final class MenuConfigScreen implements AutoCloseable {
             what = "Polling Spigot versions from hub.spigotmc.org";
         } else if (MenuModel.ID_PAPER.equals(current.id())) {
             pending = this.model.paperVersions();
-            what = "Polling Paper versions from api.papermc.io";
+            what = "Polling Paper versions from fill.papermc.io";
         } else if (MenuModel.ID_USUAL_PLUGINS.equals(current.id())) {
             pending = this.model.usualPlugins();
             what = "Fetching the usual-plugins list from watchwolf.dev";

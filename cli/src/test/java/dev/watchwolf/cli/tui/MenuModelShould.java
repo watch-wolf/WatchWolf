@@ -97,7 +97,7 @@ public class MenuModelShould {
         // F8/F9 are scoped to the focused list -- there is no "< All >" row anywhere, because
         // those read as options and get mis-clicked
         this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.19.4"),
-                McVersion.of("1.8.8")), 0);
+                McVersion.of("1.8.8")));
 
         this.menu.selectAll(MenuModel.ID_SPIGOT);
         assertEquals(3, this.menu.selectedVersions(MenuModel.ID_SPIGOT).size());
@@ -108,9 +108,11 @@ public class MenuModelShould {
     }
 
     @Test
-    public void markVersionsAlreadyOnDiskAndNotPreselectThem() {
+    public void selectEveryFetchedVersionByDefaultExceptAlreadyInstalledOnes() {
+        // the install default: everything not already built/downloaded starts selected, so a
+        // fresh install picks up every version with one keypress ('s') rather than none
         this.menu.withInstalled(Set.of(McVersion.of("1.8.8")), Set.of());
-        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")), 2);
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
 
         MenuNode spigot = this.menu.node(MenuModel.ID_SPIGOT).orElseThrow();
         MenuNode installed = spigot.children().stream()
@@ -120,6 +122,14 @@ public class MenuModelShould {
         assertFalse(installed.isChecked(), "no point rebuilding what is already there");
         assertEquals(List.of(McVersion.of("1.20.4")),
                 this.menu.selectedVersions(MenuModel.ID_SPIGOT));
+    }
+
+    @Test
+    public void applyTheSameDefaultToPaperVersions() {
+        this.menu.withInstalled(Set.of(), Set.of(McVersion.of("1.20.4")));
+        this.menu.paperLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.20.6")));
+
+        assertEquals(List.of(McVersion.of("1.20.6")), this.menu.selectedVersions(MenuModel.ID_PAPER));
     }
 
     @Test
@@ -147,6 +157,96 @@ public class MenuModelShould {
         assertTrue(this.menu.spigotVersions().failureDetail().orElseThrow()
                 .contains("hub.spigotmc.org"), "the pane must name the host it waited on");
         assertNotNull(this.menu.toBuildPlan(), "a failed fetch must not break the plan");
+    }
+
+    @Test
+    public void makeSpigotAndPaperIndividuallySelectableSubmenus() {
+        // "Server jars" used to hold two flat on/off checkboxes; each is now its own submenu of
+        // individually selectable versions, the same shape as "Usual plugins"
+        assertEquals(MenuNode.Kind.SUBMENU,
+                this.menu.node(MenuModel.ID_SPIGOT).orElseThrow().kind());
+        assertEquals(MenuNode.Kind.SUBMENU,
+                this.menu.node(MenuModel.ID_PAPER).orElseThrow().kind());
+    }
+
+    @Test
+    public void deriveBuildSpigotFromWhetherAnyVersionIsSelected() {
+        // there is no separate on/off flag any more -- picking zero versions IS "don't build
+        // Spigot", picking one IS "build it"
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
+        assertTrue(this.menu.toBuildPlan().buildSpigot(), "everything is selected by default");
+
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+        assertFalse(this.menu.toBuildPlan().buildSpigot());
+
+        this.menu.toggle("spigot:1.8.8");
+        assertTrue(this.menu.toBuildPlan().buildSpigot());
+    }
+
+    @Test
+    public void keepLocallyInstalledVersionsSelectableWhileTheListIsStillLoading() {
+        // withInstalled's own promise ("listed immediately, so the pane is useful before the
+        // network is") did not actually hold before: nothing populated the submenu until the
+        // fetch succeeded, so the pane was empty for the entire loading window regardless
+        this.menu.withInstalled(Set.of(McVersion.of("1.8.8")), Set.of());
+
+        this.menu.spigotLoading(Instant.now());
+
+        MenuNode spigot = this.menu.node(MenuModel.ID_SPIGOT).orElseThrow();
+        assertEquals(1, spigot.children().size());
+        MenuNode installed = spigot.children().get(0);
+        assertEquals("1.8.8", installed.label());
+        assertEquals("installed", installed.annotation().orElseThrow());
+        assertFalse(installed.isChecked());
+    }
+
+    @Test
+    public void keepLocallyInstalledVersionsSelectableWhenTheFetchFails() {
+        // the failure's own remedy text ("versions already on disk are still selectable") must
+        // actually be true -- this is the "hub.spigotmc.org is down" scenario
+        this.menu.withInstalled(Set.of(McVersion.of("1.8.8")), Set.of());
+        this.menu.spigotLoading(Instant.now());
+
+        this.menu.spigotFailed("hub.spigotmc.org: Connection refused",
+                "Versions already on disk are still selectable; pass --skip-spigot-build to skip "
+                        + "Spigot entirely.");
+
+        assertTrue(this.menu.spigotVersions().hasFailed());
+        MenuNode spigot = this.menu.node(MenuModel.ID_SPIGOT).orElseThrow();
+        assertEquals(1, spigot.children().size(), "the version already on disk must still be there");
+        assertTrue(spigot.isEnabled(), "the submenu itself must stay reachable, not lock up");
+
+        // and it must actually still be selectable, not just visible
+        this.menu.toggle("spigot:1.8.8");
+        assertEquals(List.of(McVersion.of("1.8.8")), this.menu.selectedVersions(MenuModel.ID_SPIGOT));
+        BuildPlan plan = this.menu.toBuildPlan();
+        assertTrue(plan.buildSpigot());
+        assertEquals(List.of(McVersion.of("1.8.8")), plan.spigotVersions());
+    }
+
+    @Test
+    public void leaveTheSubmenuEmptyWithoutCrashingWhenNothingIsInstalledAndTheFetchFails() {
+        // the other half of "something goes wrong": no local fallback exists either -- must
+        // degrade to an empty, harmless submenu rather than throw or leave stale state around
+        this.menu.spigotLoading(Instant.now());
+        this.menu.spigotFailed("hub.spigotmc.org: Connection refused", "Try again later.");
+
+        assertTrue(this.menu.spigotVersions().hasFailed());
+        assertTrue(this.menu.node(MenuModel.ID_SPIGOT).orElseThrow().children().isEmpty());
+        assertFalse(this.menu.toBuildPlan().buildSpigot());
+        assertDoesNotThrow(this.menu::toBuildPlan);
+    }
+
+    @Test
+    public void annotateSpigotWhenNothingIsSelected() {
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+
+        MenuNode spigot = this.menu.node(MenuModel.ID_SPIGOT).orElseThrow();
+        assertEquals("nothing selected", spigot.annotation().orElseThrow());
+
+        this.menu.toggle("spigot:1.8.8");
+        assertTrue(this.menu.node(MenuModel.ID_SPIGOT).orElseThrow().annotation().isEmpty());
     }
 
     @Test
@@ -225,7 +325,7 @@ public class MenuModelShould {
     public void carryEverySelectionIntoTheBuildPlan() {
         this.menu.toggle(MenuModel.ID_BRANCH_DEV);
         this.menu.setValue(MenuModel.ID_THREADS, "4");
-        this.menu.paperLoaded(List.of(McVersion.of("1.20.4")), 1);
+        this.menu.paperLoaded(List.of(McVersion.of("1.20.4")));
 
         BuildPlan plan = this.menu.toBuildPlan();
 

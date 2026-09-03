@@ -98,8 +98,12 @@ public final class MenuModel {
                 .withHelp("Which Minecraft servers to install. Each Spigot version is compiled by "
                         + "BuildTools in its own container and takes about an hour; Paper ships "
                         + "prebuilt and only has to be downloaded.");
-        serverJars.add(MenuNode.check(ID_SPIGOT, "Spigot", initial.buildSpigot()));
-        serverJars.add(MenuNode.check(ID_PAPER, "Paper", initial.buildPaper()));
+        serverJars.add(MenuNode.submenu(ID_SPIGOT, "Spigot")
+                .withHelp("Fetched from hub.spigotmc.org. Each version is compiled by BuildTools "
+                        + "in its own container and takes about an hour."));
+        serverJars.add(MenuNode.submenu(ID_PAPER, "Paper")
+                .withHelp("Fetched from fill.papermc.io. Ships prebuilt, so each version is just a "
+                        + "download."));
         this.root.add(serverJars);
 
         this.root.add(MenuNode.submenu(ID_USUAL_PLUGINS, "Usual plugins (WorldGuard, EssentialsX, ...)")
@@ -211,14 +215,27 @@ public final class MenuModel {
         });
 
         this.node(ID_SERVER_JARS).ifPresent(serverJars -> {
-            boolean anySelected = this.isChecked(ID_SPIGOT) || this.isChecked(ID_PAPER);
+            boolean anySelected = !this.selectedVersions(ID_SPIGOT).isEmpty()
+                    || !this.selectedVersions(ID_PAPER).isEmpty();
             serverJars.setAnnotation(anySelected ? null : "nothing selected");
         });
+        this.annotateIfNothingSelected(ID_SPIGOT);
+        this.annotateIfNothingSelected(ID_PAPER);
+        this.annotateIfNothingSelected(ID_USUAL_PLUGINS);
+    }
 
-        this.node(ID_USUAL_PLUGINS).ifPresent(usualPlugins -> {
-            boolean fetched = !usualPlugins.children().isEmpty();
-            boolean anySelected = usualPlugins.children().stream().anyMatch(MenuNode::isChecked);
-            usualPlugins.setAnnotation(fetched && !anySelected ? "nothing selected" : null);
+    /**
+     * Marks a fetched, per-item checkbox submenu (Spigot/Paper versions, usual plugins) with
+     * "nothing selected" once it has something to select and none of it is checked. Silent while
+     * the list is still empty -- not fetched yet, still loading, or the fetch failed -- so a
+     * network problem shows as the status line's own failure message, not a misleading blanket
+     * "nothing selected" that reads like a user mistake.
+     */
+    private void annotateIfNothingSelected(String submenuId) {
+        this.node(submenuId).ifPresent(submenu -> {
+            boolean fetched = !submenu.children().isEmpty();
+            boolean anySelected = submenu.children().stream().anyMatch(MenuNode::isChecked);
+            submenu.setAnnotation(fetched && !anySelected ? "nothing selected" : null);
         });
     }
 
@@ -233,28 +250,47 @@ public final class MenuModel {
 
     public void spigotLoading(Instant startedAt) {
         this.spigotVersions = Async.loading(startedAt);
+        // whatever is already on disk stays selectable and visible while the network is still
+        // being waited on, not just once it answers -- see populateInstalledOnly's Javadoc
+        this.populateInstalledOnly(ID_SPIGOT, "spigot", this.spigotInstalled);
     }
 
     public void paperLoading(Instant startedAt) {
         this.paperVersions = Async.loading(startedAt);
+        this.populateInstalledOnly(ID_PAPER, "paper", this.paperInstalled);
     }
 
-    public void spigotLoaded(List<McVersion> versions, int preselectNewest) {
+    /** Every fetched version starts selected, except ones already built/downloaded -- there is
+     *  nothing to do for those, so preselecting them would just mean rebuilding what is already
+     *  there the moment someone presses 's' without looking. */
+    public void spigotLoaded(List<McVersion> versions) {
         this.spigotVersions = Async.loaded(versions);
-        this.populateVersions(ID_SPIGOT, "spigot", versions, this.spigotInstalled, preselectNewest);
+        this.populateVersions(ID_SPIGOT, "spigot", versions, this.spigotInstalled);
+        this.applyConstraints();
     }
 
-    public void paperLoaded(List<McVersion> versions, int preselectNewest) {
+    public void paperLoaded(List<McVersion> versions) {
         this.paperVersions = Async.loaded(versions);
-        this.populateVersions(ID_PAPER, "paper", versions, this.paperInstalled, preselectNewest);
+        this.populateVersions(ID_PAPER, "paper", versions, this.paperInstalled);
+        this.applyConstraints();
     }
 
+    /**
+     * hub.spigotmc.org (or fill.papermc.io) is unreachable, times out, or returns garbage --
+     * whatever is already on disk must stay exactly as selectable as it was while loading, which
+     * is also what the failure's own remedy text promises ("versions already on disk are still
+     * selectable"). Without this the submenu would go from "local versions, none checked" (while
+     * loading) to completely empty the moment the fetch fails, silently making that promise false
+     * and leaving nothing to select even for a version already built.
+     */
     public void spigotFailed(String detail, String remedy) {
         this.spigotVersions = Async.failed(detail, remedy);
+        this.populateInstalledOnly(ID_SPIGOT, "spigot", this.spigotInstalled);
     }
 
     public void paperFailed(String detail, String remedy) {
         this.paperVersions = Async.failed(detail, remedy);
+        this.populateInstalledOnly(ID_PAPER, "paper", this.paperInstalled);
     }
 
     public Async<List<WatchWolfWebClient.UsualPlugin>> usualPlugins() { return this.usualPlugins; }
@@ -305,21 +341,37 @@ public final class MenuModel {
     }
 
     private void populateVersions(String parentId, String prefix, List<McVersion> versions,
-                                  Set<McVersion> installed, int preselectNewest) {
+                                  Set<McVersion> installed) {
         MenuNode parent = this.root.find(parentId).orElse(null);
         if (parent == null) return;
         parent.children().clear();
 
-        int preselected = 0;
         for (McVersion version : versions) {
             boolean alreadyInstalled = installed.contains(version);
-            boolean select = !alreadyInstalled && preselected < preselectNewest;
-            if (select) preselected++;
-
-            MenuNode node = MenuNode.check(prefix + ":" + version, version.toString(), select);
+            MenuNode node =
+                    MenuNode.check(prefix + ":" + version, version.toString(), !alreadyInstalled);
             if (alreadyInstalled) node.setAnnotation("installed");
             parent.add(node);
         }
+    }
+
+    /**
+     * The degraded version of {@link #populateVersions}, used while the remote list is loading or
+     * once it has failed: only what {@link #withInstalled} already knows is on disk, none of it
+     * preselected (there is no "newest" to preselect without the remote index), each annotated
+     * "installed" the same way a successful fetch would mark it.
+     */
+    private void populateInstalledOnly(String parentId, String prefix, Set<McVersion> installed) {
+        MenuNode parent = this.root.find(parentId).orElse(null);
+        if (parent == null) return;
+        parent.children().clear();
+
+        for (McVersion version : installed) {
+            MenuNode node = MenuNode.check(prefix + ":" + version, version.toString(), false);
+            node.setAnnotation("installed");
+            parent.add(node);
+        }
+        this.applyConstraints();
     }
 
     public List<McVersion> selectedVersions(String parentId) {
@@ -353,8 +405,11 @@ public final class MenuModel {
                 .cloneClientsManager(this.isChecked(ID_CLONE_CLIENTS_MANAGER))
                 .cloneTester(this.isChecked(ID_CLONE_TESTER))
                 .pullJdkImages(this.isChecked(ID_PULL_IMAGES))
-                .buildSpigot(this.isChecked(ID_SPIGOT))
-                .buildPaper(this.isChecked(ID_PAPER))
+                // Spigot/Paper have no on/off checkbox of their own any more -- they are submenus
+                // of individually selectable versions, so "build Spigot at all" is simply "is
+                // anything checked in there"
+                .buildSpigot(!this.selectedVersions(ID_SPIGOT).isEmpty())
+                .buildPaper(!this.selectedVersions(ID_PAPER).isEmpty())
                 .spigotVersions(this.selectedVersions(ID_SPIGOT))
                 .paperVersions(this.selectedVersions(ID_PAPER))
                 .selectedUsualPlugins(this.selectedUsualPluginsOrNullIfUnresolved())
