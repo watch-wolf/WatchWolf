@@ -57,6 +57,89 @@ public final class GitRepository {
         return merge;
     }
 
+    /**
+     * Fetches {@code branch} from origin and fast-forwards onto it -- and only when that is a
+     * <b>clean</b> fast-forward. Unlike {@link #update}, this never switches branches and never
+     * attempts a real (non-fast-forward) merge, so commits local to this checkout that origin
+     * does not have -- active development on this exact checkout, for instance -- are always left
+     * exactly as they are. There is nothing here that can lose, rewrite, or conflict-merge local
+     * work; the worst that happens is {@link PullOutcome.Diverged} being reported instead of
+     * applying anything.
+     */
+    public PullOutcome pullFastForwardOnly(String branch, ProgressSink progress) {
+        progress.begin("Checking " + this.directory.getFileName() + " for updates on " + branch);
+
+        CommandResult fetch =
+                this.run(CLONE_TIMEOUT, progress, "git", "fetch", "--prune", "origin", branch);
+        if (!fetch.succeeded()) {
+            progress.end("failed");
+            return new PullOutcome.Failed(fetch.failureText());
+        }
+
+        Optional<String> local = this.revParse("HEAD");
+        Optional<String> remote = this.revParse("origin/" + branch);
+        if (local.isEmpty() || remote.isEmpty()) {
+            progress.end("failed");
+            return new PullOutcome.Failed("could not resolve HEAD or origin/" + branch);
+        }
+
+        if (local.get().equals(remote.get()) || this.isAncestor(remote.get(), "HEAD")) {
+            // origin is at or behind local -- nothing to pull, even if local is ahead of it (e.g.
+            // active development that started from what is still origin's tip)
+            progress.end("already up to date");
+            return new PullOutcome.UpToDate();
+        }
+
+        if (!this.isAncestor("HEAD", remote.get())) {
+            // neither side is an ancestor of the other: both have commits the other lacks
+            progress.end("diverged");
+            return new PullOutcome.Diverged(shortSha(local.get()), shortSha(remote.get()));
+        }
+
+        CommandResult merge =
+                this.run(CLONE_TIMEOUT, progress, "git", "merge", "--ff-only", "origin/" + branch);
+        if (!merge.succeeded()) {
+            // the ancestor check above should make this unreachable in practice; kept as a safety
+            // net (e.g. a dirty working tree the fast-forward would have to overwrite) rather than
+            // mislabelling an unrelated failure as "diverged"
+            progress.end("failed");
+            return new PullOutcome.Failed(merge.failureText());
+        }
+        String newSha = this.headSha().orElse(shortSha(remote.get()));
+        progress.end("updated to " + newSha);
+        return new PullOutcome.FastForwarded(shortSha(local.get()), newSha);
+    }
+
+    private Optional<String> revParse(String ref) {
+        CommandResult result = this.run(QUICK_TIMEOUT, null, "git", "rev-parse", ref);
+        if (!result.succeeded() || result.stdout().isEmpty()) return Optional.empty();
+        return Optional.of(result.stdout().get(0).strip());
+    }
+
+    private boolean isAncestor(String ancestor, String descendant) {
+        return this.run(QUICK_TIMEOUT, null, "git", "merge-base", "--is-ancestor",
+                ancestor, descendant).succeeded();
+    }
+
+    private static String shortSha(String fullSha) {
+        return fullSha.length() > 7 ? fullSha.substring(0, 7) : fullSha;
+    }
+
+    /** The result of {@link #pullFastForwardOnly}. */
+    public sealed interface PullOutcome {
+        /** Nothing to pull: origin is at or behind local. Local may be ahead; untouched either way. */
+        record UpToDate() implements PullOutcome { }
+
+        /** A clean fast-forward was applied. */
+        record FastForwarded(String fromSha, String toSha) implements PullOutcome { }
+
+        /** Both sides have commits the other lacks. Nothing was touched. */
+        record Diverged(String localSha, String remoteSha) implements PullOutcome { }
+
+        /** The fetch failed, or an unexpected error prevented checking/applying the update. */
+        record Failed(String reason) implements PullOutcome { }
+    }
+
     public boolean looksLikeAClone() {
         CommandResult result = this.run(QUICK_TIMEOUT, null, "git", "rev-parse", "--git-dir");
         return result.succeeded();

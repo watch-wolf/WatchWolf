@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
                 MonitorCommand.class,
                 LogsCommand.class,
                 DoctorCommand.class,
+                UpdateCommand.class,
                 InternalCopyCommand.class,
         }
 )

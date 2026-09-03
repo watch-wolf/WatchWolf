@@ -54,16 +54,42 @@ mkdir -p "$M2"
 TTY_FLAGS=""
 if [ -t 0 ] && [ -t 1 ]; then TTY_FLAGS="-it"; fi
 
+cli_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+# The checkout root (parent of cli/) so 'watchwolf update' can fetch/fast-forward it and rebuild
+# this image from inside the container. Only set when this launcher is actually sitting in a git
+# checkout -- e.g. not when someone copied just this file out on its own.
+REPO_ROOT=""
+if [ -d "$cli_dir/../.git" ]; then
+    REPO_ROOT="$(cd "$cli_dir/.." && pwd -P)"
+fi
+
+# Every host path so far, in the order claimed -- a later one nested inside an earlier one is
+# skipped rather than mounted again, which is what a nested bind mount would otherwise error on.
+MOUNTED_ROOTS=("$BASE" "$M2")
+covered_by_a_mount() {
+    local candidate="$1" root
+    for root in "${MOUNTED_ROOTS[@]}"; do
+        case "$candidate/" in "$root"/*|"$root/") return 0 ;; esac
+    done
+    return 1
+}
+
+REPO_MOUNT=()
+if [ -n "$REPO_ROOT" ] && ! covered_by_a_mount "$REPO_ROOT"; then
+    REPO_MOUNT=(-v "$REPO_ROOT:$REPO_ROOT")
+    MOUNTED_ROOTS+=("$REPO_ROOT")
+fi
+
 # Mount the cwd so `--out ./bundle.tar.gz` lands where the user is standing -- unless it is
 # already covered by one of the other identity mounts, which would be a duplicate mount error.
 PWD_REAL="$(pwd -P)"
-PWD_MOUNT=(-v "$PWD_REAL:$PWD_REAL" -w "$PWD_REAL")
-case "$PWD_REAL/" in
-    "$BASE"/*|"$M2"/*|"$BASE"|"$M2") PWD_MOUNT=(-w "$PWD_REAL") ;;
-esac
+PWD_MOUNT=(-w "$PWD_REAL")
+if ! covered_by_a_mount "$PWD_REAL"; then
+    PWD_MOUNT=(-v "$PWD_REAL:$PWD_REAL" -w "$PWD_REAL")
+fi
 
 if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
-    cli_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
     [ -f "$cli_dir/Dockerfile" ] \
         || die "No Dockerfile next to this launcher ($cli_dir). Run it from a checkout of the WatchWolf repo: git clone https://github.com/watch-wolf/WatchWolf, then bash cli/watchwolf ..."
     echo "[v] Building the WatchWolf CLI image from $cli_dir (this takes a few minutes the first time; cached after)..."
@@ -80,9 +106,11 @@ docker run --rm $TTY_FLAGS                                  \
     -v "$SOCK":/var/run/docker.sock                         \
     -v "$BASE":"$BASE"                                      \
     -v "$M2":"$M2"                                          \
+    "${REPO_MOUNT[@]}"                                      \
     "${PWD_MOUNT[@]}"                                       \
     -e HOME="$HOME"                                         \
     -e WW_BASE="$BASE"                                      \
+    -e WW_REPO_ROOT="$REPO_ROOT"                            \
     -e WW_UID="$(id -u)" -e WW_GID="$(id -g)"               \
     -e WW_HOST_PWD="$PWD_REAL"                              \
     -e WW_LAUNCHER=2                                        \

@@ -37,6 +37,7 @@ the image itself from this checkout's own `Dockerfile` (cached after the first r
 | `watchwolf monitor` | The live dashboard — a btop-style view of the managers, their servers and their bots, with per-entity logs. |
 | `watchwolf logs` | Exports one `tar.gz` diagnostics bundle to `<install base>/logs/` by default (`--session`, `--last`, `--since`, `--out` to override). |
 | `watchwolf doctor` | Self-tests: fast static checks (tier 1), then the real WatchWolf-Tester integration suites against a live environment (tier 2, `--quick` to skip). |
+| `watchwolf update` | Fast-forwards this checkout (rebuilding the image if it moved) and, if an install exists, its ServersManager/ClientsManager clones. Never merges, rebases, or discards local work — a checkout with commits the remote lacks is reported, not touched. |
 
 Every command accepts `--path <dir>` (default `$HOME/WatchWolf`) to point at a different install.
 

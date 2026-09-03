@@ -135,6 +135,23 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   deselecting all of them with F9 in the menu — one must download everything, the other nothing.
   See `MenuModel.selectedUsualPluginsOrNullIfUnresolved` and `BuildPlan.selectedUsualPlugins`'s
   Javadoc before changing either side of this.
+- **`watchwolf update` needs the checkout root identity-mounted, which no other command does.**
+  `cli/watchwolf` mounts the repo root (the directory containing `cli/`, detected by `.git` sitting
+  next to `cli/`) at its own path and passes it as `WW_REPO_ROOT`, the same identity-mount trick
+  used for `WW_BASE`/`$HOME/.m2`/`$PWD` -- see the launcher's own header comment. Without this the
+  container has no filesystem access to the checkout that built its own image, which is why every
+  other command never needed it. `UpdateCommand` rebuilds the image afterwards via
+  `DockerFacade.buildImage(repoRoot/cli, WW_IMAGE, ...)`, reusing the exact mechanism
+  `BuildClientsManagerImageStep` uses -- it only works because `repoRoot` is identity-mounted, so
+  the daemon resolves that build context on the host.
+- **`GitRepository.pullFastForwardOnly` must never call `git merge` without first proving the
+  fast-forward is clean.** It exists specifically so `watchwolf update` is safe to run on a
+  checkout with active, uncommitted-or-not development on it: commits local to the checkout that
+  origin does not have are reported (`Diverged`, or `UpToDate` if origin simply hasn't moved past
+  where they branched) and never touched -- there is no code path in this method that runs a real
+  merge, a rebase, or a branch switch. If you touch this, re-run
+  `ITGitRepositoryPullFastForwardOnlyShould`, which proves all three outcomes against a real local
+  `git`, not just a scripted fake.
 
 ## Git conventions
 
