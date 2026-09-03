@@ -49,14 +49,22 @@ public final class MonitorScreen implements AutoCloseable {
     private final ProgressSink progress;
     private final Duration interval;
 
+    /**
+     * How often the loop wakes when nothing is happening. Bounds worst-case input latency for an
+     * isolated keypress to roughly 2x this -- comfortably under the ~120ms a terminal UI needs to
+     * feel immediate. It does NOT gate how fast a burst of keys is processed: see {@link #run()}.
+     */
+    private static final long IDLE_POLL_MILLIS = 20;
+
     private Screen screen;
     private MonitorModel model;
     private final LogRing logs = new LogRing(5000);
     private AutoCloseable logStream;
     private String followedKey;
     private String statusMessage;
+    private long statusMessageSetAtMillis;
     private String filterBeingTyped;
-    private int frame;
+    private long lastFileLogReloadAtMillis;
 
     public MonitorScreen(InstallLayout layout, DockerFacade docker, FileGateway files,
                          MonitorPoller poller, BundleWriter bundleWriter, ProgressSink progress,
@@ -72,7 +80,16 @@ public final class MonitorScreen implements AutoCloseable {
 
     public void run() throws IOException {
         Terminal terminal = new DefaultTerminalFactory().createTerminal();
-        this.screen = new TerminalScreen(terminal);
+        this.runOn(new TerminalScreen(terminal));
+    }
+
+    /**
+     * Package-visible so a test can inject a {@link com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal}
+     * -backed screen and drive the real loop -- including its actual input-draining and timing
+     * behaviour -- with no pty involved. See {@code NFMonitorScreenResponsivenessShould}.
+     */
+    void runOn(Screen screen) throws IOException {
+        this.screen = screen;
         this.screen.startScreen();
         this.screen.setCursorPosition(null);
 
@@ -83,15 +100,26 @@ public final class MonitorScreen implements AutoCloseable {
                 EnvironmentSnapshot latest = this.poller.latest();
                 if (latest != null) this.model.update(latest);
 
+                // Drain EVERY key already buffered before drawing, not just one. A single
+                // pollInput() per loop meant a quick burst -- someone tapping an arrow key a few
+                // times to move the selection, which is completely normal -- only advanced by one
+                // step per IDLE_POLL_MILLIS, so five taps could take five loop periods to catch up
+                // and visibly finish moving. Draining fully means a burst is fully reflected in the
+                // very next frame, however many keys it contained.
+                boolean quit = false;
+                KeyStroke key;
+                while ((key = this.screen.pollInput()) != null) {
+                    if (!this.handle(key)) {
+                        quit = true;
+                        break;
+                    }
+                }
+
                 this.syncLogStream();
-                this.draw();
+                this.draw();   // always AFTER handling input, so this frame shows its effect
+                if (quit) return;
 
-                // poll for a key rather than block, so the clock and the tree keep moving
-                KeyStroke key = this.screen.pollInput();
-                if (key != null && !this.handle(key)) return;
-
-                this.frame++;
-                sleep(Math.min(200, this.interval.toMillis()));
+                sleep(IDLE_POLL_MILLIS);
             }
         } finally {
             this.closeLogStream();
@@ -116,12 +144,12 @@ public final class MonitorScreen implements AutoCloseable {
                     }
                     return false;
                 }
-                case 'r' -> this.statusMessage = "refreshed";
+                case 'r' -> this.setStatusMessage("refreshed");
                 case 'e' -> this.exportEverything();
                 case 'f' -> {
                     if (this.model.isInEntityView()) {
                         this.logs.scrollToTail();
-                        this.statusMessage = "following";
+                        this.setStatusMessage("following");
                     }
                 }
                 case '/' -> {
@@ -130,7 +158,7 @@ public final class MonitorScreen implements AutoCloseable {
                 case 's' -> {
                     if (this.model.isInEntityView()) this.saveCurrentLog();
                 }
-                case '?' -> this.statusMessage = this.helpText();
+                case '?' -> this.setStatusMessage(this.helpText());
                 default -> { }
             }
             return true;
@@ -187,6 +215,11 @@ public final class MonitorScreen implements AutoCloseable {
         return true;
     }
 
+    private void setStatusMessage(String message) {
+        this.statusMessage = message;
+        this.statusMessageSetAtMillis = System.currentTimeMillis();
+    }
+
     private void leaveEntity() {
         this.model.back();
         this.closeLogStream();
@@ -209,10 +242,14 @@ public final class MonitorScreen implements AutoCloseable {
 
         String key = view.title();
         if (key.equals(this.followedKey)) {
-            // a file log has no push notification, so re-read its tail as frames go by
+            // a file log has no push notification, so re-read its tail periodically. Gated
+            // on wall-clock time, not a frame count: the loop now runs far faster than any
+            // sensible reload cadence, and coupling this to the loop's own polling rate would
+            // either reload needlessly often or drift if that rate ever changes again.
             if (view.logSource() instanceof EntityView.LogSource.FileLog file
-                    && this.frame % 10 == 0) {
+                    && System.currentTimeMillis() - this.lastFileLogReloadAtMillis >= 1000) {
                 this.reloadFileLog(file.path());
+                this.lastFileLogReloadAtMillis = System.currentTimeMillis();
             }
             return;
         }
@@ -264,15 +301,15 @@ public final class MonitorScreen implements AutoCloseable {
     // ---- actions ---------------------------------------------------------------------------
 
     private void exportEverything() {
-        this.statusMessage = "exporting all logs...";
+        this.setStatusMessage("exporting all logs...");
         try {
             Path destination = this.layout.base()
                     .resolve("watchwolf-logs-" + System.currentTimeMillis() + ".tar.gz");
             Path written = this.bundleWriter.write(destination,
                     BundleWriter.Selection.everything(), ProgressSink.discarding());
-            this.statusMessage = "exported everything to " + written;
+            this.setStatusMessage("exported everything to " + written);
         } catch (RuntimeException ex) {
-            this.statusMessage = "export failed: " + ex.getMessage();
+            this.setStatusMessage("export failed: " + ex.getMessage());
         }
     }
 
@@ -283,9 +320,9 @@ public final class MonitorScreen implements AutoCloseable {
             Path destination = this.layout.base()
                     .resolve(view.title().replaceAll("[^A-Za-z0-9_.-]", "_") + ".log");
             this.files.writeString(destination, String.join("\n", this.logs.window(100000)) + "\n");
-            this.statusMessage = "saved " + destination;
+            this.setStatusMessage("saved " + destination);
         } catch (IOException ex) {
-            this.statusMessage = "could not save: " + ex.getMessage();
+            this.setStatusMessage("could not save: " + ex.getMessage());
         }
     }
 
@@ -448,7 +485,7 @@ public final class MonitorScreen implements AutoCloseable {
             List<String> window = this.logs.window(logHeight - 2);
             if (window.isEmpty()) {
                 String spinner = String.valueOf(
-                        SPINNER.charAt((this.frame / 2) % SPINNER.length()));
+                        SPINNER.charAt((int) ((System.currentTimeMillis() / 100) % SPINNER.length())));
                 painter.text(2, logTop + 1, spinner + " waiting for output...", Theme.DIM);
             }
             for (int i = 0; i < window.size(); i++) {
@@ -469,7 +506,9 @@ public final class MonitorScreen implements AutoCloseable {
     private void drawFooter(Painter painter, int row, String keys) {
         if (this.statusMessage != null) {
             painter.text(1, row, this.statusMessage, Theme.WARN);
-            if (this.frame % 40 == 0) this.statusMessage = null;
+            if (System.currentTimeMillis() - this.statusMessageSetAtMillis >= 2000) {
+                this.statusMessage = null;
+            }
             return;
         }
         painter.text(1, row, keys, Theme.DIM);
@@ -481,6 +520,11 @@ public final class MonitorScreen implements AutoCloseable {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    /** Package-visible for {@code NFMonitorScreenResponsivenessShould}. */
+    MonitorModel modelForTesting() {
+        return this.model;
     }
 
     @Override

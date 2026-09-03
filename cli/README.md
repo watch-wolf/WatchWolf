@@ -62,6 +62,7 @@ Dockerized, same as every other WatchWolf repo — the host needs only Docker:
 ./ci/build.sh [--preclean] [--image]   # -> target/watchwolf-cli.jar, optionally the Docker image
 ./ci/tests.sh --unit                   # hermetic: no Docker socket, no network
 ./ci/tests.sh --validation             # naming conventions + code checks
+./ci/tests.sh --nonfunctional          # timing budgets (e.g. dashboard input latency); own suite
 ./ci/tests.sh --integration            # needs a reachable Docker daemon
 ./ci/validator.sh                      # alias for --validation
 ```

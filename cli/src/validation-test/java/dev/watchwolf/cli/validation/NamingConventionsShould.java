@@ -12,11 +12,11 @@ import java.util.stream.Stream;
 
 /**
  * A file that breaks these conventions is <b>silently never executed</b> by Maven -- Surefire only
- * picks up {@code *Should.java} in the default suite, and Failsafe only picks up {@code IT*.java}.
- * That is how WatchWolf-Tester ended up with a suite nobody had run in years, and the reason these
- * are ordinary JUnit tests rather than a comment: one dynamic test per file, so a violation reports
- * individually and names the offending file, the same shape as
- * WatchWolf-Tester's own {@code src/validation-test/java}.
+ * picks up {@code *Should.java} in the default suite, {@code **{@literal /}NF*.java} in the
+ * non-functional suite, and Failsafe only picks up {@code IT*.java}. That is how WatchWolf-Tester
+ * ended up with a suite nobody had run in years, and the reason these are ordinary JUnit tests
+ * rather than a comment: one dynamic test per file, so a violation reports individually and names
+ * the offending file, the same shape as WatchWolf-Tester's own {@code src/validation-test/java}.
  *
  * <p>Only files that actually declare a test are checked -- a fixture like
  * {@code fake/FakeDockerFacade.java} legitimately lives under {@code src/test/java} without ending
@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 public class NamingConventionsShould {
     private static final Path UNIT_TESTS_ROOT = Paths.get("src/test/java");
     private static final Path INTEGRATION_TESTS_ROOT = Paths.get("src/integration-test/java");
+    private static final Path NONFUNCTIONAL_TESTS_ROOT = Paths.get("src/nonfunctional-test/java");
 
     @TestFactory
     Stream<DynamicTest> nameEveryUnitTestWithTheShouldSuffix() {
@@ -51,6 +52,21 @@ public class NamingConventionsShould {
                         throw new AssertionError(name + " declares a @Test/@TestFactory under "
                                 + INTEGRATION_TESTS_ROOT + " but does not start with 'IT' -- "
                                 + "Failsafe will never run it.");
+                    }
+                }));
+    }
+
+    @TestFactory
+    Stream<DynamicTest> nameEveryNonFunctionalTestWithTheNfPrefix() {
+        return javaFilesDeclaringATest(NONFUNCTIONAL_TESTS_ROOT).map(file -> DynamicTest.dynamicTest(
+                file.toString(),
+                () -> {
+                    String name = file.getFileName().toString();
+                    if (!name.startsWith("NF")) {
+                        throw new AssertionError(name + " declares a @Test/@TestFactory under "
+                                + NONFUNCTIONAL_TESTS_ROOT + " but does not start with 'NF' -- "
+                                + "the nonfunctional-tests Surefire execution only includes "
+                                + "**/NF*.java, so this class silently never runs.");
                     }
                 }));
     }

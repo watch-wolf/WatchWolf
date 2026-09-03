@@ -14,9 +14,10 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
 | `Dockerfile` | Multi-stage: `maven:3.9-eclipse-temurin-17` builder → `eclipse-temurin:17-jre` runtime with `docker` CLI + compose plugin (Docker's static binaries, not a distro apt repo — see the Dockerfile's own comment for why) and `git`. |
 | `ci/{build,tests,validator}.sh` | Dockerized build/test verbs, same shape as every other WatchWolf repo's `ci/`. See [`ci/README.md`](ci/README.md). |
 | `src/main/java/dev/watchwolf/cli/` | The application. See the package map below. |
-| `src/test/java` | Unit tests (`*Should`), hermetic — no Docker, no network, no filesystem beyond a temp dir. |
-| `src/integration-test/java` | System tests (`IT*`) — need a reachable Docker daemon. |
-| `src/validation-test/java` | Code checks (`*Should`) — naming conventions, the pure-logic boundary, the Core drift check. |
+| `src/test/java` | Unit tests (`*Should`), hermetic — no Docker, no network, no filesystem beyond a temp dir. Asserts correctness. |
+| `src/integration-test/java` | System tests (`IT*`) — need a reachable Docker daemon. Asserts correctness. |
+| `src/validation-test/java` | Code checks (`*Should`) — naming conventions, the pure-logic boundary, the Core drift check. Asserts repo conventions. |
+| `src/nonfunctional-test/java` | Non-functional tests (`NF*`), hermetic — no Docker, no real terminal (driven over a Lanterna `DefaultVirtualTerminal`). Asserts **wall-clock timing**, not correctness — its own category, its own Maven profile (`-P nonfunctional-test`), its own report directory; never folded into the unit suite. |
 
 ## Package map
 
@@ -98,6 +99,21 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   detects a network filesystem (this checkout's own SMB mount included) and builds on the
   container's own disk, copying back only the finished jar and reports — see
   [`ci/README.md`](ci/README.md#a-note-on-this-filesystem) for why.
+- **Both TUI loops drain every buffered key before drawing, and draw only after handling input.**
+  `MonitorScreen.runOn`/`MenuConfigScreen.runOn` loop `pollInput()` until it returns `null`,
+  *then* draw once. A single `pollInput()` per sleep looked fine for an isolated keypress but
+  meant a burst of taps — completely normal when moving a selection — drained at one key per
+  sleep, taking most of a second to visibly catch up; drawing before consuming the key added a
+  further frame of lag on top. Both are guarded by
+  `NFMonitorScreenResponsivenessShould`/`NFMenuConfigScreenResponsivenessShould`
+  (`src/nonfunctional-test/java`) — its burst test is what actually catches a regression here; a
+  single-keypress test alone would not have. If you touch either loop, keep the drain-before-draw
+  order and re-run `./ci/tests.sh --nonfunctional`.
+- **Loop-iteration counters must not drive animation or periodic-task timing.** Both screens used
+  to gate the spinner, the periodic file-log reload, and the status-message auto-clear on a
+  `frame` counter incremented once per loop iteration; when the idle-poll interval dropped (see
+  above) those all sped up by the same factor. They are wall-clock-based now
+  (`System.currentTimeMillis()`), independent of however fast the loop actually polls.
 
 ## Git conventions
 

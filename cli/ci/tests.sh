@@ -4,6 +4,7 @@
 unit=0
 integration=0
 validation=0
+nonfunctional=0
 test_match=""
 skip_preflight=0
 
@@ -13,6 +14,7 @@ while [[ "$#" -gt 0 ]]; do
         --unit) unit=1 ;;
         --integration) integration=1 ;;
         --validation) validation=1 ;;
+        --nonfunctional) nonfunctional=1 ;;
         --tests) test_match="$2" ; shift ;;
         --skip-preflight) skip_preflight=1 ;;
 
@@ -21,7 +23,7 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-if [ $integration -eq 0 ] && [ $unit -eq 0 ] && [ $validation -eq 0 ]; then
+if [ $integration -eq 0 ] && [ $unit -eq 0 ] && [ $validation -eq 0 ] && [ $nonfunctional -eq 0 ]; then
     echo "[e] You must specify at least one type of test to run!" >&2
     exit 1
 fi
@@ -125,6 +127,35 @@ if [ $validation -eq 1 ]; then
 
     if [ $result -ne 0 ]; then
         echo "[e] Code checks failed" >&2
+        overall=$result
+    fi
+fi
+
+if [ $nonfunctional -eq 1 ]; then
+    # NOT unit tests -- a distinct category. These assert wall-clock timing (e.g. the dashboard
+    # reacting to a keypress in under 120ms) rather than correctness, driven over a headless
+    # virtual terminal (com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal), so they
+    # need no Docker daemon and no real pty -- but they ARE timing-sensitive, which is why they
+    # live in their own suite with their own reports rather than in target/surefire-reports.
+    nonfunctional_tests_report_path="$WW_BASE_PATH/target/nonfunctional-reports"
+    mkdir -p "$nonfunctional_tests_report_path"
+
+    if [ ! -z "$test_match" ]; then
+        echo "[v] Running filtered non-functional tests: $test_match"
+        ww_mvn test -P nonfunctional-test                                       \
+                        -Dmaven.test.redirectTestOutputToFile=true              \
+                        -Dtest="$test_match"                                    \
+                2>&1 | tee "$nonfunctional_tests_report_path/docker-log.txt"
+        result=${PIPESTATUS[0]}
+    else
+        ww_mvn test -P nonfunctional-test                                       \
+                        -Dmaven.test.redirectTestOutputToFile=true              \
+                2>&1 | tee "$nonfunctional_tests_report_path/docker-log.txt"
+        result=${PIPESTATUS[0]}
+    fi
+
+    if [ $result -ne 0 ]; then
+        echo "[e] Non-functional tests failed" >&2
         overall=$result
     fi
 fi

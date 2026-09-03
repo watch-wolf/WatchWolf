@@ -38,13 +38,15 @@ public final class MenuConfigScreen implements AutoCloseable {
     private final MenuModel model;
     private final VersionFetcher versionFetcher;
 
+    /** Same reasoning as MonitorScreen's IDLE_POLL_MILLIS -- see there. */
+    private static final long IDLE_POLL_MILLIS = 20;
+
     private Screen screen;
     private final Deque<MenuNode> path = new ArrayDeque<>();
     private int cursor;
     private String editingId;
     private String editBuffer;
     private boolean showHelp = true;
-    private int frame;
     private boolean cancelled;
 
     /** Supplies the two remote version lists, on a thread of its own. */
@@ -64,7 +66,16 @@ public final class MenuConfigScreen implements AutoCloseable {
 
     /** @return the plan the user accepted, or empty when they cancelled */
     public Optional<BuildPlan> run() throws IOException {
-        this.screen = new TerminalScreen(new DefaultTerminalFactory().createTerminal());
+        return this.runOn(new TerminalScreen(new DefaultTerminalFactory().createTerminal()));
+    }
+
+    /**
+     * Package-visible so a test can drive the real loop over a
+     * {@link com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal}-backed screen, with
+     * no pty involved. See {@code NFMenuConfigScreenResponsivenessShould}.
+     */
+    Optional<BuildPlan> runOn(Screen screen) throws IOException {
+        this.screen = screen;
         this.screen.startScreen();
         this.screen.setCursorPosition(null);
 
@@ -74,17 +85,26 @@ public final class MenuConfigScreen implements AutoCloseable {
 
         try {
             while (true) {
-                this.draw();
-
-                KeyStroke key = this.screen.pollInput();
-                if (key != null) {
+                // Drain every buffered key before drawing, not just one -- a single pollInput()
+                // per loop meant a quick burst of taps (completely normal when navigating a list)
+                // only advanced by one step per IDLE_POLL_MILLIS, so a handful of presses could
+                // take several loop periods to visibly finish. Draining fully means a burst is
+                // fully reflected in the very next frame, however many keys it contained.
+                KeyStroke key;
+                while ((key = this.screen.pollInput()) != null) {
                     Decision decision = this.handle(key);
-                    if (decision == Decision.START) return Optional.of(this.model.toBuildPlan());
-                    if (decision == Decision.CANCEL) return Optional.empty();
+                    if (decision == Decision.START) {
+                        this.draw();
+                        return Optional.of(this.model.toBuildPlan());
+                    }
+                    if (decision == Decision.CANCEL) {
+                        this.draw();
+                        return Optional.empty();
+                    }
                 }
 
-                this.frame++;
-                sleep(80);
+                this.draw();   // always AFTER handling input, so this frame shows its effect
+                sleep(IDLE_POLL_MILLIS);
             }
         } finally {
             this.screen.stopScreen();
@@ -237,6 +257,11 @@ public final class MenuConfigScreen implements AutoCloseable {
         return this.cancelled;
     }
 
+    /** Package-visible for {@code NFMenuConfigScreenResponsivenessShould}. */
+    int cursorForTesting() {
+        return this.cursor;
+    }
+
     // ---- drawing ---------------------------------------------------------------------------
 
     private void draw() throws IOException {
@@ -295,7 +320,8 @@ public final class MenuConfigScreen implements AutoCloseable {
         if (pending == null) return;
 
         if (pending.isLoading()) {
-            String spinner = String.valueOf(SPINNER.charAt((this.frame / 2) % SPINNER.length()));
+            String spinner = String.valueOf(
+                    SPINNER.charAt((int) ((System.currentTimeMillis() / 100) % SPINNER.length())));
             painter.text(2, row, spinner + " " + pending.describe(what, Instant.now()), Theme.WARN);
         } else if (pending.hasFailed()) {
             painter.text(2, row, "! " + pending.failureDetail().orElse("failed"), Theme.BAD);

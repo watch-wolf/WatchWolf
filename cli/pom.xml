@@ -19,14 +19,19 @@
 
         <!--
           Which suite runs is decided by the profiles at the bottom of this file:
-            default           -> unit tests only   (src/test/java, *Should)          hermetic
-            integration-test  -> system tests only  (src/integration-test/java, IT*)  needs Docker
-            validation-test   -> code checks only   (src/validation-test/java, *Should)
-          System tests need a Docker daemon, so they must never run by default.
+            default              -> unit tests only     (src/test/java, *Should)              hermetic
+            integration-test     -> system tests only    (src/integration-test/java, IT*)      needs Docker
+            validation-test      -> code checks only     (src/validation-test/java, *Should)   hermetic
+            nonfunctional-test   -> non-functional only   (src/nonfunctional-test/java, NF*)    hermetic, but SLOW/timing-sensitive
+          System tests need a Docker daemon, so they must never run by default. Non-functional tests are
+          hermetic (no daemon, no network — driven over a headless virtual terminal) but assert wall-clock
+          timing, which is a different kind of claim from "this is correct" — kept out of the default run
+          so a loaded CI box can't turn a timing assertion into a flaky unit-test failure.
         -->
         <skip.unit.tests>false</skip.unit.tests>
         <skip.integration.tests>true</skip.integration.tests>
         <skip.validation.tests>true</skip.validation.tests>
+        <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
 
         <picocli.version>4.7.6</picocli.version>
         <lanterna.version>3.1.2</lanterna.version>
@@ -136,6 +141,7 @@
                             <sources>
                                 <source>${project.basedir}/src/integration-test/java/</source>
                                 <source>${project.basedir}/src/validation-test/java/</source>
+                                <source>${project.basedir}/src/nonfunctional-test/java/</source>
                             </sources>
                         </configuration>
                     </execution>
@@ -143,10 +149,12 @@
             </plugin>
 
             <!--
-              Surefire runs two independent suites, each with its own reports directory so a
-              failing code check is never mixed into the unit-test report:
-                default-test      unit tests   -> target/surefire-reports
-                validation-tests  code checks  -> target/validation-reports
+              Surefire runs three independent suites, each with its own reports directory so a
+              failing code check — or a failing timing assertion — is never mixed into the
+              unit-test report:
+                default-test         unit tests            -> target/surefire-reports
+                validation-tests     code checks           -> target/validation-reports
+                nonfunctional-tests  non-functional tests  -> target/nonfunctional-reports
             -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -173,6 +181,7 @@
                             <excludes>
                                 <exclude>**/IT*.java</exclude>
                                 <exclude>**/validation/**</exclude>
+                                <exclude>**/NF*.java</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -188,6 +197,27 @@
                             <reportsDirectory>${project.build.directory}/validation-reports</reportsDirectory>
                             <includes>
                                 <include>**/validation/*Should.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+
+                    <!--
+                      Non-functional tests: NOT "unit tests" — they assert wall-clock timing
+                      (e.g. keypress-to-redraw latency), a different kind of claim from "this is
+                      correct", run over a headless virtual terminal so they still need no Docker
+                      daemon and no real pty. Own category, own report directory, own profile.
+                    -->
+                    <execution>
+                        <id>nonfunctional-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>${skip.nonfunctional.tests}</skipTests>
+                            <reportsDirectory>${project.build.directory}/nonfunctional-reports</reportsDirectory>
+                            <includes>
+                                <include>**/NF*.java</include>
                             </includes>
                         </configuration>
                     </execution>
@@ -261,6 +291,7 @@
                 <skip.unit.tests>false</skip.unit.tests>
                 <skip.integration.tests>true</skip.integration.tests>
                 <skip.validation.tests>true</skip.validation.tests>
+                <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
             </properties>
         </profile>
 
@@ -270,6 +301,7 @@
                 <skip.unit.tests>true</skip.unit.tests>
                 <skip.integration.tests>false</skip.integration.tests>
                 <skip.validation.tests>true</skip.validation.tests>
+                <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
             </properties>
         </profile>
 
@@ -279,6 +311,17 @@
                 <skip.unit.tests>true</skip.unit.tests>
                 <skip.integration.tests>true</skip.integration.tests>
                 <skip.validation.tests>false</skip.validation.tests>
+                <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>nonfunctional-test</id>
+            <properties>
+                <skip.unit.tests>true</skip.unit.tests>
+                <skip.integration.tests>true</skip.integration.tests>
+                <skip.validation.tests>true</skip.validation.tests>
+                <skip.nonfunctional.tests>false</skip.nonfunctional.tests>
             </properties>
         </profile>
     </profiles>
