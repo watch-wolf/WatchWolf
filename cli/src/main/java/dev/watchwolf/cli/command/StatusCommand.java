@@ -27,7 +27,7 @@ public class StatusCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "status")) {
             EnvironmentSnapshot snapshot = cli.scanner().scan();
 
             if (!snapshot.dockerReachable()) {

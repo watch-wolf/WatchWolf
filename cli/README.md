@@ -35,7 +35,7 @@ the image itself from this checkout's own `Dockerfile` (cached after the first r
 | `watchwolf run` / `stop` | Lifecycle. `run` checks the environment first unless `--skip-checks`; `stop` also sweeps up leftover `MC_Server-*` containers. |
 | `watchwolf status` | One-shot plain-text picture of what's running. Safe to pipe. |
 | `watchwolf monitor` | The live dashboard — a btop-style view of the managers, their servers and their bots, with per-entity logs. |
-| `watchwolf logs` | Exports one `tar.gz` diagnostics bundle to `<install base>/logs/` by default (`--session`, `--last`, `--since`, `--out` to override). |
+| `watchwolf logs` | Exports one `tar.gz` diagnostics bundle to `<install base>/logs/` by default (`--session`, `--last`, `--since`, `--out` to override). Includes the CLI's own run logs — see below. |
 | `watchwolf doctor` | Self-tests: fast static checks (tier 1), then the real WatchWolf-Tester integration suites against a live environment (tier 2, `--quick` to skip). |
 | `watchwolf update` | Fast-forwards this checkout (rebuilding the image if it moved) and, if an install exists, its ServersManager/ClientsManager clones. Never merges, rebases, or discards local work — a checkout with commits the remote lacks is reported, not touched. |
 
@@ -79,6 +79,38 @@ know one. Two keys matter while it runs:
 
 Flag-driven runs (`--spigot`, `--skip-tester`, a non-TTY, ...) keep the plain one-line-per-step
 output, unchanged.
+
+## What the CLI writes about itself
+
+Every run leaves a log in `<install base>/.watchwolf/run-logs/`, one file per run, named
+`<timestamp>-<command>.log`:
+
+```
+watchwolf build
+started      2026-09-04T16:07:16Z
+install base /home/me/WatchWolf
+branch       dev
+------------------------------------------------------------------------------
+
+plan
+    branch                 dev
+    spigot versions        [1.8.8, 1.20.4]
+    ...
+
+16:07:17  [v] (3/13) Clone WatchWolf-ServersManager
+16:07:17  [v]   -> ok
+16:07:19  [v]   Spigot 1.20.4: queued
+16:08:02  [e]   Spigot 1.8.8: no jar was produced
+16:08:02  [e]      remedy: BuildTools needs network access and about 1.5GB free. ...
+```
+
+It matters most where the terminal cannot help: the drawn install prints nothing while it runs (a
+full-screen UI owns the terminal), and an install sent to the background finishes in a container
+nobody is watching. Detail is written whether or not you passed `--verbose`; the per-second
+heartbeats are not, so the file stays readable. The newest 20 runs are kept.
+
+`watchwolf logs` puts the newest 10 of them in the bundle under `cli-runs/`, so a bug report says
+what the installer did as well as what the containers did.
 
 ## The dashboard
 

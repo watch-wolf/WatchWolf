@@ -37,7 +37,10 @@ public final class PlainStepReporter implements StepReporter {
             case OK -> this.out.println("[v]   -> ok");
             case ALREADY_DONE -> this.out.println("[v]   -> already done (" + result.why() + ")");
             case SKIPPED -> this.out.println("[v]   -> skipped (" + result.why() + ")");
-            case BLOCKED -> this.err.println("[w]   -> blocked: " + result.why());
+            // blocked steps are never announced by stepStarting, so the line has to name the
+            // step itself -- otherwise a run of them reads as a wall of anonymous "blocked"
+            case BLOCKED -> this.err.println("[w] " + result.title() + " -> blocked: "
+                    + result.why());
             case FAILED, VERIFY_FAILED -> {
                 this.err.println("[e]   -> " + result.outcome().label());
                 this.err.println("[e]      " + result.what() + ": " + result.why());

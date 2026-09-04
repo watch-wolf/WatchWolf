@@ -43,6 +43,15 @@ public interface FileGateway {
 
     void writeString(Path path, String contents) throws IOException;
 
+    /**
+     * Adds to the end of a file, creating it if needed.
+     *
+     * <p>Separate from {@link #writeString} because the run log is written line by line as the
+     * install happens: rewriting the whole file per line would be quadratic, and -- the part that
+     * matters -- a run killed half way through must leave everything it had already said on disk.
+     */
+    void appendString(Path path, String contents) throws IOException;
+
     void setExecutable(Path path) throws IOException;
 
     void delete(Path path) throws IOException;

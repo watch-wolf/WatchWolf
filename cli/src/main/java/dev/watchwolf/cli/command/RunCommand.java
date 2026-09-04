@@ -41,7 +41,7 @@ public class RunCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "run")) {
             if (!this.skipChecks) {
                 DoctorReport report = new Tier1Suite(
                         new CompatibilityMatrixSource.AbsentMatrixSource(),

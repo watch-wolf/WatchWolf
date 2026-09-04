@@ -58,7 +58,7 @@ public class DoctorCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "doctor")) {
             StepContext context = cli.stepContext(BuildPlan.defaults());
 
             System.out.println("Tier 1 -- static checks");

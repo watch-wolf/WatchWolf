@@ -34,7 +34,7 @@ public class StopCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "stop")) {
             new ComposeProject(cli.layout(), cli.commands(), cli.interfaces()).down(cli.progress());
 
             if (cli.docker().findContainer(ContainerNames.CLIENTS_MANAGER).isPresent()) {

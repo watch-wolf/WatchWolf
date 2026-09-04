@@ -42,7 +42,7 @@ public class MonitorCommand implements Callable<Integer> {
             return ExitCodes.USAGE;
         }
 
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "monitor")) {
             Duration interval = Duration.ofMillis(Math.max(250, this.intervalMillis));
 
             MonitorPoller poller = new MonitorPoller(cli.scanner(), interval);

@@ -36,6 +36,7 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
 | `inventory` | `EnvironmentScanner` builds an `EnvironmentSnapshot` from `DockerFacade` + `InstallLayout`; `ManagerStatus`/`McServerStatus`/`ClientStatus`; `ClientDiscovery` + `SocketAndLogClientDiscovery` (see below); `ServerJarInventory`. |
 | `net` | `HostInterfaces` (candidate addresses, ranked — the whole point of this effort), `AddressCandidate`/`AddressClassifier`, `PortProbe`. |
 | `step` | The install engine: `Step`, `Verification`, `StepContext`, `StepGraph` (topological sort, cycle/duplicate detection), `StepRunner` (verify-before-and-after, "performed but unverified" as a distinct outcome), `HostAction` (see below). `step.build` and `step.install` hold the concrete steps and `StepCatalog` assembles the graphs. |
+| `log` | `RunLog` — every run writes itself to `<base>/.watchwolf/run-logs/<timestamp>-<command>.log`, plus the `RunLogProgressSink`/`RunLogStepReporter` decorators that tee the existing events into it. Appends line by line (never buffers to the end), records state changes but not heartbeats, and degrades to a no-op rather than ever failing a command. |
 | `progress` | `ProgressSink` (the seam) — every slow operation announces itself, names the host it's waiting on, and reports a heartbeat. Nothing calls `System.out` directly outside this package. |
 | `doctor` | `Check`/`CheckResult`/`DoctorReport`, `Tier1Suite` (fast static checks), `Tier2Runner` (shells out to `WatchWolf-Tester/ci/tests.sh`), `CompatibilityMatrixSource` (currently always `AbsentMatrixSource` — see below). |
 | `bundle` | `BundleWriter` + `ManifestBuilder` — the diagnostics `tar.gz`, reused by `logs`, `doctor` on failure, and the dashboard's `e` key. |
@@ -97,6 +98,13 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   structurally only ever holds `info.txt`/`latest.log`, so copying the whole tree can never sweep up a jar,
   whereas `tmp/<id>/` holds `server.jar` and the plugin jars, so its
   four named config files keep their plain per-file graceful skip instead.
+- **The CLI keeps its own logs, and the bundle collects them.** `CliContext` opens a `RunLog` per
+  run and wraps the progress sink and step reporter in it, so nothing at a call site has to
+  remember to log. Three cases made this necessary: the drawn install cannot print while it runs, a
+  backgrounded install has no terminal at all, and a bundle that describes everything except the
+  run that produced it is missing half of what "it installed wrong" needs. `BundleWriter` adds them
+  under `cli-runs/`. Anything genuinely per-second (`update`, `taskUpdate`) is deliberately *not*
+  logged — see `RunLogProgressSink`'s Javadoc.
 - **A menu session gets a drawn install; flags get printed output.** `BuildCommand` decides on
   `usedMenu`: the menuconfig path runs `StepRunner` on a worker thread with `TuiProgressSink`/
   `TuiStepReporter` writing `InstallProgressModel`, while `InstallProgressScreen` only paints

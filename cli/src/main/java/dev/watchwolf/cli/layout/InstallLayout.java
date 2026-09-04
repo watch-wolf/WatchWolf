@@ -84,6 +84,17 @@ public final class InstallLayout {
     }
 
     /**
+     * Where the CLI records what it did, one file per run -- see
+     * {@link dev.watchwolf.cli.log.RunLog}. Deliberately not {@link #logs()} (the ServersManager's
+     * per-session server logs) nor {@link #exportedLogsDir()} (where bundles are written): these
+     * are the installer's own account of itself, and mixing them into either would make both
+     * harder to reason about.
+     */
+    public Path cliLogsDir() {
+        return this.stateDir().resolve("run-logs");
+    }
+
+    /**
      * How the last install ended, when nobody was watching it end -- see
      * {@link dev.watchwolf.cli.model.InstallRunRecord}. The next {@code build} shows it and then
      * removes the file.

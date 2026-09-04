@@ -35,7 +35,7 @@ public class UninstallCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "uninstall")) {
             HostAction action = cli.hostAction();
 
             if (cli.files().exists(Paths.get(RegisterLauncherStep.TARGET))) {

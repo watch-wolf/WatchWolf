@@ -46,7 +46,7 @@ public class LogsCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "logs")) {
             Path destination = this.destination(cli.layout().exportedLogsDir());
 
             BundleWriter.Selection selection = this.selection();

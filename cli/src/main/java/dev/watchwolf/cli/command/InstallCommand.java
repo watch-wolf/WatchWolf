@@ -47,7 +47,7 @@ public class InstallCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "install")) {
             BuildPlan plan = BuildPlan.builder()
                     .branch(this.options.resolvedBranch())
                     .registerLauncher(true)

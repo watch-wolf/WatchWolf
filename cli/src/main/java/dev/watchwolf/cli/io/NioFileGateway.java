@@ -105,6 +105,14 @@ public final class NioFileGateway implements FileGateway {
     }
 
     @Override
+    public void appendString(Path path, String contents) throws IOException {
+        Path parent = path.getParent();
+        if (parent != null) Files.createDirectories(parent);
+        Files.writeString(path, contents, StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE, StandardOpenOption.APPEND, StandardOpenOption.WRITE);
+    }
+
+    @Override
     public void setExecutable(Path path) throws IOException {
         if (!path.toFile().setExecutable(true, false)) {
             throw new IOException("Could not make " + path + " executable");

@@ -25,6 +25,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,9 @@ import java.util.Optional;
 public final class BundleWriter {
     private static final long MAX_FILE_BYTES = 2L * 1024 * 1024;
     private static final int MAX_LOG_LINES = 5000;
+
+    /** Recent runs are what a bug report is about; the rest are on the machine if ever needed. */
+    private static final int MAX_RUN_LOGS = 10;
 
     private final DockerFacade docker;
     private final FileGateway files;
@@ -122,6 +126,7 @@ public final class BundleWriter {
             this.addContainerInventory(tar, manifest);
             this.addHostNetwork(tar, manifest);
             this.addContainerLogs(tar, manifest);
+            this.addCliRunLogs(tar, manifest);
             this.addSessions(tar, manifest, selection);
             this.addArtefactInventory(tar, manifest);
 
@@ -283,6 +288,45 @@ public final class BundleWriter {
             }
             this.addEntry(tar, "containers/" + name + ".log", String.join("\n", lines) + "\n");
             manifest.collected("containers/" + name + ".log", lines.size() + " line(s)");
+        }
+    }
+
+    /**
+     * The CLI's own account of itself: {@code <base>/.watchwolf/run-logs/}, written by
+     * {@link dev.watchwolf.cli.log.RunLog}.
+     *
+     * <p>The bundle used to describe everything except the run that produced it -- and "the
+     * install went wrong" is one of the two things bundles are opened for. Includes the note left
+     * by an install that was sent to the background, since that run's terminal output never
+     * existed.
+     */
+    private void addCliRunLogs(TarArchiveOutputStream tar, ManifestBuilder manifest)
+            throws IOException {
+        Path directory = this.layout.cliLogsDir();
+        if (!this.files.isDirectory(directory)) {
+            manifest.skipped("cli-runs/", "no CLI run logs yet (" + directory + ")");
+        } else {
+            List<Path> logs = new ArrayList<>();
+            for (Path entry : this.files.list(directory)) {
+                if (entry.getFileName().toString().endsWith(".log")) logs.add(entry);
+            }
+            // newest first: the run being reported on is almost always the last one
+            logs.sort(Comparator.comparing(this.files::lastModified).reversed());
+
+            if (logs.size() > MAX_RUN_LOGS) {
+                manifest.skipped("cli-runs/ (" + (logs.size() - MAX_RUN_LOGS) + " older run(s))",
+                        "only the newest " + MAX_RUN_LOGS + " are collected");
+                logs = logs.subList(0, MAX_RUN_LOGS);
+            }
+            for (Path log : logs) {
+                this.addFileIfReadable(tar, manifest, log,
+                        "cli-runs/" + log.getFileName());
+            }
+        }
+
+        if (this.files.exists(this.layout.lastRunFile())) {
+            this.addFileIfReadable(tar, manifest, this.layout.lastRunFile(),
+                    "cli-runs/last-run.txt");
         }
     }
 

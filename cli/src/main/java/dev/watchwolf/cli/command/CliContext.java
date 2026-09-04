@@ -7,6 +7,9 @@ import dev.watchwolf.cli.inventory.SocketAndLogClientDiscovery;
 import dev.watchwolf.cli.io.FileGateway;
 import dev.watchwolf.cli.io.NioFileGateway;
 import dev.watchwolf.cli.layout.InstallLayout;
+import dev.watchwolf.cli.log.RunLog;
+import dev.watchwolf.cli.log.RunLogProgressSink;
+import dev.watchwolf.cli.log.RunLogStepReporter;
 import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.net.HostInterfaces;
 import dev.watchwolf.cli.net.PortProbe;
@@ -18,8 +21,10 @@ import dev.watchwolf.cli.remote.JdkHttpFetcher;
 import dev.watchwolf.cli.step.CancelSignal;
 import dev.watchwolf.cli.step.HostAction;
 import dev.watchwolf.cli.step.StepContext;
+import dev.watchwolf.cli.step.StepReporter;
 
 import java.time.Clock;
+import java.util.List;
 
 /**
  * Wires the real implementations of every seam together.
@@ -38,9 +43,10 @@ public final class CliContext implements AutoCloseable {
     private final PortProbe portProbe;
     private final Clock clock;
     private final ProgressSink progress;
+    private final RunLog runLog;
     private final HostAction hostAction = new HostAction();
 
-    public CliContext(GlobalOptions options) {
+    public CliContext(GlobalOptions options, String command) {
         this.options = options;
         this.layout = options.layout();
         this.docker = DockerJavaFacade.connect();
@@ -50,7 +56,11 @@ public final class CliContext implements AutoCloseable {
         this.interfaces = new HostInterfaces();
         this.portProbe = new PortProbe();
         this.clock = Clock.systemUTC();
-        this.progress = options.progress();
+        // every run writes itself down, so "what did the installer actually do" survives the
+        // terminal it happened in -- see RunLog
+        this.runLog = RunLog.open(this.files, this.layout, this.clock, command,
+                List.of("branch       " + options.resolvedBranch()));
+        this.progress = this.logging(options.progress());
     }
 
     public GlobalOptions options()     { return this.options; }
@@ -64,6 +74,17 @@ public final class CliContext implements AutoCloseable {
     public Clock clock()               { return this.clock; }
     public ProgressSink progress()     { return this.progress; }
     public HostAction hostAction()     { return this.hostAction; }
+    public RunLog runLog()             { return this.runLog; }
+
+    /** The same sink, also written to this run's log file. */
+    public ProgressSink logging(ProgressSink sink) {
+        return new RunLogProgressSink(sink, this.runLog);
+    }
+
+    /** The same reporter, also written to this run's log file. */
+    public StepReporter logging(StepReporter reporter) {
+        return new RunLogStepReporter(reporter, this.runLog);
+    }
 
     public StepContext stepContext(BuildPlan plan) {
         return this.stepContext(plan, this.progress, CancelSignal.never());
@@ -86,6 +107,7 @@ public final class CliContext implements AutoCloseable {
 
     @Override
     public void close() {
+        this.runLog.close();
         this.docker.close();
     }
 }

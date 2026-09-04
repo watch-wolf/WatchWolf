@@ -43,7 +43,7 @@ public class UpdateCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "update")) {
             boolean ok = this.updateCliCheckout(cli);
 
             boolean serversManagerInstalled =

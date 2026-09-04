@@ -139,6 +139,53 @@ public class BundleWriterShould {
     }
 
     @Test
+    public void collectTheCliOwnRunLogs() throws IOException {
+        // the bundle used to describe everything except the run that produced it, which is one of
+        // the two things bundles are opened for
+        InstallLayout layout = this.layout();
+        Files.createDirectories(layout.cliLogsDir());
+        Files.writeString(layout.cliLogsDir().resolve("20260903-100000-build.log"),
+                "watchwolf build\n[e]   -> FAILED\n");
+        Files.createDirectories(layout.stateDir());
+        Files.writeString(layout.lastRunFile(), "ending: backgrounded\nsummary: install failed\n");
+
+        Path destination = this.base.resolve("with-run-logs.tar.gz");
+        this.writer().write(destination, BundleWriter.Selection.everything(),
+                ProgressSink.discarding());
+
+        List<String> names = entryNames(destination);
+        assertTrue(names.contains("cli-runs/20260903-100000-build.log"), names.toString());
+        assertTrue(names.contains("cli-runs/last-run.txt"), names.toString());
+        assertTrue(readEntry(destination, "cli-runs/20260903-100000-build.log")
+                .contains("-> FAILED"));
+    }
+
+    @Test
+    public void keepOnlyTheNewestRunLogsAndSayHowManyWereLeftOut() throws IOException {
+        InstallLayout layout = this.layout();
+        Files.createDirectories(layout.cliLogsDir());
+        for (int i = 1; i <= 12; i++) {
+            Path log = layout.cliLogsDir().resolve(String.format("2026090%d-100000-build.log", 0));
+            log = layout.cliLogsDir().resolve("run-" + String.format("%02d", i) + ".log");
+            Files.writeString(log, "run " + i + "\n");
+            Files.setLastModifiedTime(log,
+                    java.nio.file.attribute.FileTime.fromMillis(1_000_000L + i * 1000L));
+        }
+
+        Path destination = this.base.resolve("many-run-logs.tar.gz");
+        this.writer().write(destination, BundleWriter.Selection.everything(),
+                ProgressSink.discarding());
+
+        List<String> names = entryNames(destination);
+        long collected = names.stream().filter(name -> name.startsWith("cli-runs/")).count();
+        assertEquals(10, collected, "a machine that installs often must not blow up the bundle");
+        assertTrue(names.contains("cli-runs/run-12.log"), "the newest run is the one that matters");
+        assertFalse(names.contains("cli-runs/run-01.log"));
+        assertTrue(readEntry(destination, "manifest.txt").contains("2 older run(s)"),
+                "a gap that is explained is useful; a silent one is misleading");
+    }
+
+    @Test
     public void recordWhatWasSkippedAndWhy() throws IOException {
         Path destination = this.base.resolve("skips.tar.gz");
         this.writer().write(destination, BundleWriter.Selection.everything(), ProgressSink.discarding());

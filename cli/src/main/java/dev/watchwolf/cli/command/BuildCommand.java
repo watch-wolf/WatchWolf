@@ -118,7 +118,7 @@ public class BuildCommand implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        try (CliContext cli = new CliContext(this.options)) {
+        try (CliContext cli = new CliContext(this.options, "build")) {
             Optional<BuildPlan> plan = this.resolvePlan(cli);
             if (plan.isEmpty()) {
                 // a detached run with no plan to replay has failed at its one job, and nobody is
@@ -135,6 +135,10 @@ public class BuildCommand implements Callable<Integer> {
                 this.describe(plan.get());
                 return ExitCodes.OK;
             }
+
+            // what was actually asked for, at the top of the log -- the first question anybody
+            // reading it afterwards has
+            cli.runLog().section("plan", planLines(plan.get()));
 
             if (this.dryRun) {
                 StepContext context = cli.stepContext(plan.get());
@@ -158,8 +162,8 @@ public class BuildCommand implements Callable<Integer> {
     private int runPrinted(CliContext cli, BuildPlan plan) {
         StepContext context = cli.stepContext(plan);
         List<StepResult> results =
-                this.runner(PlainStepReporter.toStdout()).run(StepCatalog.buildGraph(context),
-                        context);
+                this.runner(cli, PlainStepReporter.toStdout())
+                        .run(StepCatalog.buildGraph(context), context);
 
         if (this.resumeBackground) this.recordForTheNextRun(cli, results);
 
@@ -178,9 +182,10 @@ public class BuildCommand implements Callable<Integer> {
         AtomicBoolean cancelled = new AtomicBoolean();
         AtomicReference<List<StepResult>> results = new AtomicReference<>(List.of());
 
-        StepContext context = cli.stepContext(plan, new TuiProgressSink(model), cancelled::get);
+        StepContext context = cli.stepContext(plan,
+                cli.logging(new TuiProgressSink(model)), cancelled::get);
         var graph = StepCatalog.buildGraph(context);
-        StepRunner runner = this.runner(new TuiStepReporter(model));
+        StepRunner runner = this.runner(cli, new TuiStepReporter(model));
 
         Thread worker = new Thread(() -> {
             List<StepResult> ran = List.of();
@@ -213,6 +218,8 @@ public class BuildCommand implements Callable<Integer> {
                 Thread.currentThread().interrupt();
             }
         }
+
+        cli.runLog().line("[i] the install ended: " + ending.name().toLowerCase());
 
         return switch (ending) {
             case COMPLETED -> this.finishDrawnRun(cli, results.get());
@@ -288,8 +295,8 @@ public class BuildCommand implements Callable<Integer> {
         }
     }
 
-    private StepRunner runner(dev.watchwolf.cli.step.StepReporter reporter) {
-        StepRunner runner = StepRunner.reporting(reporter);
+    private StepRunner runner(CliContext cli, dev.watchwolf.cli.step.StepReporter reporter) {
+        StepRunner runner = StepRunner.reporting(cli.logging(reporter));
         if (this.failFast) runner = runner.failingFast();
         if (this.verifyOnly) runner = runner.verifyingOnly();
         return runner;
@@ -451,22 +458,29 @@ public class BuildCommand implements Callable<Integer> {
     }
 
     private void describe(BuildPlan plan) {
-        System.out.println("branch                 " + plan.branch());
-        System.out.println("parallel builders      " + plan.parallelBuilders());
-        System.out.println("clone ServersManager   " + plan.cloneServersManager());
-        System.out.println("clone ClientsManager   " + plan.cloneClientsManager());
-        System.out.println("clone Tester           " + plan.cloneTester());
-        System.out.println("pull JDK images        " + plan.pullJdkImages());
-        System.out.println("spigot versions        " + plan.spigotVersions());
-        System.out.println("paper versions         " + plan.paperVersions());
-        System.out.println("usual plugins          " + (plan.usualPluginsSelectionResolved()
+        planLines(plan).forEach(System.out::println);
+    }
+
+    /** The resolved plan as text -- printed by {@code --print-plan}, and kept in the run log. */
+    private static List<String> planLines(BuildPlan plan) {
+        List<String> lines = new ArrayList<>();
+        lines.add("branch                 " + plan.branch());
+        lines.add("parallel builders      " + plan.parallelBuilders());
+        lines.add("clone ServersManager   " + plan.cloneServersManager());
+        lines.add("clone ClientsManager   " + plan.cloneClientsManager());
+        lines.add("clone Tester           " + plan.cloneTester());
+        lines.add("pull JDK images        " + plan.pullJdkImages());
+        lines.add("spigot versions        " + plan.spigotVersions());
+        lines.add("paper versions         " + plan.paperVersions());
+        lines.add("usual plugins          " + (plan.usualPluginsSelectionResolved()
                 ? plan.selectedUsualPlugins().size() + " selected"
                 : "all (unresolved until the build runs)"));
-        System.out.println("WatchWolf-Server       " + plan.downloadWatchWolfServer());
-        System.out.println("build images           " + plan.buildServersManagerImage());
-        System.out.println("register at startup    " + plan.registerStartup());
-        System.out.println("self-test              " + plan.runSelfTest()
+        lines.add("WatchWolf-Server       " + plan.downloadWatchWolfServer());
+        lines.add("build images           " + plan.buildServersManagerImage());
+        lines.add("register at startup    " + plan.registerStartup());
+        lines.add("self-test              " + plan.runSelfTest()
                 + (plan.runSelfTest()
                    ? " [" + TesterSuiteCatalog.testPatternFor(plan.selfTestSuites()) + "]" : ""));
+        return lines;
     }
 }
