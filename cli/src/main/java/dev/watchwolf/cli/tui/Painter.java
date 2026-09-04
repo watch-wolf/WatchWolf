@@ -94,6 +94,46 @@ public final class Painter {
                 foreground, background);
     }
 
+    /**
+     * A determinate bar: {@code [########······]}. {@code fraction} is clamped to 0..1.
+     *
+     * <p>Drawn with block characters rather than {@code #}/{@code -} so it reads as one bar at a
+     * glance in a list of them, the way a {@code docker pull} does.
+     */
+    public void bar(int x, int y, int width, double fraction, TextColor colour) {
+        if (width < 3) return;
+        int inner = width - 2;
+        int filled = (int) Math.round(Math.max(0, Math.min(1, fraction)) * inner);
+
+        this.text(x, y, "[", Theme.FRAME);
+        this.text(x + 1, y, "█".repeat(filled), colour);
+        this.text(x + 1 + filled, y, "·".repeat(inner - filled), Theme.DIM);
+        this.text(x + width - 1, y, "]", Theme.FRAME);
+    }
+
+    /**
+     * An indeterminate bar: a block sweeping back and forth, for work whose length genuinely
+     * cannot be known -- BuildTools compiling a Spigot version reports no total, and inventing a
+     * percentage for it would be a lie the user then plans around.
+     *
+     * @param phase  any monotonically increasing counter; the caller usually passes elapsed millis
+     */
+    public void sweepingBar(int x, int y, int width, long phase, TextColor colour) {
+        if (width < 3) return;
+        int inner = width - 2;
+        int block = Math.max(1, inner / 5);
+        int travel = Math.max(1, inner - block);
+
+        // triangle wave: 0..travel..0, so the block bounces instead of jumping back to the left
+        int step = (int) (phase % (travel * 2L));
+        int offset = step <= travel ? step : (travel * 2 - step);
+
+        this.text(x, y, "[", Theme.FRAME);
+        this.text(x + 1, y, "·".repeat(inner), Theme.DIM);
+        this.text(x + 1 + offset, y, "█".repeat(block), colour);
+        this.text(x + width - 1, y, "]", Theme.FRAME);
+    }
+
     public static String fit(String text, int width) {
         if (text == null) return " ".repeat(Math.max(0, width));
         if (text.length() >= width) return text.substring(0, Math.max(0, width));

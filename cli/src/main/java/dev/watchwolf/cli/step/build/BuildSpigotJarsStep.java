@@ -1,5 +1,6 @@
 package dev.watchwolf.cli.step.build;
 
+import dev.watchwolf.cli.docker.ContainerSnapshot;
 import dev.watchwolf.cli.docker.RunSpec;
 import dev.watchwolf.cli.io.JarInspector;
 import dev.watchwolf.cli.model.JavaImageCatalog;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -39,6 +41,17 @@ public final class BuildSpigotJarsStep implements Step {
     private static final long MINIMUM_JAR_BYTES = 10L * 1024 * 1024;
     private static final int POLL_SECONDS = 15;
     private static final int MAX_MINUTES_PER_VERSION = 120;
+
+    private final int pollSeconds;
+
+    public BuildSpigotJarsStep() {
+        this(POLL_SECONDS);
+    }
+
+    /** Package-visible so a test can poll with no wait at all; production uses POLL_SECONDS. */
+    BuildSpigotJarsStep(int pollSeconds) {
+        this.pollSeconds = pollSeconds;
+    }
 
     @Override public StepId id()    { return ID; }
     @Override public String title() { return "Build the Spigot server jars"; }
@@ -84,19 +97,34 @@ public final class BuildSpigotJarsStep implements Step {
         List<McVersion> queue = new ArrayList<>(wanted);
         List<McVersion> running = new ArrayList<>();
         long startedAt = System.nanoTime();
+        boolean cancelled = false;
 
         while (!queue.isEmpty() || !running.isEmpty()) {
+            // the one step long enough to need a finer check than StepRunner's between-steps one:
+            // an hour per version is far too long to make an abort wait for the step boundary
+            if (context.cancelSignal().cancelled()) {
+                cancelled = true;
+                break;
+            }
+
             while (!queue.isEmpty() && running.size() < parallel) {
                 McVersion version = queue.remove(0);
                 this.startBuilder(context, staging, version);
                 running.add(version);
+                context.progress().taskStarted(taskId(version), taskLabel(version));
             }
 
-            sleepSeconds(POLL_SECONDS);
+            this.sleepPolling(context);
 
             List<McVersion> finished = new ArrayList<>();
             for (McVersion version : running) {
-                if (this.builderStillRunning(context, version)) continue;
+                if (this.builderStillRunning(context, version)) {
+                    // one row per jar, the way `docker pull` gives one per layer: an aggregate
+                    // count cannot say which version is the one that is stuck
+                    context.progress().taskUpdate(taskId(version), taskLabel(version),
+                            this.phaseOf(context, version), -1, -1);
+                    continue;
+                }
                 finished.add(version);
 
                 Path built = staging.resolve(version + ".jar");
@@ -107,6 +135,11 @@ public final class BuildSpigotJarsStep implements Step {
                 } else {
                     failures.put(version, inspection.problem() + this.lastLinesOf(context, version));
                 }
+
+                String problem = failures.get(version);
+                context.progress().taskFinished(taskId(version), taskLabel(version),
+                        problem == null ? "built" : firstLineOf(problem), problem == null);
+                if (problem == null) this.discardBuilder(context, version);
             }
             running.removeAll(finished);
 
@@ -125,6 +158,16 @@ public final class BuildSpigotJarsStep implements Step {
         context.progress().end("built " + (wanted.size() - failures.size())
                 + "/" + wanted.size());
 
+        if (cancelled) {
+            // the builders are detached containers, so they carry on without us; a later run
+            // adopts them rather than starting them again (see startBuilder)
+            throw new StepFailedException("building Spigot",
+                    "aborted at your request; " + running.size()
+                            + " builder(s) were left running in their own containers",
+                    "Nothing already built was lost. Re-run 'watchwolf build' to pick the "
+                            + "builders back up and finish.");
+        }
+
         if (!failures.isEmpty()) {
             StringBuilder detail = new StringBuilder();
             failures.forEach((version, problem) ->
@@ -134,6 +177,15 @@ public final class BuildSpigotJarsStep implements Step {
                     "BuildTools needs network access and about 1.5GB free. Re-run to retry only "
                             + "the versions that failed; the ones that succeeded are kept.");
         }
+    }
+
+    /** Stable and opaque, as {@link dev.watchwolf.cli.progress.ProgressSink} asks. */
+    private static String taskId(McVersion version) {
+        return "spigot-" + version;
+    }
+
+    private static String taskLabel(McVersion version) {
+        return "Spigot " + version;
     }
 
     private void promote(StepContext context, Path built, McVersion version,
@@ -158,11 +210,28 @@ public final class BuildSpigotJarsStep implements Step {
                 + "java -jar BuildTools.jar --rev " + version + " && "
                 + "cp spigot-" + version + ".jar /Versions/" + version + ".jar";
 
-        context.progress().detail("starting " + ContainerNames.spigotBuilderFor(version.toString())
+        String name = ContainerNames.spigotBuilderFor(version.toString());
+
+        // A builder from an earlier run may still exist -- that is the normal case after an abort
+        // or a send-to-background, since these containers outlive the CLI. Docker refuses to reuse
+        // the name either way, so adopt a live one and clear away a dead one.
+        Optional<ContainerSnapshot> existing = context.docker().findContainer(name);
+        if (existing.isPresent()) {
+            if (existing.get().isRunning()) {
+                context.progress().detail("adopting the builder " + name
+                        + ", already running from an earlier run");
+                return;
+            }
+            context.progress().detail("removing the finished builder " + name
+                    + " left by an earlier run");
+            context.docker().removeContainer(name, true);
+        }
+
+        context.progress().detail("starting " + name
                 + " on " + JavaImageCatalog.imageForJavaVersion(javaVersion));
 
         context.docker().runDetached(RunSpec.of(JavaImageCatalog.imageForJavaVersion(javaVersion))
-                .named(ContainerNames.spigotBuilderFor(version.toString()))
+                .named(name)
                 .bind(staging.toString(), "/Versions")
                 .withEntrypoint("/bin/bash", "-c")
                 .withCommand(script)
@@ -187,6 +256,45 @@ public final class BuildSpigotJarsStep implements Step {
         }
     }
 
+    /**
+     * The last thing BuildTools said, for that version's own row. BuildTools reports no total and
+     * no percentage, so this is the honest alternative to inventing one.
+     */
+    private String phaseOf(StepContext context, McVersion version) {
+        try {
+            List<String> lines = context.docker()
+                    .logs(ContainerNames.spigotBuilderFor(version.toString()), 5);
+            for (int i = lines.size() - 1; i >= 0; i--) {
+                String line = lines.get(i).trim();
+                if (!line.isEmpty()) {
+                    return line.length() > 40 ? line.substring(0, 40) : line;
+                }
+            }
+        } catch (RuntimeException ex) {
+            // the row falls back to elapsed time; a log read is never worth failing a build over
+        }
+        return null;
+    }
+
+    /**
+     * Drops a builder that produced a good jar. Failed ones are deliberately kept: their log is the
+     * only explanation of what went wrong, and {@link #verification()} reports them as leftovers.
+     */
+    private void discardBuilder(StepContext context, McVersion version) {
+        try {
+            context.docker().removeContainer(
+                    ContainerNames.spigotBuilderFor(version.toString()), true);
+        } catch (RuntimeException ex) {
+            context.progress().warn("could not remove the build container for " + version
+                    + ": " + ex.getMessage());
+        }
+    }
+
+    private static String firstLineOf(String problem) {
+        int newline = problem.indexOf('\n');
+        return newline < 0 ? problem : problem.substring(0, newline);
+    }
+
     private List<McVersion> missingVersions(StepContext context) {
         List<McVersion> missing = new ArrayList<>();
         for (McVersion version : context.plan().spigotVersions()) {
@@ -196,11 +304,19 @@ public final class BuildSpigotJarsStep implements Step {
         return missing;
     }
 
-    private static void sleepSeconds(int seconds) {
-        try {
-            Thread.sleep(seconds * 1000L);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
+    /**
+     * Waits a poll interval, in one-second slices, so an abort is noticed within a second rather
+     * than fifteen -- the difference between a UI that responds and one that looks hung.
+     */
+    private void sleepPolling(StepContext context) {
+        for (int i = 0; i < this.pollSeconds; i++) {
+            if (context.cancelSignal().cancelled()) return;
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                return;
+            }
         }
     }
 

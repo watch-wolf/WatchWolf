@@ -25,6 +25,11 @@ import java.util.Set;
  * anywhere: those read as options and get mis-clicked. {@code F8} selects all and {@code F9}
  * deselects all, scoped to the focused list, and the screen prints that hint in the list's own
  * footer.
+ *
+ * <p>{@link #ID_START_BUILD} is not an exception to that. A {@code < All >} row sits <em>among the
+ * options it would change</em> and reads as one of them; the "Start build" row is a terminal
+ * confirm at the bottom of the whole form, which is exactly where someone looks for the way out of
+ * a filled-in form. {@code s} still starts the build too.
  */
 public final class MenuModel {
     public static final String ID_INSTALL_PATH = "install-path";
@@ -43,6 +48,7 @@ public final class MenuModel {
     public static final String ID_BUILD_IMAGES = "build-images";
     public static final String ID_STARTUP = "startup";
     public static final String ID_SELF_TEST = "self-test";
+    public static final String ID_START_BUILD = "start-build";
 
     private final MenuNode root;
     private Async<List<McVersion>> spigotVersions = Async.notStarted();
@@ -135,6 +141,13 @@ public final class MenuModel {
                     .withAnnotation(suite.description()));
         }
         this.root.add(selfTest);
+
+        // the terminal confirm, last so it is where a reader looks for "and now what?". 's' still
+        // works; this row exists because a keybind alone left people staring at a filled-in form
+        // with no visible way to commit it.
+        this.root.add(MenuNode.action(ID_START_BUILD, "< Start build >")
+                .withHelp("Runs everything ticked above, in dependency order, verifying each step. "
+                        + "You can abort or send it to the background while it runs."));
 
         this.applyConstraints();
     }

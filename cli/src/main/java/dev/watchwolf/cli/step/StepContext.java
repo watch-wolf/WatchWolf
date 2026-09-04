@@ -31,6 +31,7 @@ public final class StepContext {
     private final Clock clock;
     private final ProgressSink progress;
     private final HostAction hostAction;
+    private final CancelSignal cancelSignal;
 
     /** Values handed from one step to the next, e.g. the WatchWolf-Server version that was found. */
     private final Map<StepId, Object> outputs = new LinkedHashMap<>();
@@ -39,6 +40,14 @@ public final class StepContext {
                        CommandRunner commands, FileGateway files, HttpFetcher http,
                        HostInterfaces interfaces, Clock clock, ProgressSink progress,
                        HostAction hostAction) {
+        this(layout, plan, docker, commands, files, http, interfaces, clock, progress, hostAction,
+                CancelSignal.never());
+    }
+
+    public StepContext(InstallLayout layout, BuildPlan plan, DockerFacade docker,
+                       CommandRunner commands, FileGateway files, HttpFetcher http,
+                       HostInterfaces interfaces, Clock clock, ProgressSink progress,
+                       HostAction hostAction, CancelSignal cancelSignal) {
         this.layout = layout;
         this.plan = plan;
         this.docker = docker;
@@ -49,6 +58,7 @@ public final class StepContext {
         this.clock = clock;
         this.progress = progress;
         this.hostAction = hostAction;
+        this.cancelSignal = cancelSignal;
     }
 
     public InstallLayout layout()      { return this.layout; }
@@ -61,6 +71,9 @@ public final class StepContext {
     public Clock clock()               { return this.clock; }
     public ProgressSink progress()     { return this.progress; }
     public HostAction hostAction()     { return this.hostAction; }
+
+    /** Polled by anything long-running; see {@link CancelSignal} for why it is coarse. */
+    public CancelSignal cancelSignal() { return this.cancelSignal; }
 
     public void publish(StepId id, Object value) {
         this.outputs.put(id, value);

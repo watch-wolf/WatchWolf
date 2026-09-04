@@ -3,6 +3,8 @@ package dev.watchwolf.cli.command;
 import dev.watchwolf.cli.ExitCodes;
 import dev.watchwolf.cli.inventory.ServerJarInventory;
 import dev.watchwolf.cli.model.BuildPlan;
+import dev.watchwolf.cli.model.BuildPlanFile;
+import dev.watchwolf.cli.model.InstallRunRecord;
 import dev.watchwolf.cli.model.McVersion;
 import dev.watchwolf.cli.model.ServerTypeVersion;
 import dev.watchwolf.cli.model.TesterSuiteCatalog;
@@ -15,6 +17,11 @@ import dev.watchwolf.cli.step.StepResult;
 import dev.watchwolf.cli.step.StepRunner;
 import dev.watchwolf.cli.step.build.StepCatalog;
 import dev.watchwolf.cli.tui.TerminalCapability;
+import dev.watchwolf.cli.tui.install.AcknowledgeScreen;
+import dev.watchwolf.cli.tui.install.InstallProgressModel;
+import dev.watchwolf.cli.tui.install.InstallProgressScreen;
+import dev.watchwolf.cli.tui.install.TuiProgressSink;
+import dev.watchwolf.cli.tui.install.TuiStepReporter;
 import dev.watchwolf.cli.tui.menu.MenuConfigScreen;
 import dev.watchwolf.cli.tui.menu.MenuModel;
 import picocli.CommandLine.Command;
@@ -22,11 +29,15 @@ import picocli.CommandLine.Mixin;
 import picocli.CommandLine.Option;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Installs and builds the environment.
@@ -92,11 +103,30 @@ public class BuildCommand implements Callable<Integer> {
     @Option(names = "--dry-run", description = "List the steps and their checks, then exit.")
     boolean dryRun;
 
+    /**
+     * The other half of "send it to the background". The CLI runs attached to your terminal and
+     * cannot detach itself, so it exits {@link ExitCodes#BACKGROUND_REQUESTED} and the launcher
+     * starts a detached container that re-enters here -- replaying the saved plan with no menu and
+     * plain output, and leaving the result behind for the next run to show. Hidden because it is
+     * the launcher's business, not a user's.
+     */
+    @Option(names = "--resume-background", hidden = true)
+    boolean resumeBackground;
+
+    /** Set by {@link #resolvePlan}: only a menu session gets the drawn install. */
+    private boolean usedMenu;
+
     @Override
     public Integer call() throws Exception {
         try (CliContext cli = new CliContext(this.options)) {
             Optional<BuildPlan> plan = this.resolvePlan(cli);
             if (plan.isEmpty()) {
+                // a detached run with no plan to replay has failed at its one job, and nobody is
+                // watching it say so -- so it exits non-zero and leaves the reason behind
+                if (this.resumeBackground) {
+                    this.recordProblemForTheNextRun(cli, "the saved plan could not be read");
+                    return ExitCodes.ERROR;
+                }
                 System.out.println("[i] Cancelled. Nothing was changed.");
                 return ExitCodes.OK;
             }
@@ -106,12 +136,10 @@ public class BuildCommand implements Callable<Integer> {
                 return ExitCodes.OK;
             }
 
-            StepContext context = cli.stepContext(plan.get());
-            var graph = StepCatalog.buildGraph(context);
-
             if (this.dryRun) {
+                StepContext context = cli.stepContext(plan.get());
                 System.out.println("Steps, in order, with the check each one must pass:");
-                for (var step : graph.ordered()) {
+                for (var step : StepCatalog.buildGraph(context).ordered()) {
                     System.out.println("  " + step.id());
                     System.out.println("      " + step.title());
                     System.out.println("      verify: " + step.verification().describe());
@@ -119,22 +147,158 @@ public class BuildCommand implements Callable<Integer> {
                 return ExitCodes.OK;
             }
 
-            StepRunner runner = StepRunner.reporting(PlainStepReporter.toStdout());
-            if (this.failFast) runner = runner.failingFast();
-            if (this.verifyOnly) runner = runner.verifyingOnly();
-
-            List<StepResult> results = runner.run(graph, context);
-            boolean failed = results.stream().anyMatch(result -> result.outcome().isFailure());
-
-            int hostAction = HostActionFlush.flush(cli,
-                    failed ? ExitCodes.ERROR : ExitCodes.OK);
-            if (failed) return ExitCodes.ERROR;
-            return hostAction;
+            // came from the menu, so the install is drawn too: switching back to scrolling output
+            // for the next hour hides the one thing worth watching, which Spigot jar is still going
+            if (this.usedMenu) return this.runDrawn(cli, plan.get());
+            return this.runPrinted(cli, plan.get());
         }
+    }
+
+    /** The original path: one line per step, straight to the terminal. */
+    private int runPrinted(CliContext cli, BuildPlan plan) {
+        StepContext context = cli.stepContext(plan);
+        List<StepResult> results =
+                this.runner(PlainStepReporter.toStdout()).run(StepCatalog.buildGraph(context),
+                        context);
+
+        if (this.resumeBackground) this.recordForTheNextRun(cli, results);
+
+        boolean failed = results.stream().anyMatch(result -> result.outcome().isFailure());
+        int hostAction = HostActionFlush.flush(cli, failed ? ExitCodes.ERROR : ExitCodes.OK);
+        if (failed) return ExitCodes.ERROR;
+        return hostAction;
+    }
+
+    /**
+     * The install under the same UI the menu used: the runner works on its own thread and the
+     * screen only paints what it publishes, so keys stay responsive through an hour-long build.
+     */
+    private int runDrawn(CliContext cli, BuildPlan plan) throws IOException {
+        InstallProgressModel model = new InstallProgressModel();
+        AtomicBoolean cancelled = new AtomicBoolean();
+        AtomicReference<List<StepResult>> results = new AtomicReference<>(List.of());
+
+        StepContext context = cli.stepContext(plan, new TuiProgressSink(model), cancelled::get);
+        var graph = StepCatalog.buildGraph(context);
+        StepRunner runner = this.runner(new TuiStepReporter(model));
+
+        Thread worker = new Thread(() -> {
+            List<StepResult> ran = List.of();
+            try {
+                ran = runner.run(graph, context);
+            } catch (RuntimeException ex) {
+                // the runner turns step failures into results; reaching here is a bug in it, and
+                // the screen must still be told the run is over or it would spin forever
+                model.warn("the install stopped unexpectedly: " + ex);
+            }
+            results.set(ran);
+            model.runFinished(ran, cancelled.get()
+                    ? InstallProgressModel.Ending.ABORTED
+                    : InstallProgressModel.Ending.COMPLETED);
+        }, "watchwolf-install");
+        worker.setDaemon(true);
+        worker.start();
+
+        InstallProgressModel.Ending ending = new InstallProgressScreen(model).run();
+
+        if (ending != InstallProgressModel.Ending.COMPLETED) {
+            cancelled.set(true);
+            System.out.println(ending == InstallProgressModel.Ending.BACKGROUNDED
+                    ? "[i] Handing the install over to a background container..."
+                    : "[i] Stopping. Waiting for the step in flight to finish so nothing is left "
+                            + "half-written...");
+            try {
+                worker.join();
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        return switch (ending) {
+            case COMPLETED -> this.finishDrawnRun(cli, results.get());
+            case ABORTED -> {
+                System.out.println("[i] Aborted. Nothing already done was undone -- re-run "
+                        + "'watchwolf build' to carry on from here.");
+                yield ExitCodes.OK;
+            }
+            case BACKGROUNDED -> this.handOverToTheBackground(cli, plan);
+        };
+    }
+
+    /** The screen is gone by now, so the failures and their remedies go back into scrollback. */
+    private int finishDrawnRun(CliContext cli, List<StepResult> results) {
+        PlainStepReporter.toStdout().runFinished(results);
+        boolean failed = results.stream().anyMatch(result -> result.outcome().isFailure());
+        int hostAction = HostActionFlush.flush(cli, failed ? ExitCodes.ERROR : ExitCodes.OK);
+        if (failed) return ExitCodes.ERROR;
+        return hostAction;
+    }
+
+    /**
+     * Writes the plan down and asks the launcher to start it detached. This process cannot detach
+     * itself -- it is the foreground of a {@code docker run -it} -- so the handover is an exit code
+     * plus a file, and the launcher does the rest.
+     */
+    private int handOverToTheBackground(CliContext cli, BuildPlan plan) {
+        try {
+            cli.files().createDirectories(cli.layout().stateDir());
+            cli.files().writeString(cli.layout().buildPlanFile(), BuildPlanFile.render(plan));
+        } catch (IOException ex) {
+            System.err.println("[e] Could not write " + cli.layout().buildPlanFile() + ": "
+                    + ex.getMessage());
+            System.err.println("[e] remedy: check the permissions on " + cli.layout().stateDir()
+                    + ", then re-run 'watchwolf build'.");
+            return ExitCodes.ERROR;
+        }
+        System.out.println("[i] The install carries on in the background. The next 'watchwolf "
+                + "build' opens with how it ended.");
+        return ExitCodes.BACKGROUND_REQUESTED;
+    }
+
+    /** The same note, for a background run that could not even start. */
+    private void recordProblemForTheNextRun(CliContext cli, String problem) {
+        this.write(cli, new InstallRunRecord("backgrounded", "install could not start",
+                Instant.now(cli.clock()).toString(), List.of(problem)));
+    }
+
+    /** Leaves the result where the next run will find it -- see {@link InstallRunRecord}. */
+    private void recordForTheNextRun(CliContext cli, List<StepResult> results) {
+        List<String> failures = new ArrayList<>();
+        for (StepResult result : results) {
+            if (!result.outcome().isFailure()) continue;
+            failures.add(result.id() + ": " + result.what() + ": " + result.why());
+        }
+        String summary = failures.isEmpty()
+                ? "install successful"
+                : "install failed: " + failures.size() + " step(s) of " + results.size();
+
+        this.write(cli, new InstallRunRecord("backgrounded", summary,
+                Instant.now(cli.clock()).toString(), failures));
+    }
+
+    private void write(CliContext cli, InstallRunRecord record) {
+        try {
+            cli.files().createDirectories(cli.layout().stateDir());
+            cli.files().writeString(cli.layout().lastRunFile(), record.render());
+        } catch (IOException ex) {
+            // the run itself succeeded or failed on its own merits; failing to leave a note about
+            // it is worth saying, but not worth changing the exit code over
+            System.err.println("[w] Could not record the result in "
+                    + cli.layout().lastRunFile() + ": " + ex.getMessage());
+        }
+    }
+
+    private StepRunner runner(dev.watchwolf.cli.step.StepReporter reporter) {
+        StepRunner runner = StepRunner.reporting(reporter);
+        if (this.failFast) runner = runner.failingFast();
+        if (this.verifyOnly) runner = runner.verifyingOnly();
+        return runner;
     }
 
     /** The menu and the flags converge on one plan. */
     private Optional<BuildPlan> resolvePlan(CliContext cli) throws IOException {
+        if (this.resumeBackground) return this.planFromTheSavedFile(cli);
+
         BuildPlan fromFlags = this.planFromFlags(cli);
 
         boolean anySelectionFlag = this.spigot != null || this.paper != null
@@ -151,13 +315,73 @@ public class BuildCommand implements Callable<Integer> {
             return Optional.of(this.resolveVersionsForFlags(cli, fromFlags));
         }
 
+        this.showAnyPendingResult(cli);
+
         MenuModel menu = new MenuModel(fromFlags, cli.layout().base().toString());
         menu.withInstalled(this.installedVersions(cli, "Spigot"),
                 this.installedVersions(cli, "Paper"));
 
         try (MenuConfigScreen screen =
                      new MenuConfigScreen(menu, new BackgroundVersionFetcher(cli.http()))) {
-            return screen.run();
+            Optional<BuildPlan> chosen = screen.run();
+            this.usedMenu = chosen.isPresent();
+            return chosen;
+        }
+    }
+
+    /**
+     * A background run finished with nobody watching, so its result waits here and is shown before
+     * the menu -- once, behind an {@code < OK >}, and then deleted.
+     */
+    private void showAnyPendingResult(CliContext cli) throws IOException {
+        if (!cli.files().exists(cli.layout().lastRunFile())) return;
+
+        InstallRunRecord record;
+        try {
+            record = InstallRunRecord.parse(cli.files().readString(cli.layout().lastRunFile()));
+        } catch (IOException ex) {
+            // an unreadable note is not worth blocking a build over
+            return;
+        }
+
+        List<String> lines = new ArrayList<>();
+        lines.add("The install you sent to the background has finished.");
+        lines.add("");
+        lines.add(record.summary());
+        if (!record.finishedAt().isBlank()) lines.add("finished at " + record.finishedAt());
+        if (!record.failures().isEmpty()) {
+            lines.add("");
+            record.failures().forEach(lines::add);
+            lines.add("");
+            lines.add("Re-running picks up from where it stopped; nothing was undone.");
+        }
+
+        new AcknowledgeScreen(record.summary(), lines, record.succeeded()).run();
+
+        try {
+            cli.files().delete(cli.layout().lastRunFile());
+        } catch (IOException ex) {
+            System.err.println("[w] Could not remove " + cli.layout().lastRunFile()
+                    + "; it will be shown again next time.");
+        }
+    }
+
+    /** What {@code --resume-background} replays: the plan the foreground session ticked. */
+    private Optional<BuildPlan> planFromTheSavedFile(CliContext cli) {
+        if (!cli.files().exists(cli.layout().buildPlanFile())) {
+            System.err.println("[e] There is no saved plan at " + cli.layout().buildPlanFile()
+                    + ", so there is nothing to carry on with.");
+            System.err.println("[e] remedy: run 'watchwolf build' again and pick what to install.");
+            return Optional.empty();
+        }
+        try {
+            return Optional.of(
+                    BuildPlanFile.parse(cli.files().readString(cli.layout().buildPlanFile())));
+        } catch (IOException ex) {
+            System.err.println("[e] Could not read the saved plan at "
+                    + cli.layout().buildPlanFile() + ": " + ex.getMessage());
+            System.err.println("[e] remedy: run 'watchwolf build' again and pick what to install.");
+            return Optional.empty();
         }
     }
 

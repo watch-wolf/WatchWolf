@@ -20,6 +20,8 @@ public final class MenuNode {
         RADIO,
         /** {@code --->} -- descends with Enter. */
         SUBMENU,
+        /** {@code < Start build >} -- runs something with Enter, rather than holding a value. */
+        ACTION,
         /** A read-only caption. */
         LABEL
     }
@@ -66,6 +68,19 @@ public final class MenuNode {
 
     public static MenuNode submenu(String id, String label) {
         return new MenuNode(id, Kind.SUBMENU, label);
+    }
+
+    /**
+     * A row that <em>does</em> something on Enter instead of holding a value -- "Start build".
+     *
+     * <p>Not a contradiction of the "bulk selection is a keybind, never a row" rule in
+     * {@link MenuModel}: that one is about {@code < All >}/{@code < None >} pseudo-entries sitting
+     * <em>among the options of a checkbox list</em>, where they read as options themselves and get
+     * mis-clicked. This is the opposite -- a terminal confirm at the bottom of the form, which is
+     * the one place a reader looks for "and now what?". The keybind still works.
+     */
+    public static MenuNode action(String id, String label) {
+        return new MenuNode(id, Kind.ACTION, label);
     }
 
     public static MenuNode label(String id, String label) {
@@ -162,7 +177,7 @@ public final class MenuNode {
                 case SOME -> "[o]";
                 case ALL -> "[*]";
             };
-            case TEXT, LABEL -> "   ";
+            case ACTION, TEXT, LABEL -> "   ";
         };
     }
 

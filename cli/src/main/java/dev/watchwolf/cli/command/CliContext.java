@@ -15,6 +15,7 @@ import dev.watchwolf.cli.proc.ProcessCommandRunner;
 import dev.watchwolf.cli.progress.ProgressSink;
 import dev.watchwolf.cli.remote.HttpFetcher;
 import dev.watchwolf.cli.remote.JdkHttpFetcher;
+import dev.watchwolf.cli.step.CancelSignal;
 import dev.watchwolf.cli.step.HostAction;
 import dev.watchwolf.cli.step.StepContext;
 
@@ -65,8 +66,16 @@ public final class CliContext implements AutoCloseable {
     public HostAction hostAction()     { return this.hostAction; }
 
     public StepContext stepContext(BuildPlan plan) {
+        return this.stepContext(plan, this.progress, CancelSignal.never());
+    }
+
+    /**
+     * The same context with progress routed somewhere else and a way to stop it -- what the TUI
+     * install uses, since it must draw the progress rather than print it, and must be abortable.
+     */
+    public StepContext stepContext(BuildPlan plan, ProgressSink progress, CancelSignal cancel) {
         return new StepContext(this.layout, plan, this.docker, this.commands, this.files,
-                this.http, this.interfaces, this.clock, this.progress, this.hostAction);
+                this.http, this.interfaces, this.clock, progress, this.hostAction, cancel);
     }
 
     public EnvironmentScanner scanner() {

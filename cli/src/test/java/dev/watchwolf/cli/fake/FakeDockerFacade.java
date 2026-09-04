@@ -48,6 +48,7 @@ public final class FakeDockerFacade implements DockerFacade {
             new DaemonInfo("29.4.3", "1.51", "Docker Engine - Community", "linux", true, null);
     private RuntimeException execFailure;
     private int runExitCode;
+    private boolean detachedRunsFinishImmediately;
 
     // ---- construction ----------------------------------------------------------------------
 
@@ -127,6 +128,17 @@ public final class FakeDockerFacade implements DockerFacade {
 
     public FakeDockerFacade withRunExitCode(int exitCode) {
         this.runExitCode = exitCode;
+        return this;
+    }
+
+    /**
+     * Detached containers land already exited, as if the work had taken no time.
+     *
+     * <p>What a poll loop needs to complete in one pass: the Spigot builders are polled for
+     * "is it still running?", so a fake that always reports "yes" would never let a test finish.
+     */
+    public FakeDockerFacade withDetachedRunsFinishingImmediately() {
+        this.detachedRunsFinishImmediately = true;
         return this;
     }
 
@@ -213,7 +225,10 @@ public final class FakeDockerFacade implements DockerFacade {
     public String runDetached(RunSpec spec) {
         this.started.add(spec);
         if (spec.name() != null) {
-            new ContainerBuilder(spec.name()).running().image(spec.image()).done();
+            ContainerBuilder container = new ContainerBuilder(spec.name()).image(spec.image());
+            if (this.detachedRunsFinishImmediately) container.exited();
+            else container.running();
+            container.done();
         }
         return "id-" + spec.name();
     }

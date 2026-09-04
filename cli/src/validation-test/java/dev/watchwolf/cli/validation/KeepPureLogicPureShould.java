@@ -38,7 +38,10 @@ public class KeepPureLogicPureShould {
             Paths.get("src/main/java/dev/watchwolf/cli/tui/menu/MenuModel.java"),
             Paths.get("src/main/java/dev/watchwolf/cli/tui/monitor/MonitorRow.java"),
             Paths.get("src/main/java/dev/watchwolf/cli/tui/monitor/EntityView.java"),
-            Paths.get("src/main/java/dev/watchwolf/cli/tui/monitor/MonitorModel.java"));
+            Paths.get("src/main/java/dev/watchwolf/cli/tui/monitor/MonitorModel.java"),
+            Paths.get("src/main/java/dev/watchwolf/cli/tui/install/InstallProgressModel.java"),
+            Paths.get("src/main/java/dev/watchwolf/cli/model/BuildPlanFile.java"),
+            Paths.get("src/main/java/dev/watchwolf/cli/model/InstallRunRecord.java"));
 
     /**
      * Substring, not a parsed import list -- simpler, and "this text must never appear" is exactly

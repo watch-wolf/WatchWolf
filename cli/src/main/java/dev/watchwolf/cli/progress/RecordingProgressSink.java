@@ -22,6 +22,31 @@ public final class RecordingProgressSink implements ProgressSink {
         this.events.add(new Event("update", detail));
     }
 
+    // the per-jar events carry an id as well as text, so they are recorded as "kind:id" -- a test
+    // asserting "Spigot 1.8.8 got its own row" needs to tell the rows apart, not just count them
+
+    @Override
+    public void taskStarted(String id, String label) {
+        this.events.add(new Event("task-started:" + id, label));
+    }
+
+    @Override
+    public void taskUpdate(String id, String label, String detail, long done, long total) {
+        this.events.add(new Event("task-update:" + id, detail));
+    }
+
+    @Override
+    public void taskFinished(String id, String label, String outcome, boolean succeeded) {
+        this.events.add(new Event((succeeded ? "task-ok:" : "task-failed:") + id, outcome));
+    }
+
+    public List<String> taskIdsOf(String kind) {
+        return this.events.stream()
+                .filter(event -> event.kind().startsWith(kind + ":"))
+                .map(event -> event.kind().substring(kind.length() + 1))
+                .distinct().toList();
+    }
+
     public List<Event> events() {
         return List.copyOf(this.events);
     }

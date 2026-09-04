@@ -19,7 +19,7 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
 | `src/integration-test/java` | System tests (`IT*`) — need a reachable Docker daemon. Asserts correctness. |
 | `src/validation-test/java` | Code checks (`*Should`) — naming conventions, the pure-logic boundary, the Core drift check. Asserts repo conventions. |
 | `src/nonfunctional-test/java` | Non-functional tests (`NF*`), hermetic — no Docker, no real terminal (driven over a Lanterna `DefaultVirtualTerminal`). Asserts **wall-clock timing**, not correctness — its own category, its own Maven profile (`-P nonfunctional-test`), its own report directory; never folded into the unit suite. |
-| `docs/` | Architecture diagrams as **PlantUML** (`.puml`) source, not images — render with any PlantUML tool/plugin rather than committing a picture that silently goes stale next to the code it describes. One file per flow (e.g. `build-server-jars.puml`, `watchwolf-update.puml`); add a new one for a flow that's genuinely hard to follow from the code alone, not for every class. |
+| `docs/` | Architecture diagrams as **PlantUML** (`.puml`) source, not images — render with any PlantUML tool/plugin rather than committing a picture that silently goes stale next to the code it describes. One file per flow (e.g. `build-server-jars.puml`, `watchwolf-update.puml`, `install-ui.puml`); add a new one for a flow that's genuinely hard to follow from the code alone, not for every class. |
 
 ## Package map
 
@@ -39,7 +39,7 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
 | `progress` | `ProgressSink` (the seam) — every slow operation announces itself, names the host it's waiting on, and reports a heartbeat. Nothing calls `System.out` directly outside this package. |
 | `doctor` | `Check`/`CheckResult`/`DoctorReport`, `Tier1Suite` (fast static checks), `Tier2Runner` (shells out to `WatchWolf-Tester/ci/tests.sh`), `CompatibilityMatrixSource` (currently always `AbsentMatrixSource` — see below). |
 | `bundle` | `BundleWriter` + `ManifestBuilder` — the diagnostics `tar.gz`, reused by `logs`, `doctor` on failure, and the dashboard's `e` key. |
-| `tui` | `Async` (the four states of a value being fetched, so a menu never freezes on network I/O), `Theme`/`Painter`/`TerminalCapability`. `tui.menu` and `tui.monitor` each split model (pure, unit-tested) from screen (Lanterna, paints the model and turns keys into calls). |
+| `tui` | `Async` (the four states of a value being fetched, so a menu never freezes on network I/O), `Theme`/`Painter`/`TerminalCapability`. `tui.menu`, `tui.monitor` and `tui.install` each split model (pure, unit-tested) from screen (Lanterna, paints the model and turns keys into calls). |
 
 ## Conventions and gotchas
 
@@ -97,6 +97,28 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   structurally only ever holds `info.txt`/`latest.log`, so copying the whole tree can never sweep up a jar,
   whereas `tmp/<id>/` holds `server.jar` and the plugin jars, so its
   four named config files keep their plain per-file graceful skip instead.
+- **A menu session gets a drawn install; flags get printed output.** `BuildCommand` decides on
+  `usedMenu`: the menuconfig path runs `StepRunner` on a worker thread with `TuiProgressSink`/
+  `TuiStepReporter` writing `InstallProgressModel`, while `InstallProgressScreen` only paints
+  snapshots of it (every model method is `synchronized`; nothing else in the class is concurrent).
+  Steps report concurrent sub-operations through `ProgressSink.taskStarted/taskUpdate/taskFinished`
+  — one bar per Spigot jar rather than an aggregate that cannot say which version is stuck. Those
+  three default to a plain detail line, so a stream sink needs no changes. **Nothing under a
+  Lanterna screen may print**: `TuiProgressSink.detail` is a deliberate no-op, and the summary and
+  remedies are printed only after the screen has closed.
+- **Stopping an install is cooperative and coarse, and that is deliberate.** `CancelSignal` is
+  polled by `StepRunner` between steps and by `BuildSpigotJarsStep` once a second inside its poll
+  loop; nothing is interrupted mid-operation, because every step is idempotent and verified, so
+  stopping at a boundary and re-running resumes rather than repeats. Aborting therefore leaves
+  running `Spigot_build_<version>` containers alone — and `BuildSpigotJarsStep` adopts a live one
+  and removes a dead one instead of colliding with Docker's "name already in use".
+- **"Send it to the background" is an exit code, not a fork.** A foreground `docker run -it` cannot
+  detach itself, so the CLI writes the resolved plan to `.watchwolf/install.yaml`
+  (`BuildPlanFile`) and exits `ExitCodes.BACKGROUND_REQUESTED` (11); the launcher then re-runs the
+  same image detached as `WatchWolf_install` with the hidden `build --resume-background`. That run
+  leaves an `InstallRunRecord` in `.watchwolf/last-run.txt`, which the next `watchwolf build` shows
+  in an `AcknowledgeScreen` before the menu and then deletes. Same shape as exit 10 — a thing the
+  process cannot do to itself, handed to the launcher through an exit code and a file.
 - **This filesystem needs the isolated-build path.** `ci/common.sh`'s `ww_needs_isolated_build`
   detects a network filesystem (this checkout's own SMB mount included) and builds on the
   container's own disk, copying back only the finished jar and reports — see

@@ -20,6 +20,8 @@ set -euo pipefail
 
 # Fixed, purely local tag -- see the header above for why this is never a registry name.
 IMAGE="watchwolf-cli:local"
+# The detached install started when the CLI exits 11 -- see the block at the bottom of this file.
+BACKGROUND_CONTAINER="WatchWolf_install"
 BASE="${WATCHWOLF_PATH:-$HOME/WatchWolf}"
 
 # --path wins over the env var; peek at argv without consuming it
@@ -99,24 +101,35 @@ fi
 STATE="$BASE/.watchwolf"
 mkdir -p "$STATE"
 
+# One definition of "run the CLI", used twice: attached for the normal case, and detached for the
+# hand-over below. Everything but the docker flags before the image has to stay identical, or the
+# background run would see a different install base than the session that asked for it.
+# $1 is an array name holding the extra docker flags; the rest is the CLI's own argv.
+run_cli() {
+    local -n extra_flags="$1"; shift
+    docker run "${extra_flags[@]}"                              \
+        --network host                                          \
+        --user "$(id -u):$(id -g)" --group-add "$DOCKER_GID"    \
+        -v "$SOCK":/var/run/docker.sock                         \
+        -v "$BASE":"$BASE"                                      \
+        -v "$M2":"$M2"                                          \
+        "${REPO_MOUNT[@]}"                                      \
+        "${PWD_MOUNT[@]}"                                       \
+        -e HOME="$HOME"                                         \
+        -e WW_BASE="$BASE"                                      \
+        -e WW_REPO_ROOT="$REPO_ROOT"                            \
+        -e WW_UID="$(id -u)" -e WW_GID="$(id -g)"               \
+        -e WW_HOST_PWD="$PWD_REAL"                              \
+        -e WW_LAUNCHER=2                                        \
+        -e WW_IMAGE="$IMAGE"                                    \
+        -e TERM -e COLUMNS -e LINES -e DOCKER_HOST              \
+        "$IMAGE" "$@"
+}
+
+ATTACHED_FLAGS=(--rm $TTY_FLAGS)
+
 set +e
-docker run --rm $TTY_FLAGS                                  \
-    --network host                                          \
-    --user "$(id -u):$(id -g)" --group-add "$DOCKER_GID"    \
-    -v "$SOCK":/var/run/docker.sock                         \
-    -v "$BASE":"$BASE"                                      \
-    -v "$M2":"$M2"                                          \
-    "${REPO_MOUNT[@]}"                                      \
-    "${PWD_MOUNT[@]}"                                       \
-    -e HOME="$HOME"                                         \
-    -e WW_BASE="$BASE"                                      \
-    -e WW_REPO_ROOT="$REPO_ROOT"                            \
-    -e WW_UID="$(id -u)" -e WW_GID="$(id -g)"               \
-    -e WW_HOST_PWD="$PWD_REAL"                              \
-    -e WW_LAUNCHER=2                                        \
-    -e WW_IMAGE="$IMAGE"                                    \
-    -e TERM -e COLUMNS -e LINES -e DOCKER_HOST              \
-    "$IMAGE" "$@"
+run_cli ATTACHED_FLAGS "$@"
 rc=$?
 set -e
 
@@ -141,6 +154,24 @@ if [ $rc -eq 10 ] && [ -f "$STATE/host-action.sh" ]; then
         rc=$?
     fi
     rm -f "$STATE/host-action.sh" "$STATE/host-action.needs-root"
+fi
+
+# Exit 11 means "keep installing without me". A foreground container cannot detach itself, so the
+# CLI saved the plan and the relaunch happens out here: same image, same mounts, no TTY, detached.
+# The container is deliberately NOT --rm, so 'docker logs' can still explain a failure afterwards.
+if [ $rc -eq 11 ]; then
+    docker rm -f "$BACKGROUND_CONTAINER" >/dev/null 2>&1 || true
+    DETACHED_FLAGS=(-d --name "$BACKGROUND_CONTAINER")
+    if run_cli DETACHED_FLAGS build --path "$BASE" --resume-background >/dev/null; then
+        echo "[i] Installing in the background as the container $BACKGROUND_CONTAINER."
+        echo "[i]     follow it:  docker logs -f $BACKGROUND_CONTAINER"
+        echo "[i]     the next 'watchwolf build' opens with how it ended."
+        rc=0
+    else
+        echo "[e] Could not start the background install." >&2
+        echo "[e] remedy: re-run 'watchwolf build' and let it finish in the foreground." >&2
+        rc=1
+    fi
 fi
 
 exit $rc

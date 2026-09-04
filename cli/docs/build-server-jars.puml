@@ -29,6 +29,12 @@ note right of SpigotStep
 end note
 
 loop for each selected Spigot version not already on disk
+    SpigotStep -> Docker: findContainer(Spigot_build_<version>)
+    alt one is already running (left by an aborted or backgrounded run)
+        SpigotStep -> SpigotStep: adopt it -- Docker would refuse a duplicate name
+    else one exited, left by a failed run
+        SpigotStep -> Docker: removeContainer (its log was already read)
+    end
     SpigotStep -> Docker: runDetached(Spigot_build_<version>,\nBuildTools.jar --rev <version>)
     activate Docker
     Docker -> BuildTools: start (bind-mounts a staging dir at /Versions)
@@ -39,14 +45,22 @@ loop for each selected Spigot version not already on disk
     Docker --> SpigotStep: (container exits)
     deactivate Docker
 
-    loop every 15s until the container stops
+    loop every 15s until the container stops (cancel signal checked every second)
         SpigotStep -> Docker: is Spigot_build_<version> still running?
         Docker --> SpigotStep: running / finished
+        SpigotStep -> SpigotStep: progress.taskUpdate(<version>, last BuildTools line)
+        note right
+          one row per version, the way docker pull
+          gives one per layer -- BuildTools reports
+          no total, so the bar sweeps rather than
+          inventing a percentage
+        end note
     end
 
     SpigotStep -> FS: inspect staged jar (size, valid zip)
     alt jar is valid
         SpigotStep -> FS: move staging/<version>.jar\n-> server-types/Spigot/<version>.jar
+        SpigotStep -> Docker: removeContainer (a failed one is kept: its log is the diagnosis)
     else jar missing or too small
         SpigotStep -> SpigotStep: record failure + last container log lines
     end

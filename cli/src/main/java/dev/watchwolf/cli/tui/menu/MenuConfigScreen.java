@@ -165,10 +165,13 @@ public final class MenuConfigScreen implements AutoCloseable {
         if (key.getKeyType() == KeyType.Character) {
             char character = Character.toLowerCase(key.getCharacter());
             switch (character) {
-                case ' ' -> this.row(rows).ifPresent(row -> {
-                    if (row.kind() == MenuNode.Kind.TEXT) this.beginEditing(row);
-                    else this.model.toggle(row.id());
-                });
+                case ' ' -> {
+                    if (this.selectedRowIsStartBuild(rows)) return Decision.START;
+                    this.row(rows).ifPresent(row -> {
+                        if (row.kind() == MenuNode.Kind.TEXT) this.beginEditing(row);
+                        else this.model.toggle(row.id());
+                    });
+                }
                 case '?' -> this.showHelp = !this.showHelp;
                 case 's' -> {
                     return Decision.START;
@@ -190,15 +193,18 @@ public final class MenuConfigScreen implements AutoCloseable {
         switch (key.getKeyType()) {
             case ArrowDown -> this.moveCursor(rows, 1);
             case ArrowUp -> this.moveCursor(rows, -1);
-            case Enter -> this.row(rows).ifPresent(row -> {
-                if (row.kind() == MenuNode.Kind.SUBMENU && row.isEnabled()) {
-                    this.descend(row);
-                } else if (row.kind() == MenuNode.Kind.TEXT) {
-                    this.beginEditing(row);
-                } else {
-                    this.model.toggle(row.id());
-                }
-            });
+            case Enter -> {
+                if (this.selectedRowIsStartBuild(rows)) return Decision.START;
+                this.row(rows).ifPresent(row -> {
+                    if (row.kind() == MenuNode.Kind.SUBMENU && row.isEnabled()) {
+                        this.descend(row);
+                    } else if (row.kind() == MenuNode.Kind.TEXT) {
+                        this.beginEditing(row);
+                    } else {
+                        this.model.toggle(row.id());
+                    }
+                });
+            }
             case Escape, ArrowLeft -> {
                 if (this.path.size() > 1) {
                     this.ascend();
@@ -224,6 +230,13 @@ public final class MenuConfigScreen implements AutoCloseable {
             default -> { }
         }
         return Decision.CONTINUE;
+    }
+
+    private boolean selectedRowIsStartBuild(List<MenuNode> rows) {
+        return this.row(rows)
+                .map(row -> row.kind() == MenuNode.Kind.ACTION
+                        && MenuModel.ID_START_BUILD.equals(row.id()) && row.isEnabled())
+                .orElse(false);
     }
 
     private void descend(MenuNode row) {
@@ -391,6 +404,11 @@ public final class MenuConfigScreen implements AutoCloseable {
             if (selected) {
                 painter.row(1, screenRow, width - 2, line.toString(),
                         Theme.TEXT, Theme.SELECTED_BACKGROUND);
+            } else if (row.kind() == MenuNode.Kind.ACTION) {
+                // the one row that DOES something rather than holding a value; coloured so it
+                // reads as the way out of the form even before the cursor reaches it
+                painter.text(1, screenRow, line.toString(),
+                        row.isEnabled() ? Theme.OK : Theme.DIM);
             } else {
                 painter.text(1, screenRow, line.toString(),
                         row.isEnabled() ? Theme.TEXT : Theme.DIM);

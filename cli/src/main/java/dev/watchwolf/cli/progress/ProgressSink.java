@@ -41,6 +41,29 @@ public interface ProgressSink {
     /** Detail only wanted under {@code --verbose}. */
     void detail(String message);
 
+    // ---- concurrent sub-operations ------------------------------------------------------------
+    //
+    // begin/update/end describe ONE thing happening at a time, which is all most steps need. The
+    // Spigot builders are the exception: several versions compile at once, each in its own
+    // container for about an hour, and an aggregate "2/5 done" hides which one is stuck. These
+    // three report them individually, so a TUI can draw a bar per jar the way `docker pull` draws
+    // one per layer. Default to a plain detail line, so a stream-based sink needs no changes.
+
+    /** One of several concurrent sub-operations started. {@code id} is opaque and stable. */
+    default void taskStarted(String id, String label) {
+        this.detail(label + ": started");
+    }
+
+    /** @param done/total  units for a real bar, or -1 when the length is genuinely unknowable */
+    default void taskUpdate(String id, String label, String detail, long done, long total) {
+        // deliberately silent by default: this is called on every poll, and a stream sink that
+        // echoed it would bury the one-line-per-event output the plain path is built around
+    }
+
+    default void taskFinished(String id, String label, String outcome, boolean succeeded) {
+        this.detail(label + ": " + outcome);
+    }
+
     /** A sink that discards everything -- for tests and for non-reporting call paths. */
     static ProgressSink discarding() {
         return new ProgressSink() {
@@ -49,6 +72,9 @@ public interface ProgressSink {
             @Override public void end(String outcome) { }
             @Override public void warn(String message) { }
             @Override public void detail(String message) { }
+            @Override public void taskStarted(String id, String label) { }
+            @Override public void taskFinished(String id, String label, String outcome,
+                                               boolean succeeded) { }
         };
     }
 }

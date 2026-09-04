@@ -59,6 +59,9 @@ public final class StepRunner {
         for (Step step : steps) {
             index++;
 
+            // between steps only -- see CancelSignal for why nothing is interrupted mid-step
+            if (context.cancelSignal().cancelled()) break;
+
             Set<StepId> unsatisfied = unsatisfiedDependencies(step, outcomes);
             if (!unsatisfied.isEmpty()) {
                 StepResult blocked = StepResult.blocked(step.id(), step.title(),

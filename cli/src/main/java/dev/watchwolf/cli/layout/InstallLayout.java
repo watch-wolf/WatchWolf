@@ -83,6 +83,15 @@ public final class InstallLayout {
         return this.stateDir().resolve("install.yaml");
     }
 
+    /**
+     * How the last install ended, when nobody was watching it end -- see
+     * {@link dev.watchwolf.cli.model.InstallRunRecord}. The next {@code build} shows it and then
+     * removes the file.
+     */
+    public Path lastRunFile() {
+        return this.stateDir().resolve("last-run.txt");
+    }
+
     // ---- the three clones ------------------------------------------------------------------
 
     public Path serversManagerRepo() {

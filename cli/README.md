@@ -60,6 +60,24 @@ This still runs the rest of `build` (cloning the managers, pulling JDK images, p
 Docker images) unless you skip those too, e.g. `--skip-tester --skip-self-test`. `--dry-run` lists
 every step a given set of flags would actually perform, so nothing runs by surprise.
 
+## Installing from the menu
+
+`watchwolf build` on a TTY with no flags opens the checkbox screen. Arrows move, space toggles,
+Enter descends into a submenu, `F8`/`F9` tick and untick a whole list, `?` explains the highlighted
+row, and the last row is `< Start build >` (`s` still works from anywhere).
+
+The install that follows is drawn, not printed: an overall bar, the step list with what each one is
+waiting on, and -- while BuildTools runs -- **one bar per Spigot version**, the way `docker pull`
+gives one per layer. Two keys matter while it runs:
+
+| Key | Does |
+| --- | --- |
+| `q` | Abort, after a confirmation. Nothing already finished is undone; re-running carries on from where it stopped. Spigot builders already started keep going in their own containers either way. |
+| `b` | Keep installing without you. You get your prompt back, the install continues in a detached container (`docker logs -f WatchWolf_install` to watch it), and the **next** `watchwolf build` opens with how it ended and an `< OK >` before the menu. |
+
+Flag-driven runs (`--spigot`, `--skip-tester`, a non-TTY, ...) keep the plain one-line-per-step
+output, unchanged.
+
 ## The dashboard
 
 `watchwolf monitor` is two levels, deliberately:
