@@ -26,6 +26,11 @@ public final class RecordingProgressSink implements ProgressSink {
     // asserting "Spigot 1.8.8 got its own row" needs to tell the rows apart, not just count them
 
     @Override
+    public void taskQueued(String id, String label) {
+        this.events.add(new Event("task-queued:" + id, label));
+    }
+
+    @Override
     public void taskStarted(String id, String label) {
         this.events.add(new Event("task-started:" + id, label));
     }

@@ -45,7 +45,7 @@ loop every step
     Screen -> User: overall bar, step list, current operation
 end
 
-== the slow part: one bar per jar ==
+== the slow part: one row per jar ==
 
 Runner -> Spigot: perform(context)
 activate Spigot
@@ -59,7 +59,12 @@ loop until every version is done, or cancelled
         Spigot -> Docker: runDetached(Spigot_build_<v>)
     end
     Spigot -> Model: taskStarted / taskUpdated(<last BuildTools line>)
-    Screen -> User: one sweeping bar per version (no total exists, so no percentage)
+    Screen -> User: a spinner per version being built, "waiting" for the queued ones
+    note right
+      every selected version is announced with
+      taskQueued before any of them starts, so
+      the list does not grow over the afternoon
+    end note
     Spigot -> Spigot: sleepPolling -- checks the cancel signal every second
 end
 deactivate Spigot

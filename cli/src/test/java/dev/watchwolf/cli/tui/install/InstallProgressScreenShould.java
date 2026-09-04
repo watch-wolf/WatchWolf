@@ -105,8 +105,9 @@ public class InstallProgressScreenShould {
         model.stepFinished("clone-servers-manager", "Clone the ServersManager", StepOutcome.OK);
         model.stepStarting("build-spigot", "Build the Spigot server jars");
         model.operationStarted("Building 2 Spigot version(s) with BuildTools");
+        model.taskQueued("spigot-1.8.8", "Spigot 1.8.8");
+        model.taskQueued("spigot-1.20.4", "Spigot 1.20.4");
         model.taskStarted("spigot-1.8.8", "Spigot 1.8.8", System.currentTimeMillis());
-        model.taskStarted("spigot-1.20.4", "Spigot 1.20.4", System.currentTimeMillis());
 
         this.terminal = new DefaultVirtualTerminal(new TerminalSize(120, 40));
         Screen virtualScreen = new TerminalScreen(this.terminal);

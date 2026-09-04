@@ -52,7 +52,7 @@ loop for each selected Spigot version not already on disk
         note right
           one row per version, the way docker pull
           gives one per layer -- BuildTools reports
-          no total, so the bar sweeps rather than
+          no total, so the row spins rather than
           inventing a percentage
         end note
     end

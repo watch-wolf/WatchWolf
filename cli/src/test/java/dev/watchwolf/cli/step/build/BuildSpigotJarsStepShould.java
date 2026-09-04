@@ -64,6 +64,9 @@ public class BuildSpigotJarsStepShould {
         assertThrows(StepFailedException.class, () -> new BuildSpigotJarsStep(0).perform(context));
 
         assertEquals(List.of("spigot-1.8.8", "spigot-1.20.4"),
+                this.progress.taskIdsOf("task-queued"),
+                "every selected version must get a row before any of them starts");
+        assertEquals(List.of("spigot-1.8.8", "spigot-1.20.4"),
                 this.progress.taskIdsOf("task-started"));
         assertEquals(List.of("spigot-1.8.8", "spigot-1.20.4"),
                 this.progress.taskIdsOf("task-failed"));
@@ -108,6 +111,27 @@ public class BuildSpigotJarsStepShould {
     }
 
     @Test
+    public void queueTheVersionsThatDoNotFitTheParallelismYet() {
+        this.docker.withDetachedRunsFinishingImmediately();
+        BuildPlan plan = BuildPlan.builder()
+                .buildSpigot(true)
+                .spigotVersions(List.of(McVersion.of("1.8.8"), McVersion.of("1.16.5"),
+                        McVersion.of("1.20.4")))
+                .parallelBuilders(1)
+                .build();
+
+        assertThrows(StepFailedException.class,
+                () -> new BuildSpigotJarsStep(0).perform(this.context(plan, CancelSignal.never())));
+
+        // all three are announced up front, even though only one builder ever runs at a time
+        assertEquals(List.of("spigot-1.8.8", "spigot-1.16.5", "spigot-1.20.4"),
+                this.progress.taskIdsOf("task-queued"));
+        assertEquals(1, this.progress.events().stream()
+                        .filter(event -> event.kind().equals("task-started:spigot-1.20.4")).count(),
+                "the last version starts once, when its turn finally comes");
+    }
+
+    @Test
     public void doNothingWhenEveryVersionIsAlreadyBuilt() throws Exception {
         BuildPlan plan = this.plan("1.8.8");
         Path jar = this.layout.serverJar("Spigot", "1.8.8");
@@ -117,6 +141,7 @@ public class BuildSpigotJarsStepShould {
         new BuildSpigotJarsStep(0).perform(this.context(plan, CancelSignal.never()));
 
         assertTrue(this.docker.startedSpecs().isEmpty());
+        assertTrue(this.progress.taskIdsOf("task-queued").isEmpty());
         assertTrue(this.progress.taskIdsOf("task-started").isEmpty());
     }
 

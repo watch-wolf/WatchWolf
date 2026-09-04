@@ -93,6 +93,13 @@ public final class BuildSpigotJarsStep implements Step {
         context.progress().begin("Building " + wanted.size() + " Spigot version(s) with BuildTools, "
                 + parallel + " at a time (this takes about an hour per version)");
 
+        // every version gets its row now, not when its turn comes: with 5 versions and 2 builders
+        // the other 3 are hours away, and a list that grew from 2 rows to 5 over an afternoon
+        // would hide most of what was actually asked for
+        for (McVersion version : wanted) {
+            context.progress().taskQueued(taskId(version), taskLabel(version));
+        }
+
         Map<McVersion, String> failures = new LinkedHashMap<>();
         List<McVersion> queue = new ArrayList<>(wanted);
         List<McVersion> running = new ArrayList<>();

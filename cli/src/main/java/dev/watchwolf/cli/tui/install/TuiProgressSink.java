@@ -43,6 +43,11 @@ public final class TuiProgressSink implements ProgressSink {
     }
 
     @Override
+    public void taskQueued(String id, String label) {
+        this.model.taskQueued(id, label);
+    }
+
+    @Override
     public void taskStarted(String id, String label) {
         this.model.taskStarted(id, label, System.currentTimeMillis());
     }

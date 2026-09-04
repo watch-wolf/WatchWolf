@@ -22,10 +22,11 @@ import java.util.List;
  * <p>Three things it does that the plain output cannot:
  *
  * <ul>
- *   <li><b>A bar per concurrent jar.</b> BuildTools runs several versions at once, each for about
- *       an hour; an aggregate "2/5 done" cannot say which one is stuck. Each gets its own row, the
- *       way {@code docker pull} gives each layer one. Lengths that are genuinely unknown get a
- *       sweeping bar rather than an invented percentage.</li>
+ *   <li><b>A row per jar, all of them.</b> BuildTools runs several versions at once, each for about
+ *       an hour; an aggregate "2/5 done" cannot say which one is stuck. Every selected version gets
+ *       a row from the first frame -- the ones past the parallelism limit sitting there as
+ *       {@code waiting} -- and only the ones actually being worked on spin. BuildTools reports no
+ *       total and no percentage, so a spinner is all any of them honestly gets.</li>
  *   <li><b>Abort, behind a confirmation.</b> An hour into a build, one stray key must not throw the
  *       run away -- so {@code q} asks first. Aborting stops at the next step boundary; nothing
  *       already done is undone, and re-running resumes.</li>
@@ -41,7 +42,7 @@ import java.util.List;
 public final class InstallProgressScreen {
     private static final String SPINNER = "|/-\\";
 
-    /** Fast enough that the spinner and the sweeping bars move smoothly, cheap because drawing is. */
+    /** Fast enough that the spinners turn smoothly, and cheap, because drawing is. */
     private static final long FRAME_MILLIS = 90;
 
     /** Wide enough for {@code [PERFORMED BUT UNVERIFIED]}'s short form; see {@link #stepMarker}. */
@@ -218,13 +219,15 @@ public final class InstallProgressScreen {
 
         String detail = this.model.currentDetail().orElse(null);
         double fraction = this.model.currentFraction();
-        int barWidth = Math.max(10, Math.min(30, width - 30));
         if (fraction >= 0) {
+            // only when something real counts the units -- a docker pull's bytes, say
+            int barWidth = Math.max(10, Math.min(30, width - 30));
             painter.bar(4, row, barWidth, fraction, Theme.OK);
-        } else {
-            painter.sweepingBar(4, row, barWidth, phase(), Theme.OK);
+            if (detail != null) painter.text(4 + barWidth + 2, row, detail, Theme.DIM);
+            return row + 2;
         }
-        if (detail != null) painter.text(4 + barWidth + 2, row, detail, Theme.DIM);
+        if (detail == null) return row + 1;
+        painter.text(4, row, Painter.fit(detail, Math.max(0, width - 6)), Theme.DIM);
         return row + 2;
     }
 
@@ -232,7 +235,10 @@ public final class InstallProgressScreen {
         List<InstallProgressModel.Task> tasks = this.model.tasks();
         if (tasks.isEmpty() || row >= height - 4) return;
 
-        painter.text(2, row++, "Building in parallel:", Theme.HEADING);
+        long building = tasks.stream().filter(task -> !task.finished() && !task.waiting()).count();
+        long waiting = tasks.stream().filter(InstallProgressModel.Task::waiting).count();
+        painter.text(2, row++, "Server jars: " + building + " building, " + waiting + " waiting",
+                Theme.HEADING);
 
         int labelWidth = Math.min(24,
                 tasks.stream().mapToInt(task -> task.label().length()).max().orElse(12));
@@ -240,23 +246,33 @@ public final class InstallProgressScreen {
         for (InstallProgressModel.Task task : tasks) {
             if (row >= height - 4) return;
 
-            painter.text(4, row, Painter.fit(task.label(), labelWidth), Theme.TEXT);
-            int barX = 4 + labelWidth + 2;
-            int barWidth = Math.max(10, Math.min(24, width - barX - 24));
+            painter.text(4, row, Painter.fit(task.label(), labelWidth),
+                    task.waiting() ? Theme.DIM : Theme.TEXT);
+            int column = 4 + labelWidth + 2;
 
             if (task.finished()) {
-                painter.text(barX, row, (task.succeeded() ? "[ok] " : "[FAILED] ") + task.outcome(),
-                        task.succeeded() ? Theme.OK : Theme.BAD);
+                painter.text(column, row, (task.succeeded() ? "[ok] " : "[FAILED] ")
+                        + task.outcome(), task.succeeded() ? Theme.OK : Theme.BAD);
+            } else if (task.waiting()) {
+                // no spinner: nothing is happening to this one yet, and a spinning row would say
+                // otherwise for the hours it sits here
+                painter.text(column, row, "waiting", Theme.DIM);
             } else {
-                painter.text(barX, row, this.spinner(), Theme.WARN);
+                painter.text(column, row, this.spinner(), Theme.WARN);
+                int detailColumn = column + 2;
+
                 double fraction = task.fraction();
-                if (fraction >= 0) painter.bar(barX + 2, row, barWidth, fraction, Theme.OK);
-                else painter.sweepingBar(barX + 2, row, barWidth, phase(), Theme.WARN);
+                if (fraction >= 0) {
+                    int barWidth = Math.max(10, Math.min(24, width - column - 26));
+                    painter.bar(detailColumn, row, barWidth, fraction, Theme.OK);
+                    detailColumn += barWidth + 2;
+                }
 
                 String detail = task.detail() == null
                         ? humanElapsed(System.currentTimeMillis() - task.startedAtMillis())
                         : task.detail();
-                painter.text(barX + 2 + barWidth + 2, row, detail, Theme.DIM);
+                painter.text(detailColumn, row,
+                        Painter.fit(detail, Math.max(0, width - detailColumn - 2)), Theme.DIM);
             }
             row++;
         }
@@ -312,7 +328,7 @@ public final class InstallProgressScreen {
         return String.valueOf(SPINNER.charAt((int) (phase() % SPINNER.length())));
     }
 
-    /** Frames since the epoch -- what both the spinner and the sweeping bars advance on. */
+    /** Frames since the epoch -- what the spinner advances on. */
     private static long phase() {
         return System.currentTimeMillis() / FRAME_MILLIS;
     }

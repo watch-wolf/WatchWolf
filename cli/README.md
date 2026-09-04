@@ -67,8 +67,10 @@ Enter descends into a submenu, `F8`/`F9` tick and untick a whole list, `?` expla
 row, and the last row is `< Start build >` (`s` still works from anywhere).
 
 The install that follows is drawn, not printed: an overall bar, the step list with what each one is
-waiting on, and -- while BuildTools runs -- **one bar per Spigot version**, the way `docker pull`
-gives one per layer. Two keys matter while it runs:
+waiting on, and -- while BuildTools runs -- **a row per selected Spigot version**: the ones being
+compiled spin, the ones past the `--threads` limit sit there as `waiting`, so the whole of what you
+asked for is visible from the first frame. BuildTools reports no percentage, so nothing pretends to
+know one. Two keys matter while it runs:
 
 | Key | Does |
 | --- | --- |

@@ -26,13 +26,24 @@ public final class InstallProgressModel {
         }
     }
 
-    /** One concurrent sub-operation -- one Spigot version compiling, for instance. */
+    /**
+     * One concurrent sub-operation -- one Spigot version, for instance.
+     *
+     * <p>{@code started} is the difference between "waiting its turn" and "being worked on": with
+     * more versions selected than parallel builders, most rows are queued for hours, and a row that
+     * spun as if something were happening to it would be a lie.
+     */
     public record Task(String id, String label, String detail, long done, long total,
-                       boolean finished, boolean succeeded, String outcome, long startedAtMillis) {
-        /** -1 when the length is genuinely unknown, so the screen draws a sweeping bar instead. */
+                       boolean started, boolean finished, boolean succeeded, String outcome,
+                       long startedAtMillis) {
+        /** -1 when the length is genuinely unknown, so the screen shows no bar at all. */
         public double fraction() {
             if (this.total <= 0 || this.done < 0) return -1;
             return Math.max(0, Math.min(1, (double) this.done / this.total));
+        }
+
+        public boolean waiting() {
+            return !this.started && !this.finished;
         }
     }
 
@@ -104,15 +115,22 @@ public final class InstallProgressModel {
         this.warnings.add(message);
     }
 
+    /** The row exists and is queued; nothing is happening to it yet. */
+    public synchronized void taskQueued(String id, String label) {
+        this.tasks.put(id, new Task(id, label, null, -1, -1, false, false, false, null, 0));
+    }
+
     public synchronized void taskStarted(String id, String label, long startedAtMillis) {
-        this.tasks.put(id, new Task(id, label, null, -1, -1, false, false, null, startedAtMillis));
+        this.tasks.put(id,
+                new Task(id, label, null, -1, -1, true, false, false, null, startedAtMillis));
     }
 
     public synchronized void taskUpdated(String id, String label, String detail,
                                          long done, long total) {
         Task existing = this.tasks.get(id);
         long startedAt = existing == null ? System.currentTimeMillis() : existing.startedAtMillis();
-        this.tasks.put(id, new Task(id, label, detail, done, total, false, false, null, startedAt));
+        this.tasks.put(id,
+                new Task(id, label, detail, done, total, true, false, false, null, startedAt));
     }
 
     public synchronized void taskFinished(String id, String label, String outcome,
@@ -121,7 +139,7 @@ public final class InstallProgressModel {
         long startedAt = existing == null ? System.currentTimeMillis() : existing.startedAtMillis();
         String detail = existing == null ? null : existing.detail();
         this.tasks.put(id,
-                new Task(id, label, detail, -1, -1, true, succeeded, outcome, startedAt));
+                new Task(id, label, detail, -1, -1, true, true, succeeded, outcome, startedAt));
     }
 
     private void clearCurrentOperation() {
@@ -150,7 +168,7 @@ public final class InstallProgressModel {
         return Optional.ofNullable(this.currentDetail);
     }
 
-    /** -1 when the current operation has no known total (so: a sweeping bar, not a lie). */
+    /** -1 when the current operation has no known total (so: no bar at all, rather than a lie). */
     public synchronized double currentFraction() {
         if (this.currentTotal <= 0 || this.currentDone < 0) return -1;
         return Math.max(0, Math.min(1, (double) this.currentDone / this.currentTotal));

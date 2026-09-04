@@ -46,8 +46,21 @@ public interface ProgressSink {
     // begin/update/end describe ONE thing happening at a time, which is all most steps need. The
     // Spigot builders are the exception: several versions compile at once, each in its own
     // container for about an hour, and an aggregate "2/5 done" hides which one is stuck. These
-    // three report them individually, so a TUI can draw a bar per jar the way `docker pull` draws
-    // one per layer. Default to a plain detail line, so a stream-based sink needs no changes.
+    // four report them individually, so a TUI can draw a row per jar the way `docker pull` draws
+    // one per layer. They default to silence or a plain detail line, so a stream-based sink needs
+    // no changes.
+
+    /**
+     * One of several concurrent sub-operations is going to happen, but has not begun -- there are
+     * more of them than the parallelism allows, so it is queued behind the ones running.
+     *
+     * <p>Announced up front rather than when it starts, so the whole of what was asked for is
+     * visible from the first frame: five versions with two builders is five rows, three of them
+     * waiting, not two rows that grow into five over the next three hours.
+     */
+    default void taskQueued(String id, String label) {
+        // silent by default: a stream sink already said how many versions were selected
+    }
 
     /** One of several concurrent sub-operations started. {@code id} is opaque and stable. */
     default void taskStarted(String id, String label) {
@@ -72,6 +85,7 @@ public interface ProgressSink {
             @Override public void end(String outcome) { }
             @Override public void warn(String message) { }
             @Override public void detail(String message) { }
+            @Override public void taskQueued(String id, String label) { }
             @Override public void taskStarted(String id, String label) { }
             @Override public void taskFinished(String id, String label, String outcome,
                                                boolean succeeded) { }

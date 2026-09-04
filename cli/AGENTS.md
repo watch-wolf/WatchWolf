@@ -102,8 +102,9 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   `TuiStepReporter` writing `InstallProgressModel`, while `InstallProgressScreen` only paints
   snapshots of it (every model method is `synchronized`; nothing else in the class is concurrent).
   Steps report concurrent sub-operations through `ProgressSink.taskStarted/taskUpdate/taskFinished`
-  — one bar per Spigot jar rather than an aggregate that cannot say which version is stuck. Those
-  three default to a plain detail line, so a stream sink needs no changes. **Nothing under a
+  — a row per Spigot jar (queued ones announced up front, so the list never grows over the
+  afternoon) rather than an aggregate that cannot say which version is stuck. Those default to
+  silence or a plain detail line, so a stream sink needs no changes. **Nothing under a
   Lanterna screen may print**: `TuiProgressSink.detail` is a deliberate no-op, and the summary and
   remedies are printed only after the screen has closed.
 - **Stopping an install is cooperative and coarse, and that is deliberate.** `CancelSignal` is

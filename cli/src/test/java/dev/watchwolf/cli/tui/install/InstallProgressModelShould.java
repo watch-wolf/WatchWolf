@@ -70,6 +70,23 @@ public class InstallProgressModelShould {
     }
 
     @Test
+    public void tellAJarWaitingItsTurnFromOneBeingBuilt() {
+        InstallProgressModel model = new InstallProgressModel();
+        model.taskQueued("spigot-1.8.8", "Spigot 1.8.8");
+        model.taskQueued("spigot-1.20.4", "Spigot 1.20.4");
+
+        assertEquals(2, model.tasks().size(), "every selected version is a row from the start");
+        assertTrue(model.tasks().get(0).waiting());
+        assertFalse(model.tasks().get(0).started());
+
+        model.taskStarted("spigot-1.8.8", "Spigot 1.8.8", 1_000L);
+
+        assertFalse(model.tasks().get(0).waiting(), "the one being built must not read as waiting");
+        assertTrue(model.tasks().get(1).waiting(), "the queued one is untouched");
+        assertEquals(2, model.tasks().size(), "starting a jar must not add a second row for it");
+    }
+
+    @Test
     public void giveEachConcurrentJarItsOwnRow() {
         InstallProgressModel model = new InstallProgressModel();
         model.taskStarted("spigot-1.8.8", "Spigot 1.8.8", 1_000L);
