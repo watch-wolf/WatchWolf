@@ -109,6 +109,12 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   timestamp: `BuildSpigotJarsStep` uses it for a failed BuildTools console, which previously
   reached the user as a single line and otherwise existed only inside a container the verification
   then told them to delete.
+- **F8/F9 reach the whole subtree, not the visible rows.** `MenuModel.setAllUnder` walks every
+  `CHECK` descendant at any depth, so "select all" at the top level ticks the individual server
+  jars and plugins, and a menu holding only submenus (`Server jars`) still offers the keys —
+  `MenuConfigScreen.footerHint` asks the same question the keys answer, `checkDescendants()`, not
+  the current level's own children. It runs the pass **twice**: unticking a self-test suite
+  releases the version rows it was holding, and those were skipped as locked on the first pass.
 - **A ticked self-test suite locks the server jars it starts.** `TesterSuiteCatalog` hardcodes the
   Spigot/Paper versions each suite runs against — transcribed from the Tester's own YAML configs,
   which it must be, since the menu offers the suites before the Tester is ever cloned.

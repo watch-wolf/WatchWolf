@@ -211,7 +211,8 @@ public final class MenuNode {
         return AggregateState.SOME;
     }
 
-    private List<MenuNode> checkDescendants() {
+    /** Every {@code CHECK} in this subtree, at any depth -- what F8/F9 and the marker both walk. */
+    public List<MenuNode> checkDescendants() {
         List<MenuNode> found = new ArrayList<>();
         this.collectCheckDescendants(found);
         return found;

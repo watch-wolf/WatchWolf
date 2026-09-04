@@ -121,6 +121,81 @@ public class MenuModelShould {
     }
 
     @Test
+    public void reachIntoSubmenusFromTheTopLevel() {
+        // "select all" from the top and then finding no server jars ticked, because they live one
+        // level down, is not what anybody means by all
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
+        this.menu.paperLoaded(List.of(McVersion.of("1.21.1")));
+        this.menu.deselectAll("root");
+
+        this.menu.selectAll("root");
+
+        assertEquals(2, this.menu.selectedVersions(MenuModel.ID_SPIGOT).size());
+        assertEquals(1, this.menu.selectedVersions(MenuModel.ID_PAPER).size());
+        assertTrue(this.menu.isChecked(MenuModel.ID_PULL_IMAGES), "and the top-level rows too");
+    }
+
+    @Test
+    public void clearEverythingFromTheTopLevelIncludingSubmenus() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
+        this.menu.paperLoaded(List.of(McVersion.of("1.21.1")));
+
+        this.menu.deselectAll("root");
+
+        assertTrue(this.menu.selectedVersions(MenuModel.ID_SPIGOT).isEmpty());
+        assertTrue(this.menu.selectedVersions(MenuModel.ID_PAPER).isEmpty());
+        assertFalse(this.menu.isChecked(MenuModel.ID_PULL_IMAGES));
+    }
+
+    @Test
+    public void clearTheVersionsASuiteWasHoldingWhenTheSuiteItselfIsCleared() {
+        // F9 at the top unticks the suites, which releases their locked jars -- but those rows
+        // were skipped as locked moments earlier, so a single pass would leave them ticked
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8"), McVersion.of("1.20.2")));
+        this.menu.paperLoaded(List.of(McVersion.of("1.20.2")));
+        assertFalse(this.menu.node("spigot:1.8.8").orElseThrow().isEnabled(), "locked to start with");
+
+        this.menu.deselectAll("root");
+
+        assertTrue(this.menu.selectedVersions(MenuModel.ID_SPIGOT).isEmpty(),
+                "a 'deselect all' that leaves rows ticked is not deselect all");
+        assertTrue(this.menu.selectedVersions(MenuModel.ID_PAPER).isEmpty());
+        assertTrue(this.menu.toBuildPlan().selfTestSuites().isEmpty());
+    }
+
+    @Test
+    public void coverBothSpigotAndPaperFromTheServerJarsMenu() {
+        // "Server jars" holds no checkboxes of its own, only the two submenus -- F8 there still
+        // has to mean every version in both
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4")));
+        this.menu.paperLoaded(List.of(McVersion.of("1.21.1")));
+        this.menu.deselectAll(MenuModel.ID_SERVER_JARS);
+        assertTrue(this.menu.selectedVersions(MenuModel.ID_SPIGOT).isEmpty());
+
+        this.menu.selectAll(MenuModel.ID_SERVER_JARS);
+
+        assertEquals(1, this.menu.selectedVersions(MenuModel.ID_SPIGOT).size());
+        assertEquals(1, this.menu.selectedVersions(MenuModel.ID_PAPER).size());
+    }
+
+    @Test
+    public void keepBulkSelectionInsideTheListItWasPressedOn() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4")));
+        this.menu.paperLoaded(List.of(McVersion.of("1.21.1")));
+
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+
+        assertTrue(this.menu.selectedVersions(MenuModel.ID_SPIGOT).isEmpty());
+        assertEquals(1, this.menu.selectedVersions(MenuModel.ID_PAPER).size(),
+                "reaching deeper must not mean reaching wider");
+        assertTrue(this.menu.isChecked(MenuModel.ID_PULL_IMAGES));
+    }
+
+    @Test
     public void selectEveryFetchedVersionByDefaultExceptAlreadyInstalledOnes() {
         // the install default: everything not already built/downloaded starts selected, so a
         // fresh install picks up every version with one keypress ('s') rather than none

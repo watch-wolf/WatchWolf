@@ -26,8 +26,9 @@ import java.util.Set;
  *
  * <p><b>Bulk selection is a keybind, not a row.</b> There is no {@code < All >} pseudo-entry
  * anywhere: those read as options and get mis-clicked. {@code F8} selects all and {@code F9}
- * deselects all, scoped to the focused list, and the screen prints that hint in the list's own
- * footer.
+ * deselects all, scoped to the focused list -- meaning its whole subtree, so F8 at the top level
+ * reaches the individual server jars two levels down -- and the screen prints that hint in the
+ * list's own footer.
  *
  * <p>{@link #ID_START_BUILD} is not an exception to that. A {@code < All >} row sits <em>among the
  * options it would change</em> and reads as one of them; the "Start build" row is a terminal
@@ -201,12 +202,19 @@ public final class MenuModel {
         this.applyConstraints();
     }
 
-    /** F8 on the focused list. Scoped to that list, never the whole screen. */
+    /**
+     * F8 on the focused list: everything under it, submenus included.
+     *
+     * <p>Scoped to that list -- never the whole screen -- but scoped means the whole
+     * <em>subtree</em>, not just the rows that happen to be on this screen. "Select all" at the top
+     * level and then finding no server jars ticked, because they live one level down, is not what
+     * anybody means by all.
+     */
     public void selectAll(String parentId) {
         this.setAllUnder(parentId, true);
     }
 
-    /** F9 on the focused list. */
+    /** F9 on the focused list, with the same reach. */
     public void deselectAll(String parentId) {
         this.setAllUnder(parentId, false);
     }
@@ -214,12 +222,17 @@ public final class MenuModel {
     private void setAllUnder(String parentId, boolean checked) {
         MenuNode parent = this.root.find(parentId).orElse(null);
         if (parent == null) return;
-        for (MenuNode child : parent.children()) {
-            if (child.kind() == MenuNode.Kind.CHECK && child.isEnabled()) {
-                child.setChecked(checked);
+
+        // Twice, because the first pass can change what the second is allowed to touch: unticking
+        // a self-test suite releases the version rows it was holding, and those were skipped as
+        // locked moments earlier -- a "deselect all" that leaves rows ticked is not deselect all.
+        // Two passes suffice: releasing a lock can never create one.
+        for (int pass = 0; pass < 2; pass++) {
+            for (MenuNode node : parent.checkDescendants()) {
+                if (node.isEnabled()) node.setChecked(checked);
             }
+            this.applyConstraints();
         }
-        this.applyConstraints();
     }
 
     /**

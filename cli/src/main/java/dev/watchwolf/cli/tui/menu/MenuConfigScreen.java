@@ -416,9 +416,11 @@ public final class MenuConfigScreen implements AutoCloseable {
         }
     }
 
-    private String footerHint(MenuNode current) {
-        boolean hasCheckboxes = current.children().stream()
-                .anyMatch(child -> child.kind() == MenuNode.Kind.CHECK);
+    /** Package-visible so a test can assert the hint without reading a rendered frame. */
+    String footerHint(MenuNode current) {
+        // any depth, matching what F8/F9 actually reach: "Server jars" holds only submenus, but
+        // F8 there still ticks every version inside them, so the hint has to be offered
+        boolean hasCheckboxes = !current.checkDescendants().isEmpty();
         String hint = "space toggle";
         if (hasCheckboxes) hint += " · F8 select all · F9 deselect all";
         if (this.path.size() > 1) hint += " · esc back";

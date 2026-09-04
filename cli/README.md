@@ -63,8 +63,12 @@ every step a given set of flags would actually perform, so nothing runs by surpr
 ## Installing from the menu
 
 `watchwolf build` on a TTY with no flags opens the checkbox screen. Arrows move, space toggles,
-Enter descends into a submenu, `F8`/`F9` tick and untick a whole list, `?` explains the highlighted
-row, and the last row is `< Start build >` (`s` still works from anywhere).
+Enter descends into a submenu, `?` explains the highlighted row, and the last row is
+`< Start build >` (`s` still works from anywhere).
+
+`F8`/`F9` tick and untick everything under the menu you are standing in, **submenus included** — so
+F8 at the top level selects every server jar and plugin two levels down, and F8 on `Server jars`
+covers both Spigot and Paper. Rows locked by a self-test suite (below) are left alone.
 
 The install that follows is drawn, not printed: an overall bar, the step list with what each one is
 waiting on, and -- while BuildTools runs -- **a row per selected Spigot version**: the ones being
