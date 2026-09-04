@@ -104,7 +104,11 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   backgrounded install has no terminal at all, and a bundle that describes everything except the
   run that produced it is missing half of what "it installed wrong" needs. `BundleWriter` adds them
   under `cli-runs/`. Anything genuinely per-second (`update`, `taskUpdate`) is deliberately *not*
-  logged — see `RunLogProgressSink`'s Javadoc.
+  logged — see `RunLogProgressSink`'s Javadoc. Output too long to inline but too valuable to lose
+  goes through `RunLog.attachment`, which writes it beside the run's own log under the *same*
+  timestamp: `BuildSpigotJarsStep` uses it for a failed BuildTools console, which previously
+  reached the user as a single line and otherwise existed only inside a container the verification
+  then told them to delete.
 - **A menu session gets a drawn install; flags get printed output.** `BuildCommand` decides on
   `usedMenu`: the menuconfig path runs `StepRunner` on a worker thread with `TuiProgressSink`/
   `TuiStepReporter` writing `InstallProgressModel`, while `InstallProgressScreen` only paints

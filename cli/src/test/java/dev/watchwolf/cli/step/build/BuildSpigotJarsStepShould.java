@@ -7,6 +7,7 @@ import dev.watchwolf.cli.fake.RecordingCommandRunner;
 import dev.watchwolf.cli.io.NioFileGateway;
 import dev.watchwolf.cli.layout.InstallLayout;
 import dev.watchwolf.cli.layout.RuntimeFlavor;
+import dev.watchwolf.cli.log.RunLog;
 import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.model.McVersion;
 import dev.watchwolf.cli.net.HostInterfaces;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Instant;
@@ -46,12 +48,16 @@ public class BuildSpigotJarsStepShould {
     private InstallLayout layout;
     private FakeDockerFacade docker;
     private RecordingProgressSink progress;
+    private RunLog runLog;
 
     @BeforeEach
     void setUp() {
         this.layout = new InstallLayout(this.base, RuntimeFlavor.RELEASE);
         this.docker = new FakeDockerFacade();
         this.progress = new RecordingProgressSink();
+        this.runLog = RunLog.open(new NioFileGateway(), this.layout,
+                Clock.fixed(Instant.parse("2026-09-04T12:00:00Z"), ZoneOffset.UTC),
+                "build", List.of());
     }
 
     @Test
@@ -132,6 +138,45 @@ public class BuildSpigotJarsStepShould {
     }
 
     @Test
+    public void keepTheFailedBuildersConsoleInsteadOfThrowingItAway() throws Exception {
+        // it used to reach the user as one line, with the rest living only inside a container the
+        // verification then told them to delete
+        this.docker.withDetachedRunsFinishingImmediately();
+        this.docker.withLogs("Spigot_build_1.8.8", "Loading BuildTools", "Compiling...",
+                "[ERROR] Failed to execute goal", "BUILD FAILED");
+
+        StepFailedException failure = assertThrows(StepFailedException.class,
+                () -> new BuildSpigotJarsStep(0)
+                        .perform(this.context(this.plan("1.8.8"), CancelSignal.never())));
+
+        assertTrue(failure.getMessage().contains("BUILD FAILED"),
+                "the tail belongs in the failure itself: " + failure.getMessage());
+        assertTrue(failure.getMessage().contains("[ERROR] Failed to execute goal"),
+                failure.getMessage());
+
+        Path attachment = this.layout.cliLogsDir().resolve("20260904-120000-spigot-1.8.8.log");
+        assertTrue(Files.exists(attachment), "the whole log must outlive the container");
+        assertTrue(Files.readString(attachment).contains("Loading BuildTools"),
+                "including the lines too far back to inline");
+        assertTrue(failure.getMessage().contains(attachment.toString()),
+                "and the failure must say where it went");
+    }
+
+    @Test
+    public void sayWhenTheBuilderLeftNoOutputAtAll() {
+        this.docker.withDetachedRunsFinishingImmediately();
+
+        StepFailedException failure = assertThrows(StepFailedException.class,
+                () -> new BuildSpigotJarsStep(0)
+                        .perform(this.context(this.plan("1.8.8"), CancelSignal.never())));
+
+        // silence is itself a diagnosis (the image never started), so it is said out loud rather
+        // than left as an empty gap in the message
+        assertTrue(failure.getMessage().contains("produced no output at all"),
+                failure.getMessage());
+    }
+
+    @Test
     public void doNothingWhenEveryVersionIsAlreadyBuilt() throws Exception {
         BuildPlan plan = this.plan("1.8.8");
         Path jar = this.layout.serverJar("Spigot", "1.8.8");
@@ -157,6 +202,6 @@ public class BuildSpigotJarsStepShould {
         return new StepContext(this.layout, plan, this.docker, new RecordingCommandRunner(),
                 new NioFileGateway(), new FakeHttpFetcher(), new HostInterfaces(),
                 Clock.fixed(Instant.parse("2026-09-04T12:00:00Z"), ZoneOffset.UTC),
-                this.progress, new HostAction(), cancel);
+                this.progress, new HostAction(), cancel, this.runLog);
     }
 }

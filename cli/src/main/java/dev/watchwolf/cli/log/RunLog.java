@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * What the CLI did, written down as it happens -- one file per run under
@@ -112,6 +113,33 @@ public final class RunLog implements AutoCloseable {
     public void line(String text) {
         if (this.broken) return;
         this.write(LINE_STAMP.format(this.clock.instant()) + "  " + text + "\n");
+    }
+
+    /**
+     * Writes a whole captured output next to this run's log, as
+     * {@code <same timestamp>-<name>.log}, and leaves a pointer to it in the log itself.
+     *
+     * <p>For output that is far too long to inline but is the entire diagnosis when something
+     * fails -- BuildTools' console for a Spigot version that did not compile, say. Sharing the
+     * run's timestamp is the point: in a bundle holding several runs, an attachment is
+     * unambiguously part of one of them.
+     *
+     * @return where it was written, or empty when logging is disabled or the write failed
+     */
+    public Optional<Path> attachment(String name, List<String> lines) {
+        if (this.broken) return Optional.empty();
+
+        Path attachment = this.path.resolveSibling(
+                FILE_STAMP.format(this.startedAt) + "-" + name + ".log");
+        try {
+            this.files.writeString(attachment, String.join("\n", lines) + "\n");
+        } catch (IOException | RuntimeException ex) {
+            this.line("[w] could not write " + attachment + ": " + ex.getMessage());
+            return Optional.empty();
+        }
+        this.line("[i] " + lines.size() + " line(s) of " + name + " output written to "
+                + attachment);
+        return Optional.of(attachment);
     }
 
     /** A titled block -- the resolved plan, say -- set apart from the running commentary. */

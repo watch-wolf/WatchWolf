@@ -109,8 +109,14 @@ full-screen UI owns the terminal), and an install sent to the background finishe
 nobody is watching. Detail is written whether or not you passed `--verbose`; the per-second
 heartbeats are not, so the file stays readable. The newest 20 runs are kept.
 
-`watchwolf logs` puts the newest 10 of them in the bundle under `cli-runs/`, so a bug report says
-what the installer did as well as what the containers did.
+**A Spigot version that fails to build leaves its whole BuildTools console** next to that run's log,
+as `<timestamp>-spigot-<version>.log`, with the last dozen lines quoted inline in the failure. The
+builder's container is kept as well (it is removed only when its jar comes out good), so
+`docker logs Spigot_build_<version>` still works — but the file outlives it.
+
+`watchwolf logs` puts the newest 10 run logs in the bundle under `cli-runs/`, and any leftover
+`Spigot_build_*` container's log under `containers/`, so a bug report says what the installer did
+as well as what the containers did.
 
 ## The dashboard
 

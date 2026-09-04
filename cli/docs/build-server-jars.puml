@@ -7,6 +7,7 @@ participant "StepRunner" as Runner
 participant "BuildSpigotJarsStep" as SpigotStep
 participant "hub.spigotmc.org" as SpigotHub
 participant "Docker daemon" as Docker
+participant "RunLog\n(<base>/.watchwolf/run-logs)" as RunLog
 participant "BuildTools\ncontainer" as BuildTools
 participant "DownloadPaperJarsStep" as PaperStep
 participant "fill.papermc.io" as PaperApi
@@ -62,7 +63,16 @@ loop for each selected Spigot version not already on disk
         SpigotStep -> FS: move staging/<version>.jar\n-> server-types/Spigot/<version>.jar
         SpigotStep -> Docker: removeContainer (a failed one is kept: its log is the diagnosis)
     else jar missing or too small
-        SpigotStep -> SpigotStep: record failure + last container log lines
+        SpigotStep -> Docker: logs(Spigot_build_<version>, 2000)
+        SpigotStep -> RunLog: attachment("spigot-<version>", lines)
+        note right
+          the whole BuildTools console, beside this
+          run's own log and under the same timestamp,
+          so it outlives the container (and rides
+          along in a diagnostics bundle); the last
+          12 lines also go inline in the failure
+        end note
+        SpigotStep -> SpigotStep: record failure (the container is KEPT, unlike a good build)
     end
 end
 SpigotStep --> Runner: StepResult (built N/M, or failures)

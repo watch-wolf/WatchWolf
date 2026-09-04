@@ -274,6 +274,11 @@ public final class BundleWriter {
                 List.of(ContainerNames.SERVERS_MANAGER, ContainerNames.CLIENTS_MANAGER));
         for (ContainerSnapshot container : this.docker.listContainers()) {
             if (ContainerNames.isMcServer(container.name())) wanted.add(container.name());
+            // a Spigot_build_* container is only still here because its build failed -- they are
+            // removed on success -- so its log is exactly what somebody is about to ask for
+            if (container.name().startsWith(ContainerNames.SPIGOT_BUILDER_PREFIX)) {
+                wanted.add(container.name());
+            }
         }
 
         for (String name : wanted) {

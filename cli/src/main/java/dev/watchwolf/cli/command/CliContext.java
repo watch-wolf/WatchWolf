@@ -96,7 +96,8 @@ public final class CliContext implements AutoCloseable {
      */
     public StepContext stepContext(BuildPlan plan, ProgressSink progress, CancelSignal cancel) {
         return new StepContext(this.layout, plan, this.docker, this.commands, this.files,
-                this.http, this.interfaces, this.clock, progress, this.hostAction, cancel);
+                this.http, this.interfaces, this.clock, progress, this.hostAction, cancel,
+                this.runLog);
     }
 
     public EnvironmentScanner scanner() {

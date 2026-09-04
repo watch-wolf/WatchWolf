@@ -186,6 +186,24 @@ public class BundleWriterShould {
     }
 
     @Test
+    public void collectALeftoverSpigotBuildersLog() throws IOException {
+        // these are removed once their jar is good, so one that is still around is one that failed
+        FakeDockerFacade docker = new FakeDockerFacade();
+        docker.withContainer("Spigot_build_1.8.8").exited().done();
+        docker.withLogs("Spigot_build_1.8.8", "Compiling...", "BUILD FAILED");
+
+        Path destination = this.base.resolve("leftover-builder.tar.gz");
+        new BundleWriter(docker, new NioFileGateway(), this.layout(), new HostInterfaces(), CLOCK)
+                .write(destination, BundleWriter.Selection.everything(),
+                        ProgressSink.discarding());
+
+        assertTrue(entryNames(destination).contains("containers/Spigot_build_1.8.8.log"),
+                entryNames(destination).toString());
+        assertTrue(readEntry(destination, "containers/Spigot_build_1.8.8.log")
+                .contains("BUILD FAILED"));
+    }
+
+    @Test
     public void recordWhatWasSkippedAndWhy() throws IOException {
         Path destination = this.base.resolve("skips.tar.gz");
         this.writer().write(destination, BundleWriter.Selection.everything(), ProgressSink.discarding());

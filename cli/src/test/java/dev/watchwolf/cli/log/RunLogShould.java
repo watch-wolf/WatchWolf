@@ -74,6 +74,27 @@ public class RunLogShould {
     }
 
     @Test
+    public void writeAnAttachmentBesideTheRunItBelongsTo() throws IOException {
+        RunLog log = RunLog.open(new NioFileGateway(), this.layout(), CLOCK, "build", List.of());
+
+        Path attachment = log.attachment("spigot-1.8.8",
+                List.of("Loading BuildTools", "BUILD FAILED")).orElseThrow();
+
+        // the shared timestamp is the point: in a bundle holding several runs, an attachment has
+        // to be unambiguously part of one of them
+        assertEquals("20260904-103000-spigot-1.8.8.log", attachment.getFileName().toString());
+        assertEquals(log.path().getParent(), attachment.getParent());
+        assertEquals("Loading BuildTools\nBUILD FAILED\n", Files.readString(attachment));
+        assertTrue(Files.readString(log.path()).contains("2 line(s) of spigot-1.8.8 output"),
+                "the log itself has to point at it, or nobody will find it");
+    }
+
+    @Test
+    public void haveNoAttachmentToGiveWhenDisabled() {
+        assertTrue(RunLog.disabled().attachment("spigot-1.8.8", List.of("nope")).isEmpty());
+    }
+
+    @Test
     public void keepOnlyTheNewestRuns() throws IOException {
         Path directory = this.layout().cliLogsDir();
         Files.createDirectories(directory);

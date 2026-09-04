@@ -42,6 +42,11 @@ public final class BuildSpigotJarsStep implements Step {
     private static final int POLL_SECONDS = 15;
     private static final int MAX_MINUTES_PER_VERSION = 120;
 
+    /** Enough of BuildTools' console to hold the real error, which is rarely the last line. */
+    private static final int BUILDER_LOG_LINES = 2000;
+    /** How much of it goes inline in the failure, where it competes with everything else. */
+    private static final int BUILDER_LOG_TAIL = 12;
+
     private final int pollSeconds;
 
     public BuildSpigotJarsStep() {
@@ -140,7 +145,8 @@ public final class BuildSpigotJarsStep implements Step {
                 if (inspection.valid()) {
                     this.promote(context, built, version, failures);
                 } else {
-                    failures.put(version, inspection.problem() + this.lastLinesOf(context, version));
+                    failures.put(version,
+                            inspection.problem() + this.captureBuilderLog(context, version));
                 }
 
                 String problem = failures.get(version);
@@ -252,15 +258,39 @@ public final class BuildSpigotJarsStep implements Step {
                 .orElse(false);
     }
 
-    private String lastLinesOf(StepContext context, McVersion version) {
+    /**
+     * Keeps the failed builder's console, which is the whole diagnosis and used to be thrown away:
+     * one line of it reached the failure message and the rest existed only inside a container the
+     * verification then told you to delete.
+     *
+     * <p>The full log goes beside this run's own log (so it survives the container, and rides
+     * along in a diagnostics bundle); a short tail goes inline, because a failure the reader has to
+     * go and open a file to understand is a failure they will guess at instead.
+     *
+     * <p>Only on failure. A Spigot build that worked produces tens of thousands of lines nobody
+     * will ever read, and its container is removed straight away.
+     */
+    private String captureBuilderLog(StepContext context, McVersion version) {
+        String name = ContainerNames.spigotBuilderFor(version.toString());
+
+        List<String> lines;
         try {
-            List<String> lines = context.docker()
-                    .logs(ContainerNames.spigotBuilderFor(version.toString()), 40);
-            if (lines.isEmpty()) return "";
-            return "\n          last output: " + lines.get(lines.size() - 1);
+            lines = context.docker().logs(name, BUILDER_LOG_LINES);
         } catch (RuntimeException ex) {
-            return "";
+            return "\n          (could not read " + name + "'s log: " + ex.getMessage() + ")";
         }
+        if (lines.isEmpty()) return "\n          (" + name + " produced no output at all)";
+
+        StringBuilder detail = new StringBuilder();
+        context.runLog().attachment("spigot-" + version, lines).ifPresent(path ->
+                detail.append("\n          full ").append(name).append(" log: ").append(path));
+
+        List<String> tail = lines.subList(Math.max(0, lines.size() - BUILDER_LOG_TAIL),
+                lines.size());
+        detail.append("\n          last ").append(tail.size()).append(" line(s) of ").append(name)
+                .append(':');
+        for (String line : tail) detail.append("\n            ").append(line);
+        return detail.toString();
     }
 
     /**
