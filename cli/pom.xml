@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dev.watchwolf</groupId>
+    <artifactId>watchwolf-cli</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>WatchWolf CLI</name>
+    <description>Build, install, run, monitor and diagnose a WatchWolf environment.</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+
+        <!--
+          Which suite runs is decided by the profiles at the bottom of this file:
+            default              -> unit tests only     (src/test/java, *Should)              hermetic
+            integration-test     -> system tests only    (src/integration-test/java, IT*)      needs Docker
+            validation-test      -> code checks only     (src/validation-test/java, *Should)   hermetic
+            nonfunctional-test   -> non-functional only   (src/nonfunctional-test/java, NF*)    hermetic, but SLOW/timing-sensitive
+          System tests need a Docker daemon, so they must never run by default. Non-functional tests are
+          hermetic (no daemon, no network — driven over a headless virtual terminal) but assert wall-clock
+          timing, which is a different kind of claim from "this is correct" — kept out of the default run
+          so a loaded CI box can't turn a timing assertion into a flaky unit-test failure.
+        -->
+        <skip.unit.tests>false</skip.unit.tests>
+        <skip.integration.tests>true</skip.integration.tests>
+        <skip.validation.tests>true</skip.validation.tests>
+        <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
+
+        <picocli.version>4.7.6</picocli.version>
+        <lanterna.version>3.1.2</lanterna.version>
+        <dockerjava.version>3.3.6</dockerjava.version>
+        <junit.version>5.8.1</junit.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.lanterna</groupId>
+            <artifactId>lanterna</artifactId>
+            <version>${lanterna.version}</version>
+        </dependency>
+
+        <!-- same client the ServersManager already drives the daemon with, so the socket contract is proven -->
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java</artifactId>
+            <version>${dockerjava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.docker-java</groupId>
+            <artifactId>docker-java-transport-httpclient5</artifactId>
+            <version>${dockerjava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.26.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>2.2</version>
+        </dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.jimfs</groupId>
+            <artifactId>jimfs</artifactId>
+            <version>1.3.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.12.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.12.1</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+            <!-- the system tests and the code checks live in their own source roots -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>add-extra-test-sources</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/src/integration-test/java/</source>
+                                <source>${project.basedir}/src/validation-test/java/</source>
+                                <source>${project.basedir}/src/nonfunctional-test/java/</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--
+              Surefire runs three independent suites, each with its own reports directory so a
+              failing code check — or a failing timing assertion — is never mixed into the
+              unit-test report:
+                default-test         unit tests            -> target/surefire-reports
+                validation-tests     code checks           -> target/validation-reports
+                nonfunctional-tests  non-functional tests  -> target/nonfunctional-reports
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <!--
+                      Without this the XML records every dynamic test under its factory method name,
+                      so the per-file detail of the code checks is lost.
+                    -->
+                    <statelessTestsetReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5Xml30StatelessReporter">
+                        <usePhrasedTestCaseMethodName>true</usePhrasedTestCaseMethodName>
+                    </statelessTestsetReporter>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <skipTests>${skip.unit.tests}</skipTests>
+                            <includes>
+                                <include>**/*Should.java</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/IT*.java</exclude>
+                                <exclude>**/validation/**</exclude>
+                                <exclude>**/NF*.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>validation-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>${skip.validation.tests}</skipTests>
+                            <reportsDirectory>${project.build.directory}/validation-reports</reportsDirectory>
+                            <includes>
+                                <include>**/validation/*Should.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+
+                    <!--
+                      Non-functional tests: NOT "unit tests" — they assert wall-clock timing
+                      (e.g. keypress-to-redraw latency), a different kind of claim from "this is
+                      correct", run over a headless virtual terminal so they still need no Docker
+                      daemon and no real pty. Own category, own report directory, own profile.
+                    -->
+                    <execution>
+                        <id>nonfunctional-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>${skip.nonfunctional.tests}</skipTests>
+                            <reportsDirectory>${project.build.directory}/nonfunctional-reports</reportsDirectory>
+                            <includes>
+                                <include>**/NF*.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- system tests: IT* under src/integration-test/java (need a Docker daemon) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <executions>
+                    <execution>
+                        <id>integration-tests</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>${skip.integration.tests}</skipTests>
+                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>dev.watchwolf.cli.Main</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <!--
+                      A distinct finalName from the main artifact. With both named
+                      "watchwolf-cli.jar", Maven shuffles the plain jar aside to make room and the
+                      result is a corrupt archive ("Truncated class file" at run time).
+                    -->
+                    <finalName>watchwolf-cli</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <skip.unit.tests>false</skip.unit.tests>
+                <skip.integration.tests>true</skip.integration.tests>
+                <skip.validation.tests>true</skip.validation.tests>
+                <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>integration-test</id>
+            <properties>
+                <skip.unit.tests>true</skip.unit.tests>
+                <skip.integration.tests>false</skip.integration.tests>
+                <skip.validation.tests>true</skip.validation.tests>
+                <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>validation-test</id>
+            <properties>
+                <skip.unit.tests>true</skip.unit.tests>
+                <skip.integration.tests>true</skip.integration.tests>
+                <skip.validation.tests>false</skip.validation.tests>
+                <skip.nonfunctional.tests>true</skip.nonfunctional.tests>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>nonfunctional-test</id>
+            <properties>
+                <skip.unit.tests>true</skip.unit.tests>
+                <skip.integration.tests>true</skip.integration.tests>
+                <skip.validation.tests>true</skip.validation.tests>
+                <skip.nonfunctional.tests>false</skip.nonfunctional.tests>
+            </properties>
+        </profile>
+    </profiles>
+</project>

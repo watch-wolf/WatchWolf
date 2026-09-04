@@ -1,3 +1,6 @@
+# --- API/ (LaTeX build artefacts) -------------------------------------------
+# These patterns are unanchored, so they are kept ahead of the cli/ section to
+# make clear they were only ever meant for the LaTeX sources in API/.
 texput.log
 API.*
 API-*
@@ -9,3 +12,17 @@ diagram.*
 !diagram.tex
 !api-docs.py
 !api-docs.Dockerfile
+
+# --- cli/ (the Java installer) ----------------------------------------------
+cli/target/
+cli/.mvn/
+cli/dependency-reduced-pom.xml
+*.class
+
+# The CLI's own state directory, if anyone points --path at the checkout.
+.watchwolf/
+
+# IDE
+.idea/
+*.iml
+.vscode/

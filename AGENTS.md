@@ -1,9 +1,9 @@
 # AGENTS.md — WatchWolf (standard)
 
-This repository is the **specification**, not an implementation. It holds the WatchWolf wire
-protocol, the machine-readable API definitions generated from it, and the script that installs a
-working environment. Nothing here compiles; almost everything here is either LaTeX, JSON, or a
-Bash script.
+This repository is primarily the **specification**, not an implementation: the WatchWolf wire
+protocol, the machine-readable API definitions generated from it, and (as of `cli/`) the Java
+application that installs a working environment — the one thing here that does compile. Everything
+else is either LaTeX, JSON, or a Bash script.
 
 Repo: `https://github.com/watch-wolf/WatchWolf` · default branch `main`, development on `dev`.
 
@@ -18,7 +18,8 @@ Repo: `https://github.com/watch-wolf/WatchWolf` · default branch `main`, develo
 | `API/definitions/*.json` | Machine-readable subset of the spec, one file per module. |
 | `API/definitions/*.md`, `API/definitions/<module>/*.svg` | **Generated.** Never edit. |
 | `api-docs.py` + `api-docs.Dockerfile` | Renders the JSON into those `.md`/`.svg` files. |
-| `WatchWolfSetup.sh` | build / install / uninstall / run the whole environment. |
+| `cli/` | The `watchwolf` CLI (Java 17): build / install / uninstall / run / monitor / diagnose the whole environment, shipped as a Docker image. See [`cli/AGENTS.md`](cli/AGENTS.md). |
+| `WatchWolfSetup.sh` | **Deprecated shim.** Forwards `--build`/`--install`/`--uninstall`/`--run` and their flags to `cli/watchwolf`, kept for one release so the previously documented `wget … && bash WatchWolfSetup.sh --build` path keeps working. |
 | `Diagram.mdj` | StarUML model. |
 
 ## Packet format (needed to read anything here)
@@ -82,19 +83,23 @@ Four passes are required (glossaries + apacite). `.gitignore` keeps every interm
   `API/definitions/servers_manager.json` — see `LATEST_DEFINITIONS_LIST` in
   `src/scripts/java/dev/watchwolf/rpc/DefinitionDataFactory.java` in that repo. Changing the JSON
   here has no effect downstream until that URL's SHA is bumped.
-- **`WatchWolfSetup.sh` is Ubuntu/WSL-only** and assumes `docker`, `jq`, `wget`, `curl` and
-  `dos2unix`. It clones `WatchWolf-ServersManager` and `WatchWolf-Client` into
+- **`WatchWolfSetup.sh` is now a thin shim; the real logic lives in `cli/`.** It still clones
+  `WatchWolf-ServersManager` and `WatchWolf-Client` into
   `$HOME/WatchWolf/{ServersManager,ClientsManager}` and reaches out to `watchwolf.dev` for the
-  "usual plugins" list and the latest WatchWolf-Server jar. The `--install` path writes a systemd
-  unit (non-WSL) or a Startup `.bat` (WSL) — treat it as destructive.
-- **`WatchWolfSetup.sh` has drifted from the ServersManager.** It pulls `openjdk:{8,16,17}`, but
-  `DockerizedServerInstantiator.getDockerImageForJavaVersion` now launches servers on
-  `eclipse-temurin:<v>-jdk` and `DockerUtilities.getJavaVersion` returns **21** for MC 1.20.5+.
-  The images the script pre-pulls are the wrong names and miss 21, so those pulls happen lazily
-  (or fail) at server-start time.
-- The setup script's `--build` mode **deletes** `$HOME/WatchWolf/ServersManager` and
-  `.../ClientsManager` before cloning (it backs up `server-types/` and `usual-plugins/` to a
-  temp dir first). Do not run it against a path holding anything else.
+  "usual plugins" list and the latest WatchWolf-Server jar — same layout as before — but by
+  forwarding to `cli/watchwolf`, which runs entirely in a Docker image (the host needs only
+  Docker, not `jq`/`wget`/`curl`/`dos2unix`) and works the same on Ubuntu, WSL, and anywhere else
+  Docker runs.
+- **The two problems that motivated `cli/` are fixed there, not patched here.** The old script
+  pulled `openjdk:{8,16,17}` while `DockerizedServerInstantiator` launches
+  `eclipse-temurin:<v>-jdk` and needs **21** for MC 1.20.5+ — `cli/`'s `JavaImageCatalog` is the
+  single place that list is derived from now, checked against WatchWolf-Core's own
+  `DockerUtilities.getJavaVersion` by a code check
+  (`MinecraftJavaVersionsMatchesCoreShould`). And `--build` no longer **deletes**
+  `ServersManager`/`ClientsManager` before cloning (the old backup-then-restore dance): every
+  install step is idempotent and verified, so a second `watchwolf build` updates in place and
+  refuses to touch a directory it does not recognise as its own. See `cli/AGENTS.md`'s
+  "Conventions and gotchas" for the current design.
 
 ## Git conventions
 
