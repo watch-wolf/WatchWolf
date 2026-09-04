@@ -143,6 +143,20 @@ public final class MenuNode {
         if (this.kind == Kind.CHECK) this.checked = false;
     }
 
+    /**
+     * Ticked, greyed, and not untickable: something else the user chose requires it.
+     *
+     * <p>The mirror image of {@link #disable}, which forces the box <em>off</em>. Both render the
+     * same way -- dim, with the reason spelled out on the row -- because the rule is the same one:
+     * a box the user cannot change must say why, on the row, rather than quietly refusing the
+     * space bar. The lock is released by {@link #enable()} when whatever required it is unticked.
+     */
+    public void lock(String reason) {
+        this.enabled = false;
+        this.disabledReason = reason;
+        if (this.kind == Kind.CHECK) this.checked = true;
+    }
+
     public void enable() {
         this.enabled = true;
         this.disabledReason = null;

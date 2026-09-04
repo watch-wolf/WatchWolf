@@ -109,6 +109,16 @@ Lives inside the WatchWolf standard repo (`watch-wolf/WatchWolf`), branch `dev`,
   timestamp: `BuildSpigotJarsStep` uses it for a failed BuildTools console, which previously
   reached the user as a single line and otherwise existed only inside a container the verification
   then told them to delete.
+- **A ticked self-test suite locks the server jars it starts.** `TesterSuiteCatalog` hardcodes the
+  Spigot/Paper versions each suite runs against — transcribed from the Tester's own YAML configs,
+  which it must be, since the menu offers the suites before the Tester is ever cloned.
+  `MenuModel.applyConstraints` ticks those version rows and calls `MenuNode.lock`, the mirror of
+  `disable`: dim, with the holding suite named on the row, because a box the user cannot change has
+  to say why rather than quietly refusing the space bar. Releasing restores the row's *previous*
+  state (`lockedForTheSelfTest`), never a blanket untick, and an already-installed version is never
+  locked — the requirement is already satisfied and re-ticking it would rebuild it for an hour.
+  `TesterSuiteServersMatchTheirConfigsShould` (validation) parses the real configs when a sibling
+  Tester checkout is reachable and fails on drift.
 - **A menu session gets a drawn install; flags get printed output.** `BuildCommand` decides on
   `usedMenu`: the menuconfig path runs `StepRunner` on a worker thread with `TuiProgressSink`/
   `TuiStepReporter` writing `InstallProgressModel`, while `InstallProgressScreen` only paints

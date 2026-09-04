@@ -22,6 +22,18 @@ public class MenuModelShould {
         this.menu = new MenuModel(BuildPlan.defaults(), "/home/someone/WatchWolf");
     }
 
+    /**
+     * Unticks every self-test suite, which releases the version rows those suites lock. Used by
+     * the tests below that are about something else -- the aggregate marker, F8/F9's scope -- and
+     * happen to name versions {@code ITServerStarterShould} needs.
+     */
+    private void withoutTheSelfTest() {
+        MenuNode selfTest = this.menu.node(MenuModel.ID_SELF_TEST).orElseThrow();
+        for (MenuNode suite : selfTest.children()) {
+            if (suite.isChecked()) this.menu.toggle(suite.id());
+        }
+    }
+
     private static WatchWolfWebClient.UsualPlugin plugin(String name) {
         return new WatchWolfWebClient.UsualPlugin(name, "1.0",
                 McVersion.of("1.8"), McVersion.of("LATEST"), "https://example.invalid/" + name);
@@ -96,6 +108,7 @@ public class MenuModelShould {
     public void selectAndDeselectEveryRowOfOneListOnly() {
         // F8/F9 are scoped to the focused list -- there is no "< All >" row anywhere, because
         // those read as options and get mis-clicked
+        this.withoutTheSelfTest();
         this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.19.4"),
                 McVersion.of("1.8.8")));
 
@@ -173,6 +186,7 @@ public class MenuModelShould {
     public void deriveBuildSpigotFromWhetherAnyVersionIsSelected() {
         // there is no separate on/off flag any more -- picking zero versions IS "don't build
         // Spigot", picking one IS "build it"
+        this.withoutTheSelfTest();
         this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
         assertTrue(this.menu.toBuildPlan().buildSpigot(), "everything is selected by default");
 
@@ -239,6 +253,7 @@ public class MenuModelShould {
 
     @Test
     public void markSpigotsAggregateStateAsItsSelectionChanges() {
+        this.withoutTheSelfTest();
         this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
         MenuNode spigot = this.menu.node(MenuModel.ID_SPIGOT).orElseThrow();
         assertEquals(MenuNode.AggregateState.ALL, spigot.aggregateState(), "all selected by default");
@@ -257,6 +272,7 @@ public class MenuModelShould {
     public void rollUpServerJarsAggregateStateAcrossBothSpigotAndPaper() {
         // "Server jars" holds no checkboxes of its own -- Spigot and Paper are themselves
         // submenus -- so its marker must roll up every CHECK descendant at any depth
+        this.withoutTheSelfTest();
         this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
         this.menu.paperLoaded(List.of(McVersion.of("1.20.4")));
         MenuNode serverJars = this.menu.node(MenuModel.ID_SERVER_JARS).orElseThrow();
@@ -267,6 +283,170 @@ public class MenuModelShould {
 
         this.menu.deselectAll(MenuModel.ID_SPIGOT);
         assertEquals(MenuNode.AggregateState.NONE, serverJars.aggregateState());
+    }
+
+    // ---- the server jars a ticked self-test suite needs ------------------------------------
+
+    @Test
+    public void lockTheServerVersionsATickedSuiteStarts() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+
+        // ITWorldLoaderShould runs against Spigot 1.8.8 and nothing else
+        this.menu.toggle("ITWorldLoaderShould");
+
+        MenuNode locked = this.menu.node("spigot:1.8.8").orElseThrow();
+        assertTrue(locked.isChecked(), "the suite cannot pass without the jar it starts");
+        assertFalse(locked.isEnabled(), "and it must not be untickable while that suite is on");
+        assertTrue(locked.disabledReason().orElseThrow().contains("ITWorldLoaderShould"),
+                "a box somebody cannot change has to say who is holding it: "
+                        + locked.disabledReason().orElse(""));
+
+        assertTrue(this.menu.node("spigot:1.20.4").orElseThrow().isEnabled(),
+                "a version no suite needs stays the user's to choose");
+    }
+
+    @Test
+    public void refuseToUntickALockedVersion() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
+        this.menu.toggle("ITWorldLoaderShould");
+
+        this.menu.toggle("spigot:1.8.8");
+        assertTrue(this.menu.node("spigot:1.8.8").orElseThrow().isChecked());
+
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+        assertTrue(this.menu.node("spigot:1.8.8").orElseThrow().isChecked(),
+                "F9 must not clear a row the self-test is holding either");
+    }
+
+    @Test
+    public void giveALockedVersionBackExactlyAsItWas() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+
+        this.menu.toggle("ITWorldLoaderShould");     // locks 1.8.8 on
+        this.menu.toggle("ITWorldLoaderShould");     // and releases it
+
+        MenuNode released = this.menu.node("spigot:1.8.8").orElseThrow();
+        assertTrue(released.isEnabled());
+        assertFalse(released.isChecked(),
+                "it was unticked before the suite took it, so it must come back unticked");
+        assertTrue(released.disabledReason().isEmpty());
+    }
+
+    @Test
+    public void keepAVersionTheUserHadAlreadyTickedWhenTheLockIsReleased() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));   // everything starts ticked
+
+        this.menu.toggle("ITWorldLoaderShould");
+        this.menu.toggle("ITWorldLoaderShould");
+
+        assertTrue(this.menu.node("spigot:1.8.8").orElseThrow().isChecked(),
+                "releasing a lock must never untick what the user chose themselves");
+    }
+
+    @Test
+    public void nameEverySuiteHoldingTheSameVersion() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
+
+        this.menu.toggle("ITWorldLoaderShould");
+        this.menu.toggle("ITClientsItemModuleShould");   // also starts Spigot 1.8.8
+
+        // one of them is named and the count says there are more: the row has a line of space,
+        // not a list of nine class names
+        String reason = this.menu.node("spigot:1.8.8").orElseThrow().disabledReason().orElseThrow();
+        assertTrue(reason.contains("ITWorldLoaderShould") || reason.contains("ITClientsItemModuleShould"),
+                reason);
+        assertTrue(reason.contains("+1 more need it"), reason);
+    }
+
+    @Test
+    public void lockTheVersionsOfASuiteTickedBeforeTheListEvenArrived() {
+        // the suites are on screen immediately; the version lists take seconds to fetch, so the
+        // lock has to be applied to rows that did not exist when the suite was ticked
+        this.withoutTheSelfTest();
+        this.menu.toggle("ITWorldLoaderShould");
+
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
+
+        assertFalse(this.menu.node("spigot:1.8.8").orElseThrow().isEnabled());
+        assertTrue(this.menu.node("spigot:1.8.8").orElseThrow().isChecked());
+    }
+
+    @Test
+    public void leaveAnAlreadyInstalledVersionAlone() {
+        // the requirement is already satisfied on disk: ticking it would rebuild, for an hour,
+        // something the suite can already find
+        this.withoutTheSelfTest();
+        this.menu.withInstalled(Set.of(McVersion.of("1.8.8")), Set.of());
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
+
+        this.menu.toggle("ITWorldLoaderShould");
+
+        MenuNode installed = this.menu.node("spigot:1.8.8").orElseThrow();
+        assertFalse(installed.isChecked(), "no point rebuilding what is already there");
+        assertTrue(installed.isEnabled());
+    }
+
+    @Test
+    public void sayOnTheSuiteWhenAServerItNeedsIsNotOffered() {
+        // Paper never published every Minecraft release and hub.spigotmc.org drops old ones, so a
+        // requirement can be unsatisfiable -- and a silent gap here is a self-test that cannot
+        // start its server, discovered an hour later
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4")));
+
+        this.menu.toggle("ITWorldLoaderShould");     // needs Spigot 1.8.8
+
+        String annotation = this.menu.node("ITWorldLoaderShould").orElseThrow()
+                .annotation().orElseThrow();
+        assertTrue(annotation.contains("NOT OFFERED: Spigot 1.8.8"), annotation);
+    }
+
+    @Test
+    public void notCallAServerMissingWhileTheListIsStillLoading() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoading(Instant.now());
+
+        this.menu.toggle("ITWorldLoaderShould");
+
+        assertFalse(this.menu.node("ITWorldLoaderShould").orElseThrow()
+                .annotation().orElseThrow().contains("NOT OFFERED"),
+                "'not offered' is not yet a true statement about a list nobody has fetched");
+    }
+
+    @Test
+    public void putTheLockedVersionsIntoThePlan() {
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.20.4"), McVersion.of("1.8.8")));
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+
+        this.menu.toggle("ITWorldLoaderShould");
+
+        BuildPlan plan = this.menu.toBuildPlan();
+        assertTrue(plan.buildSpigot());
+        assertEquals(List.of(McVersion.of("1.8.8")), plan.spigotVersions());
+        assertTrue(plan.selfTestSuites().contains("ITWorldLoaderShould"));
+    }
+
+    @Test
+    public void releaseEveryLockWhenTheTesterCloneIsUnticked() {
+        // no Tester checkout means no suites at all, so nothing is holding a version any more
+        this.withoutTheSelfTest();
+        this.menu.spigotLoaded(List.of(McVersion.of("1.8.8")));
+        this.menu.deselectAll(MenuModel.ID_SPIGOT);
+        this.menu.toggle("ITWorldLoaderShould");
+
+        this.menu.toggle(MenuModel.ID_CLONE_TESTER);
+
+        MenuNode released = this.menu.node("spigot:1.8.8").orElseThrow();
+        assertTrue(released.isEnabled());
+        assertFalse(released.isChecked());
     }
 
     @Test

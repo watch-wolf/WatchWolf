@@ -2,14 +2,17 @@ package dev.watchwolf.cli.tui.menu;
 
 import dev.watchwolf.cli.model.BuildPlan;
 import dev.watchwolf.cli.model.McVersion;
+import dev.watchwolf.cli.model.ServerTypeVersion;
 import dev.watchwolf.cli.model.TesterSuiteCatalog;
 import dev.watchwolf.cli.remote.WatchWolfWebClient;
 import dev.watchwolf.cli.tui.Async;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -56,6 +59,13 @@ public final class MenuModel {
     private Async<List<WatchWolfWebClient.UsualPlugin>> usualPlugins = Async.notStarted();
     private Set<McVersion> spigotInstalled = Set.of();
     private Set<McVersion> paperInstalled = Set.of();
+
+    /**
+     * Version rows this class ticked and locked on a suite's behalf, against what they were
+     * before. Unticking the suite has to give the row back exactly as the user left it, not
+     * silently untick something they had chosen themselves.
+     */
+    private final Map<String, Boolean> lockedForTheSelfTest = new LinkedHashMap<>();
 
     public MenuModel(BuildPlan initial, String basePath) {
         this.root = MenuNode.submenu("root", "watchwolf build");
@@ -133,12 +143,17 @@ public final class MenuModel {
 
         MenuNode selfTest = MenuNode.submenu(ID_SELF_TEST, "Run the self-diagnosis when finished")
                 .withHelp("Runs WatchWolf-Tester's own integration suites against the environment "
-                        + "you just installed. Real servers start, so this takes minutes.");
+                        + "you just installed. Real servers start, so this takes minutes -- and "
+                        + "ticking a suite ticks and locks the server jars it needs, under "
+                        + "Server jars.");
         for (TesterSuiteCatalog.Suite suite : TesterSuiteCatalog.all()) {
             selfTest.add(MenuNode
                     .check(suite.className(), suite.className(),
                             initial.selfTestSuites().contains(suite.className()))
-                    .withAnnotation(suite.description()));
+                    .withAnnotation(suite.description())
+                    .withHelp("Starts " + describe(suite.starts()) + ". Ticking this holds those "
+                            + "jars ticked under Server jars, because the suite cannot pass "
+                            + "without them; unticking it releases them."));
         }
         this.root.add(selfTest);
 
@@ -232,6 +247,120 @@ public final class MenuModel {
                         child -> child.disable("needs WatchWolf-Tester"));
             }
         });
+        this.lockServersTheSelfTestNeeds();
+    }
+
+    /**
+     * A ticked self-test suite ticks the server jars it starts, and holds them there.
+     *
+     * <p>Every suite runs against specific Spigot/Paper versions (see {@link TesterSuiteCatalog});
+     * ticking one and then not installing its servers is a run that can only fail, minutes in, for
+     * a reason that was knowable before it started. So the jars it needs are ticked and greyed,
+     * <em>with the suite that needs them named on the row</em> -- a box somebody cannot change has
+     * to say why rather than just refusing the space bar.
+     *
+     * <p>Unticking the suite releases them back to whatever they were before, which is why
+     * {@link #lockedForTheSelfTest} remembers the previous state rather than simply unticking.
+     */
+    private void lockServersTheSelfTestNeeds() {
+        Set<String> suites = this.checkedSelfTestSuites();
+        Set<ServerTypeVersion> needed = TesterSuiteCatalog.serversNeededBy(suites);
+
+        this.lockVersionsUnder(ID_SPIGOT, "Spigot", suites, needed, this.spigotInstalled);
+        this.lockVersionsUnder(ID_PAPER, "Paper", suites, needed, this.paperInstalled);
+        this.annotateSuitesWhoseServersAreNotOffered(suites);
+    }
+
+    private void lockVersionsUnder(String parentId, String type, Set<String> suites,
+                                   Set<ServerTypeVersion> needed, Set<McVersion> installed) {
+        MenuNode parent = this.root.find(parentId).orElse(null);
+        if (parent == null) return;
+
+        for (MenuNode child : parent.children()) {
+            if (child.kind() != MenuNode.Kind.CHECK) continue;
+            McVersion version = McVersion.parseOrNull(child.label());
+            if (version == null) continue;
+
+            // a version already on disk needs no lock: the suite will find its jar either way,
+            // and ticking it would mean rebuilding what is already there -- an hour, for nothing
+            ServerTypeVersion server = new ServerTypeVersion(type, version);
+            if (needed.contains(server) && !installed.contains(version)) {
+                this.lockedForTheSelfTest.putIfAbsent(child.id(), child.isChecked());
+                child.lock(lockReason(TesterSuiteCatalog.suitesNeeding(suites, server)));
+            } else if (this.lockedForTheSelfTest.containsKey(child.id())) {
+                child.enable();
+                child.setChecked(this.lockedForTheSelfTest.remove(child.id()));
+            }
+        }
+    }
+
+    private static String describe(List<ServerTypeVersion> servers) {
+        if (servers.isEmpty()) return "no servers of its own";
+        List<String> named = new ArrayList<>();
+        servers.forEach(server -> named.add(server.toString()));
+        return String.join(", ", named);
+    }
+
+    private static String lockReason(List<String> suites) {
+        if (suites.isEmpty()) return "locked by the self-diagnosis";
+        if (suites.size() == 1) {
+            return "locked: " + suites.get(0) + " needs it (untick that suite to release)";
+        }
+        return "locked: " + suites.get(0) + " +" + (suites.size() - 1)
+                + " more need it (untick them to release)";
+    }
+
+    private Set<String> checkedSelfTestSuites() {
+        Set<String> suites = new LinkedHashSet<>();
+        this.node(ID_SELF_TEST).ifPresent(selfTest -> {
+            for (MenuNode child : selfTest.children()) {
+                if (child.isChecked()) suites.add(child.id());
+            }
+        });
+        return suites;
+    }
+
+    /**
+     * A suite can need a version the remote index does not offer -- Paper never published every
+     * Minecraft release, and hub.spigotmc.org drops old ones. Nothing can be locked for it, so the
+     * suite says so on its own row instead of the gap being silent; the alternative is a build
+     * that looks complete and a self-test that cannot start its server.
+     *
+     * <p>Only once the list has actually loaded: while it is still being fetched, "not offered" is
+     * not yet a true statement about anything.
+     */
+    private void annotateSuitesWhoseServersAreNotOffered(Set<String> suites) {
+        MenuNode selfTest = this.node(ID_SELF_TEST).orElse(null);
+        if (selfTest == null) return;
+
+        for (MenuNode child : selfTest.children()) {
+            TesterSuiteCatalog.Suite suite =
+                    TesterSuiteCatalog.byClassName(child.id()).orElse(null);
+            if (suite == null) continue;
+
+            List<String> missing = new ArrayList<>();
+            if (suites.contains(suite.className())) {
+                for (ServerTypeVersion server : suite.starts()) {
+                    if (this.isOfferable(server)) continue;
+                    missing.add(server.toString());
+                }
+            }
+            child.setAnnotation(missing.isEmpty() ? suite.description()
+                    : suite.description() + "; NOT OFFERED: " + String.join(", ", missing));
+        }
+    }
+
+    private boolean isOfferable(ServerTypeVersion server) {
+        boolean spigot = server.type().equalsIgnoreCase("Spigot");
+        if (!(spigot ? this.spigotVersions : this.paperVersions).isLoaded()) {
+            return true;   // unknown yet, so not something to complain about
+        }
+        MenuNode parent = this.root.find(spigot ? ID_SPIGOT : ID_PAPER).orElse(null);
+        if (parent == null) return true;
+        for (MenuNode child : parent.children()) {
+            if (server.version().equals(McVersion.parseOrNull(child.label()))) return true;
+        }
+        return false;
     }
 
     public boolean isChecked(String id) {
@@ -345,6 +474,8 @@ public final class MenuModel {
             if (alreadyInstalled) node.setAnnotation("installed");
             parent.add(node);
         }
+        // these rows did not exist when the suites were ticked, so the locks are applied now
+        this.applyConstraints();
     }
 
     /**
@@ -363,6 +494,7 @@ public final class MenuModel {
             node.setAnnotation("installed");
             parent.add(node);
         }
+        this.applyConstraints();
     }
 
     public List<McVersion> selectedVersions(String parentId) {

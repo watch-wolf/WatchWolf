@@ -80,6 +80,24 @@ know one. Two keys matter while it runs:
 Flag-driven runs (`--spigot`, `--skip-tester`, a non-TTY, ...) keep the plain one-line-per-step
 output, unchanged.
 
+### Self-test suites hold the jars they need
+
+Every self-diagnosis suite starts specific servers — `ITWorldLoaderShould` runs against Spigot
+1.8.8, `ITServerStarterShould` against four Spigot and four Paper versions, and so on. Tick a suite
+and those versions are ticked for you under `Server jars` and **locked**: greyed, with the suite
+that is holding them named on the row.
+
+```
+  [*] 1.8.8    -- locked: ITWorldLoaderShould needs it (untick that suite to release)
+  [*] 1.20.4
+```
+
+Untick the suite and each row goes back to exactly what it was before. Versions already on disk are
+left alone — the suite will find their jars, and re-ticking them would mean rebuilding, for an hour,
+something that is already there. If a suite needs a version the remote index does not offer at all,
+the suite's own row says so (`NOT OFFERED: Spigot 1.8.8`) rather than leaving you to find out an
+hour later.
+
 ## What the CLI writes about itself
 
 Every run leaves a log in `<install base>/.watchwolf/run-logs/`, one file per run, named
