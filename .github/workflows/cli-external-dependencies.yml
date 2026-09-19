@@ -1,0 +1,35 @@
+name: CLI external dependencies
+
+# Weekly, plus on-demand from the Actions tab (Run workflow). Scheduled workflows only ever run
+# from whatever is on the repository's DEFAULT branch -- "main" here, not "dev" where this repo's
+# PRs normally land (see AGENTS.md's Git conventions) -- so this has no effect on a schedule until
+# it reaches main, however that promotion happens. workflow_dispatch works from any branch in the
+# meantime, including this one, for a manual check.
+#
+# What this actually checks -- see cli/ci/tests-external.sh and cli/ci/README.md's own section on
+# it -- is everything cli/ outside this repo's control: building its own Docker image (Maven
+# Central, the eclipse-temurin base images, Docker's static docker/compose binaries, apt), listing
+# Spigot/Paper's published versions, watchwolf.dev's usual-plugin list and newest WatchWolf-Server
+# jar, and pulling the JDK images. It deliberately never builds a Spigot version or downloads every
+# Paper jar -- that's what an actual `watchwolf build` does, and far too slow to run on a schedule.
+#
+# A run failing here means one of those moved or broke, unprompted by any change in this repo --
+# exactly what happened once already this project's history (api.papermc.io/v2 retired for
+# fill.papermc.io/v3, and Spigot's own version numbering changed shape, both silently).
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # every Monday, 06:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  external-dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run cli/ci/tests-external.sh
+        run: bash cli/ci/tests-external.sh
