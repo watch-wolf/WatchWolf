@@ -268,7 +268,9 @@ case "$opt" in
 		sudo bash "run.sh"
 		
 		# run ClientsManager
-		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 --env MACHINE_IP=$(hostname -I | awk '{print $1}') --env PUBLIC_IP=$(curl ifconfig.me) clients-manager:latest >/dev/null 2>&1 & disown
+		cd "$clients_manager_path"
+		dos2unix "run.sh"
+		sudo bash "run.sh"
 		
 		dots=""
 		while [ `sudo docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
