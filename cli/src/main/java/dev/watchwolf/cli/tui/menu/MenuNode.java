@@ -1,0 +1,227 @@
+package dev.watchwolf.cli.tui.menu;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
+/**
+ * One row of the menuconfig screen.
+ *
+ * <p>Pure data: no terminal code, so the whole navigation and selection behaviour is unit-testable.
+ */
+public final class MenuNode {
+    public enum Kind {
+        /** {@code [*]} -- toggled with space. */
+        CHECK,
+        /** {@code [ text ]} -- an editable value. */
+        TEXT,
+        /** {@code ( ) / (*)} -- one of a group. */
+        RADIO,
+        /** {@code --->} -- descends with Enter. */
+        SUBMENU,
+        /** {@code < Start build >} -- runs something with Enter, rather than holding a value. */
+        ACTION,
+        /** A read-only caption. */
+        LABEL
+    }
+
+    private final String id;
+    private final Kind kind;
+    private String label;
+    private final List<MenuNode> children = new ArrayList<>();
+
+    private boolean checked;
+    private String value;
+    private String help;
+    private String radioGroup;
+    private boolean enabled = true;
+    private String disabledReason;
+    private String annotation;
+    /** {@code TEXT} only. Returns an error message for an invalid value, or empty when it's fine. */
+    private Function<String, Optional<String>> validator = ignored -> Optional.empty();
+
+    public MenuNode(String id, Kind kind, String label) {
+        this.id = id;
+        this.kind = kind;
+        this.label = label;
+    }
+
+    public static MenuNode check(String id, String label, boolean checked) {
+        MenuNode node = new MenuNode(id, Kind.CHECK, label);
+        node.checked = checked;
+        return node;
+    }
+
+    public static MenuNode text(String id, String label, String value) {
+        MenuNode node = new MenuNode(id, Kind.TEXT, label);
+        node.value = value;
+        return node;
+    }
+
+    public static MenuNode radio(String id, String label, String group, boolean selected) {
+        MenuNode node = new MenuNode(id, Kind.RADIO, label);
+        node.radioGroup = group;
+        node.checked = selected;
+        return node;
+    }
+
+    public static MenuNode submenu(String id, String label) {
+        return new MenuNode(id, Kind.SUBMENU, label);
+    }
+
+    /**
+     * A row that <em>does</em> something on Enter instead of holding a value -- "Start build".
+     *
+     * <p>Not a contradiction of the "bulk selection is a keybind, never a row" rule in
+     * {@link MenuModel}: that one is about {@code < All >}/{@code < None >} pseudo-entries sitting
+     * <em>among the options of a checkbox list</em>, where they read as options themselves and get
+     * mis-clicked. This is the opposite -- a terminal confirm at the bottom of the form, which is
+     * the one place a reader looks for "and now what?". The keybind still works.
+     */
+    public static MenuNode action(String id, String label) {
+        return new MenuNode(id, Kind.ACTION, label);
+    }
+
+    public static MenuNode label(String id, String label) {
+        return new MenuNode(id, Kind.LABEL, label);
+    }
+
+    public MenuNode withHelp(String help) {
+        this.help = help;
+        return this;
+    }
+
+    public MenuNode withAnnotation(String annotation) {
+        this.annotation = annotation;
+        return this;
+    }
+
+    /** {@code TEXT} only -- rejected in {@link MenuConfigScreen} rather than silently accepted
+     *  and papered over later (e.g. by falling back to a default when the plan is built). */
+    public MenuNode withValidator(Function<String, Optional<String>> validator) {
+        this.validator = validator;
+        return this;
+    }
+
+    /** @return an error message if {@code candidate} is invalid for this field, else empty */
+    public Optional<String> validate(String candidate) {
+        return this.validator.apply(candidate);
+    }
+
+    public MenuNode with(MenuNode... children) {
+        this.children.addAll(List.of(children));
+        return this;
+    }
+
+    public MenuNode add(MenuNode child) {
+        this.children.add(child);
+        return this;
+    }
+
+    public String id()                       { return this.id; }
+    public Kind kind()                       { return this.kind; }
+    public String label()                    { return this.label; }
+    public List<MenuNode> children()         { return this.children; }
+    public boolean isChecked()               { return this.checked; }
+    public String value()                    { return this.value; }
+    public Optional<String> help()           { return Optional.ofNullable(this.help); }
+    public Optional<String> annotation()     { return Optional.ofNullable(this.annotation); }
+    public String radioGroup()               { return this.radioGroup; }
+    public boolean isEnabled()               { return this.enabled; }
+    public Optional<String> disabledReason()  { return Optional.ofNullable(this.disabledReason); }
+
+    public void setLabel(String label)       { this.label = label; }
+    public void setChecked(boolean checked)  { this.checked = checked; }
+    public void setValue(String value)       { this.value = value; }
+    public void setAnnotation(String note)   { this.annotation = note; }
+
+    /** Greyed out with a stated reason -- never silently unclickable. */
+    public void disable(String reason) {
+        this.enabled = false;
+        this.disabledReason = reason;
+        if (this.kind == Kind.CHECK) this.checked = false;
+    }
+
+    /**
+     * Ticked, greyed, and not untickable: something else the user chose requires it.
+     *
+     * <p>The mirror image of {@link #disable}, which forces the box <em>off</em>. Both render the
+     * same way -- dim, with the reason spelled out on the row -- because the rule is the same one:
+     * a box the user cannot change must say why, on the row, rather than quietly refusing the
+     * space bar. The lock is released by {@link #enable()} when whatever required it is unticked.
+     */
+    public void lock(String reason) {
+        this.enabled = false;
+        this.disabledReason = reason;
+        if (this.kind == Kind.CHECK) this.checked = true;
+    }
+
+    public void enable() {
+        this.enabled = true;
+        this.disabledReason = null;
+    }
+
+    public boolean isSelectable() {
+        return this.kind != Kind.LABEL && this.enabled;
+    }
+
+    public Optional<MenuNode> find(String id) {
+        if (this.id.equals(id)) return Optional.of(this);
+        for (MenuNode child : this.children) {
+            Optional<MenuNode> found = child.find(id);
+            if (found.isPresent()) return found;
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Rendered prefix: {@code [*]}, {@code [ ]}, {@code (*)} ... A {@code SUBMENU} gets one too --
+     * {@code [ ]}/{@code [o]}/{@code [*]} for none/some/all of its {@code CHECK} descendants, at
+     * any depth, currently checked -- so a list's state is visible without opening it. The
+     * {@code --->} that also marks it a submenu is appended separately, in
+     * {@code MenuConfigScreen.drawRows}.
+     */
+    public String marker() {
+        return switch (this.kind) {
+            case CHECK -> this.checked ? "[*]" : "[ ]";
+            case RADIO -> this.checked ? "(*)" : "( )";
+            case SUBMENU -> switch (this.aggregateState()) {
+                case NONE -> "[ ]";
+                case SOME -> "[o]";
+                case ALL -> "[*]";
+            };
+            case ACTION, TEXT, LABEL -> "   ";
+        };
+    }
+
+    public enum AggregateState { NONE, SOME, ALL }
+
+    /** Over every {@code CHECK} descendant anywhere in this subtree, not just direct children --
+     *  a submenu can itself hold submenus (Server jars -&gt; Spigot -&gt; versions). */
+    public AggregateState aggregateState() {
+        int total = 0;
+        int checkedCount = 0;
+        for (MenuNode descendant : this.checkDescendants()) {
+            total++;
+            if (descendant.checked) checkedCount++;
+        }
+        if (checkedCount == 0) return AggregateState.NONE;
+        if (checkedCount == total) return AggregateState.ALL;
+        return AggregateState.SOME;
+    }
+
+    /** Every {@code CHECK} in this subtree, at any depth -- what F8/F9 and the marker both walk. */
+    public List<MenuNode> checkDescendants() {
+        List<MenuNode> found = new ArrayList<>();
+        this.collectCheckDescendants(found);
+        return found;
+    }
+
+    private void collectCheckDescendants(List<MenuNode> out) {
+        for (MenuNode child : this.children) {
+            if (child.kind == Kind.CHECK) out.add(child);
+            child.collectCheckDescendants(out);
+        }
+    }
+}
