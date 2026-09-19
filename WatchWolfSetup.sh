@@ -1,292 +1,81 @@
 #!/bin/bash
+#
+# DEPRECATED. WatchWolfSetup.sh has been replaced by the `watchwolf` CLI in cli/ -- a Java 17
+# application shipped as a Docker image, so the host needs only Docker (not `jq`, `wget`, `curl`
+# or `dos2unix`), works the same on Ubuntu/WSL/macOS/Windows, verifies every install step, and adds
+# `watchwolf monitor` (a live dashboard) and `watchwolf doctor`/`watchwolf logs` for diagnosing a
+# broken environment.
+#
+# This script is kept for one release so scripts and bookmarks pointing at it keep working. It
+# does nothing itself: it translates this script's flags into the CLI's and execs cli/watchwolf.
+# See cli/README.md for the full command reference; see cli/AGENTS.md for the design.
+#
+# NOTE the previously documented single-file download path no longer works:
+#     wget https://raw.githubusercontent.com/watch-wolf/WatchWolf/main/WatchWolfSetup.sh
+#     bash WatchWolfSetup.sh --build
+# The CLI has no published image to fall back to (see cli/watchwolf's own header for why -- in
+# short, defaulting to an unclaimed registry name is a supply-chain risk) and always builds itself
+# from this repository's Dockerfile, so a lone downloaded script has nothing to build from. Clone
+# the repository instead: git clone https://github.com/watch-wolf/WatchWolf
+#
+# Two behaviours worth knowing about if you were relying on the old script specifically:
+#   - `--build` no longer deletes ServersManager/ClientsManager before cloning. Every step is
+#     idempotent and verified instead, so a second `--build` updates in place.
+#   - The JDK images pulled now actually match what MC servers run on, eclipse-temurin:{8,16,17,21}
+#     -- the old script pulled openjdk:{8,16,17}, which were both the wrong image names and missing
+#     the one 1.20.5+ servers need.
 
-echo "Starting WatchWolfSetup..."
+set -euo pipefail
 
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+launcher="$script_dir/cli/watchwolf"
+
+echo "[w] WatchWolfSetup.sh is deprecated. Forwarding to cli/watchwolf -- see cli/README.md." >&2
+echo "[w] Update any scripts or bookmarks to use that directly." >&2
+
+if [ ! -f "$launcher" ]; then
+    echo "[e] cli/watchwolf was not found next to this script ($script_dir/cli)." >&2
+    echo "[e] The CLI builds its own image from this repository's Dockerfile -- there is no" >&2
+    echo "[e] published image to fetch instead -- so a standalone copy of this script can no" >&2
+    echo "[e] longer set itself up. Clone the full repository instead:" >&2
+    echo "[e]     git clone https://github.com/watch-wolf/WatchWolf" >&2
+    echo "[e]     cd WatchWolf && bash WatchWolfSetup.sh --build" >&2
+    exit 1
+fi
+
+# translate this script's flags into the CLI's -- almost all of them are already the same
 opt=""
-branch="master"
-no_startup=0
-no_spigot=0
-num_processes=1
-base_path="$HOME/WatchWolf"
+declare -a cli_args=()
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --dev) branch="dev" ;;
-		--threads) num_processes="$2"; shift ;;
-		--path) base_path="$2"; shift ;;
-		--disable-startup) no_startup=1 ;;
-		--skip-spigot-build) no_spigot=1 ;;
-		
-		--build) opt="build" ;;
-		--install) opt="install" ;;
-		--uninstall) opt="uninstall" ;;
-		--run) opt="run" ;;
-		
+        --build)               opt="build" ;;
+        --install)              opt="install" ;;
+        --uninstall)             opt="uninstall" ;;
+        --run)                  opt="run" ;;
+
+        # identical on both sides
+        --dev)                   cli_args+=(--dev) ;;
+        --threads)               cli_args+=(--threads "$2"); shift ;;
+        --path)                  cli_args+=(--path "$2"); shift ;;
+        --skip-spigot-build)     cli_args+=(--skip-spigot-build) ;;
+        --disable-startup)       cli_args+=(--disable-startup) ;;
+
         *) echo "[e] Unknown parameter passed: $1" >&2 ; exit 1 ;;
     esac
     shift
 done
 
-if [ $num_processes -lt 1 ]; then
-	num_processes=1 # at least 1 process
+if [ -z "$opt" ]; then
+    echo "[e] No operation. Run 'bash WatchWolfSetup.sh --build', 'bash WatchWolfSetup.sh --install', 'bash WatchWolfSetup.sh --uninstall' or 'bash WatchWolfSetup.sh --run'" >&2
+    echo "[e] (or, directly: watchwolf build / install / uninstall / run)" >&2
+    exit 1
 fi
 
-# target paths
-servers_manager_path="$base_path/ServersManager"
-server_builders_path="$servers_manager_path/src/tools"
-servers_manager_ci_path="$servers_manager_path/ci/release"
-clients_manager_path="$base_path/ClientsManager"
+# non-interactive by default here, matching the old script's behaviour: it never opened a TUI.
+# Explicitly ask for the new menuconfig screen with `watchwolf build` (no --build/flags) instead.
+if [ "$opt" = "build" ] && [ -t 1 ]; then
+    cli_args+=(--no-tui)
+fi
 
-# ask for sudo
-sudo echo "" # this will prompt the sudo password input (if not sudo)
-
-# run the desider operation
-case "$opt" in
-	"build" )
-		# keep previous servers/plugins
-		tmpdir=`mktemp -d`
-		cp -r "$servers_manager_ci_path/server-types/" "$tmpdir" 2>/dev/null
-		cp -r "$servers_manager_ci_path/usual-plugins/" "$tmpdir" 2>/dev/null
-		
-		# git needs empty folders
-		sudo rm -rf "$servers_manager_path" 2>/dev/null
-		sudo rm -rf "$clients_manager_path" 2>/dev/null
-
-		# get git files
-		git clone --branch "$branch" https://github.com/rogermiranda1000/WatchWolf-ServersManager.git "$servers_manager_path"
-		git clone --branch "$branch" https://github.com/rogermiranda1000/WatchWolf-Client.git "$clients_manager_path"
-		
-		# restore back previous servers/plugins (if any)
-		# keep current files if they are updated in comparison to the old ones
-		cp -r -u "$tmpdir/server-types/" "$servers_manager_ci_path" 2>/dev/null
-		cp -r -u "$tmpdir/usual-plugins/" "$servers_manager_ci_path" 2>/dev/null
-		
-		mkdir -p "$servers_manager_ci_path/server-types/Spigot"
-		mkdir -p "$servers_manager_ci_path/server-types/Paper"
-
-		if [ `docker -v >/dev/null 2>&1 ; echo $?` -ne 0 ]; then
-			echo "[e] Docker is not installed, or is currently stopped. Check https://docs.docker.com/get-docker/." >&2
-			exit 1
-		fi
-
-		# ServersManager dependencies
-		sudo docker pull eclipse-temurin:8-jdk
-		sudo docker pull eclipse-temurin:16-jdk
-		sudo docker pull eclipse-temurin:17-jdk
-		sudo docker pull eclipse-temurin:21-jdk
-
-		if [ $no_spigot -eq 0 ]; then
-			dos2unix "$server_builders_path/SpigotBuilder.sh" "$server_builders_path/PaperBuilder.sh"
-			
-			source "$server_builders_path/SpigotBuilder.sh" # getAllVersions/buildVersion
-			source "$server_builders_path/PaperBuilder.sh" # getAllPaperVersions/buildPaperVersion
-			
-			# download the first <num_processes> Spigot versions
-			echo "[v] Will download Spigot: $(getAllVersions)"
-			num_downloading_containers=`getAllVersions | grep -c $'\n'`
-			num_pending_containers=$(($num_downloading_containers > $num_processes ? $num_downloading_containers - $num_processes : 0))
-			while read version; do
-				buildVersion "$servers_manager_ci_path/server-types/Spigot" "$version" >/dev/null 2>&1
-			done <<< "$(getAllVersions | head -n $num_processes)" # get the first <num_processes> versions
-		fi
-
-		# download usual plugins
-		while read usual_plugin; do
-			usual_plugin_name=`echo "$usual_plugin" | jq -r -c '.name + "-" + .version + "-" + .min_mc_version + "-" + .max_mc_version + ".jar"'`
-			usual_plugin_url=`echo "$usual_plugin" | jq -r -c '.url'`
-
-			# @ref https://github.com/rogermiranda1000/WatchWolf-ServersManager/blob/fdd45da8fa787b201a48ccca565a4e9f1415b7c3/ServersManager.sh#L56
-			spigot_id=`echo "$usual_plugin_url" | grep -o -P '(?<=spigotmc.org/resources/)[^/]+' | grep -o -P '\d+$'`
-			if [ -z "$spigot_id" ]; then
-				wget -O "$servers_manager_ci_path/usual-plugins/$usual_plugin_name" "$usual_plugin_url"
-			else
-				# Spigot plugin; get plugin from Spiget website
-				spigot_plugin_name=`wget -q -O - "https://api.spiget.org/v2/resources/$spigot_id" | jq -r .name`
-				
-				# TODO download a specific version doesn't work
-				#spigot_plugin_version=`echo "$usual_plugin_url" | grep -o -P '(?<=/download\?version=)[^/]+$'`
-				#if [ -z "$spigot_plugin_version" ]; then
-					usual_plugin_url="https://api.spiget.org/v2/resources/$spigot_id/download"
-				#else
-				#	usual_plugin_url="https://api.spiget.org/v2/resources/$spigot_id/versions/$spigot_plugin_version/download"
-				#fi
-				
-				wget -O "$servers_manager_ci_path/usual-plugins/$usual_plugin_name" "$usual_plugin_url"
-			fi
-		done <<< `curl -k -s -N https://watchwolf.dev/api/v1/usual-plugins | jq -c '."usual-plugins" | .[]'` # all usual plugins urls
-		
-		# WatchWolf Server as usual-plugins
-		watchwolf_server_versions_base_path="https://watchwolf.dev/versions"
-		web_contents=`wget --no-check-certificate -q -O - "$watchwolf_server_versions_base_path"`
-		higher_version=`echo "$web_contents" | grep -o -P '(?<=WatchWolf-)[\d.]+(?=-)' | sort --reverse --version-sort --field-separator=. | head -1` # get the current higher version
-		echo "[v] Will download highest WW-Server: $higher_version"
-		higher_version_file=`echo "$web_contents" | grep -o -P "WatchWolf-${higher_version//./\\.}-[\d.]+-(([\d.]+)|(LATEST))\.jar"`
-		wget --no-check-certificate --max-redirect=2 "$watchwolf_server_versions_base_path/$higher_version_file" -P "$servers_manager_ci_path/usual-plugins/"
-
-		# Install WatchWolf ServersManager
-		cd "$servers_manager_ci_path"
-		dos2unix "build.sh"
-		sudo bash "build.sh"
-
-		# ClientsManager dependencies
-		sudo docker pull nikolaik/python-nodejs
-		sudo docker build --tag clients-manager "$clients_manager_path"
-		
-		if [ $no_spigot -eq 0 ]; then
-			# all ended; wait for the Spigot versions to finish
-			current_downloading_containers=`sudo docker container ls -a | grep 'Spigot_build_' -c`
-			dots=""
-			while [ $(($current_downloading_containers + $num_pending_containers)) -gt 0 ]; do
-				while read version; do
-					if [ ! -z "$version" ]; then
-						# still versions remaining, and there's a place to run them
-						buildVersion "$servers_manager_ci_path/server-types/Spigot" "$version" >/dev/null 2>&1
-						((num_pending_containers--))
-						((current_downloading_containers++))
-					fi
-				done <<< "$( getAllVersions | tail -n $num_pending_containers | head -n $(($num_processes > $current_downloading_containers ? $num_processes - $current_downloading_containers : 0)) )" # get enought versions of the remaining versions to fill the threads
-				
-				echo "Spigot containers still running (this process can take up to 1 hour in an average computer)"
-				echo -ne "Waiting all Spigot containers to finish$dots ($(( $num_downloading_containers-$num_pending_containers-$current_downloading_containers ))/$num_downloading_containers)      \r"
-				
-				dots="$dots."
-				if [ ${#dots} -gt 3 ]; then
-					dots=""
-				fi
-				
-				sleep 15
-				current_downloading_containers=`sudo docker container ls -a | grep 'Spigot_build_' -c`
-			done
-			# Spigot ended, now wait for Paper
-			
-			echo "[v] Will download Paper: $(getAllPaperVersions)"
-			while read version; do
-				if [ ! -z "$version" ]; then
-					# still versions remaining, and there's a place to run them
-					buildPaperVersion "$servers_manager_ci_path/server-types/Paper" "$version" #>/dev/null 2>&1
-				fi
-			done <<< "$(getAllPaperVersions)"
-		fi
-		
-		echo -ne '\n[i] WatchWolf built.\n'
-		;;
-		
-	"install" )
-		if [ "$0" == "/usr/bin/watchwolf" ]; then
-			echo "[e] 'bash WatchWolfSetup.sh --install' can only be executed from the original path. Check that location with 'stat /usr/bin/watchwolf'." >&2
-			exit 1
-		fi
-		
-		wsl=`cat /proc/version | grep -i -c 'microsoft'`
-		script_path="$(pwd)/$0"
-		
-		# accessible from everywhere
-		chmod +x "$script_path"
-		sudo ln -sf "$script_path" /bin/watchwolf # run WatchWolf from any place
-		
-		if [ $no_startup -eq 0 ]; then
-			# run at startup
-			if [ $wsl -eq 0 ]; then
-				echo "[w] Install has only been tested with WSL. Report any problem in https://github.com/watch-wolf/WatchWolf/issues" >&2
-			
-				# create service
-				service_contents=$(cat <<-END
-					[Unit]
-					Description=Launches WatchWolf ServersManager and WatchWolf ClientsManager
-					
-					[Service]
-					ExecStart=bash "$script_path" --run --path "$base_path"
-					
-					[Install]
-					WantedBy=multi-user.target
-				END
-				)
-				sudo bash -c "echo '$service_contents' > /etc/systemd/system/watchwolf.service" # create service
-				sudo systemctl enable watchwolf # init service
-			else
-				# WSL
-				echo "Running WatchWolf at startup will prompt a CMD asking for the WSL password each time."
-				echo "To make this task more pleasant, this script will disable the WSL admin password."
-				echo "Do you want to disable the WSL password? (D)isable"
-				echo "Do you want to keep the WSL password, thus prompting the CMD on each startup? (K)eep"
-				echo "Do you want to exit (don't launch WatchWolf at startup; manually run './WatchWolf --run' each time)? (E)xit"
-				read -p 'D/K/E: ' option
-				while [ `echo "$option" | grep -i -E -c '^[DKE]'` -eq 0 ]; do
-					read -p 'Unknown option. Use (D)isable, (K)eep, or (E)xit: ' option
-				done
-				
-				if [ `echo "$option" | grep -i -E -c '^[DK]'` -ne 0 ]; then # Exit?
-					if [ `echo "$option" | grep -i -E -c '^D'` -ne 0 ]; then
-						# don't keep; disable sudo password
-						sudo bash -c "echo '`whoami` ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/`whoami`" && sudo chmod 0440 /etc/sudoers.d/`whoami` # @ref https://www.folkstalk.com/tech/ubuntu-wsl-disable-sudo-password-prompt-with-code-examples/
-						echo "WSL password disabled"
-					fi
-					
-					# create "service"
-					base=`/mnt/c/Windows/System32/cmd.exe /c 'echo %USERPROFILE%' | sed 's/\r$//'` # get the base path
-					base=`echo "$base" | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'` # in WSL the directory delimiter is '/' (not '\'), and 'C:' is '/mnt/c'
-					windows_start_folder="$base/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup" # @ref https://www.thewindowsclub.com/startup-folder-in-windows-8
-					echo "wsl bash \"$script_path\" --run --path \"$base_path\"" > "$windows_start_folder/WatchWolf.bat"
-					echo "Launch on startup done"
-				fi
-			fi
-		fi
-		echo "[i] WatchWolf installed."
-		;;
-	
-	"uninstall" )
-		wsl=`cat /proc/version | grep -i -c 'microsoft'`
-		sudo rm /bin/watchwolf
-		if [ $wsl -eq 0 ]; then
-			echo "[w] Uninstall has only been tested with WSL. Report any problem in https://github.com/watch-wolf/WatchWolf/issues" >&2
-			sudo rm /etc/systemd/system/watchwolf.service
-		else
-			base=`/mnt/c/Windows/System32/cmd.exe /c 'echo %USERPROFILE%' | sed 's/\r$//'`
-			base=`echo "$base" | sed 's_\\\\_/_g' | sed 's_C:/_/mnt/c/_g'`
-			windows_start_folder="$base/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
-			sudo rm "$windows_start_folder/WatchWolf.bat"
-		fi
-		;;
-		
-	"run" )
-		dots=""
-		while [ `docker -v >/dev/null 2>&1 ; echo $?` -ne 0 ]; do
-			echo -ne "Waiting Docker to start$dots    \r"
-			
-			dots="$dots."
-			if [ ${#dots} -gt 3 ]; then
-				dots=""
-			fi
-			
-			sleep 15
-		done
-		echo ""
-		
-		# run ServersManager
-		cd "$servers_manager_ci_path"
-		dos2unix "run.sh"
-		sudo bash "run.sh"
-		
-		# run ClientsManager
-		sudo docker run -i --rm --name ClientsManager -p 7000-7199:7000-7199 --env MACHINE_IP=$(hostname -I | awk '{print $1}') --env PUBLIC_IP=$(curl ifconfig.me) clients-manager:latest >/dev/null 2>&1 & disown
-		
-		dots=""
-		while [ `sudo docker container ls -a | grep -c -E 'ClientsManager|ServersManager'` -lt 2 ]; do
-			echo -ne "Waiting Docker containers to start$dots    \r"
-			
-			dots="$dots."
-			if [ ${#dots} -gt 3 ]; then
-				dots=""
-			fi
-			
-			sleep 1 # wait
-		done
-		
-		echo -ne "\nWatchWolf started.\n" # TODO wait for containers to install
-		;;
-	
-	* )
-		echo "[e] No operation. Run 'bash WatchWolfSetup.sh --build', 'bash WatchWolfSetup.sh --install', 'bash WatchWolfSetup.sh --uninstall' or 'bash WatchWolfSetup.sh --run'" >&2
-		exit 1
-		;;
-esac
+exec bash "$launcher" "$opt" "${cli_args[@]}"

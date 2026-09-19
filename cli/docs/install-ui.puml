@@ -1,0 +1,115 @@
+@startuml install-ui
+title "watchwolf build" from the menu -- the drawn install, abort, and send-to-background
+
+actor User
+participant "cli/watchwolf\n(launcher, on the host)" as Launcher
+participant "BuildCommand" as Build
+participant "MenuConfigScreen" as Menu
+participant "InstallProgressScreen\n(UI thread)" as Screen
+participant "InstallProgressModel\n(shared, synchronized)" as Model
+participant "StepRunner\n(worker thread)" as Runner
+participant "BuildSpigotJarsStep" as Spigot
+participant "Docker daemon" as Docker
+
+User -> Launcher: bash cli/watchwolf build
+activate Launcher
+Launcher -> Build: docker run -it ... watchwolf-cli:local build
+activate Build
+
+== picking what to install ==
+
+Build -> Build: is there a note from a background run?\n(.watchwolf/last-run.txt)
+alt a background install finished since last time
+    Build -> User: AcknowledgeScreen: "install successful" + < OK >
+    User -> Build: any key
+    Build -> Build: delete the note (shown once)
+end
+
+Build -> Menu: run()
+activate Menu
+User -> Menu: navigate, tick, then Enter on "< Start build >"
+Menu --> Build: Optional<BuildPlan>
+deactivate Menu
+
+== the install, drawn ==
+
+Build -> Model: new
+Build -> Runner: run(graph, context) on a worker thread
+activate Runner
+Build -> Screen: run()  (this thread paints only)
+activate Screen
+
+loop every step
+    Runner -> Model: stepStarting / operationStarted / operationUpdated
+    Screen -> Model: steps(), tasks(), currentOperation()  (snapshots)
+    Screen -> User: overall bar, step list, current operation
+end
+
+== the slow part: one row per jar ==
+
+Runner -> Spigot: perform(context)
+activate Spigot
+loop until every version is done, or cancelled
+    Spigot -> Docker: findContainer(Spigot_build_<v>)
+    alt already running (left by an earlier run)
+        Spigot -> Spigot: adopt it -- Docker refuses a duplicate name
+    else exited, from a failed run
+        Spigot -> Docker: removeContainer, then runDetached
+    else nothing there
+        Spigot -> Docker: runDetached(Spigot_build_<v>)
+    end
+    Spigot -> Model: taskStarted / taskUpdated(<last BuildTools line>)
+    Screen -> User: a spinner per version being built, "waiting" for the queued ones
+    note right
+      every selected version is announced with
+      taskQueued before any of them starts, so
+      the list does not grow over the afternoon
+    end note
+    Spigot -> Spigot: sleepPolling -- checks the cancel signal every second
+end
+deactivate Spigot
+
+== how it ends ==
+
+alt runs to the end
+    Runner -> Model: runFinished(results, COMPLETED)
+    Screen -> User: summary; any key closes
+    Screen --> Build: COMPLETED
+    Build -> User: the failures and their remedies, in scrollback
+else User presses q  (abort)
+    User -> Screen: q
+    Screen -> User: "Abort the install?"  y / n
+    note right
+      never on the first press: an hour
+      into a build, one stray key must
+      not throw the run away
+    end note
+    User -> Screen: y
+    Screen --> Build: ABORTED
+    Build -> Runner: cancel; wait for the step in flight
+    note right
+      cancellation is coarse on purpose:
+      every step is idempotent and verified,
+      so stopping at a boundary and re-running
+      resumes rather than repeats
+    end note
+    Build -> User: "Nothing already done was undone"
+else User presses b  (send to the background)
+    User -> Screen: b, then < OK >
+    Screen --> Build: BACKGROUNDED
+    Build -> Build: write .watchwolf/install.yaml (the resolved plan)
+    Build --> Launcher: exit 11
+    deactivate Screen
+    deactivate Runner
+    deactivate Build
+    note right of Launcher
+      a foreground container cannot detach
+      itself, so the relaunch happens out here
+    end note
+    Launcher -> Launcher: docker run -d --name WatchWolf_install ...\nbuild --resume-background
+    Launcher -> User: "follow it: docker logs -f WatchWolf_install"
+    Launcher -> Launcher: (detached run) writes .watchwolf/last-run.txt\nfor the next 'watchwolf build' to show
+end
+
+deactivate Launcher
+@enduml

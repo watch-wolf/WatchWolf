@@ -1,0 +1,106 @@
+@startuml build-server-jars
+title Downloading & building Minecraft server jars ("watchwolf build")
+
+actor User
+participant "BuildCommand" as Build
+participant "StepRunner" as Runner
+participant "BuildSpigotJarsStep" as SpigotStep
+participant "hub.spigotmc.org" as SpigotHub
+participant "Docker daemon" as Docker
+participant "RunLog\n(<base>/.watchwolf/run-logs)" as RunLog
+participant "BuildTools\ncontainer" as BuildTools
+participant "DownloadPaperJarsStep" as PaperStep
+participant "fill.papermc.io" as PaperApi
+participant "Filesystem\n(server-types/)" as FS
+
+User -> Build: watchwolf build\n(menu selection, or --spigot/--paper <version>)
+activate Build
+Build -> Runner: run(stepGraph, context)
+activate Runner
+
+== Spigot: built locally, one container per version ==
+
+Runner -> SpigotStep: perform(context)
+activate SpigotStep
+note right of SpigotStep
+  the version list itself was already
+  polled when the menu opened, or
+  resolved from --spigot at plan time
+  (SpigotHubClient -> hub.spigotmc.org)
+end note
+
+loop for each selected Spigot version not already on disk
+    SpigotStep -> Docker: findContainer(Spigot_build_<version>)
+    alt one is already running (left by an aborted or backgrounded run)
+        SpigotStep -> SpigotStep: adopt it -- Docker would refuse a duplicate name
+    else one exited, left by a failed run
+        SpigotStep -> Docker: removeContainer (its log was already read)
+    end
+    SpigotStep -> Docker: runDetached(Spigot_build_<version>,\nBuildTools.jar --rev <version>)
+    activate Docker
+    Docker -> BuildTools: start (bind-mounts a staging dir at /Versions)
+    activate BuildTools
+    BuildTools -> SpigotHub: download BuildTools.jar,\nfetch & compile <version>
+    BuildTools -> BuildTools: write spigot-<version>.jar to /Versions
+    deactivate BuildTools
+    Docker --> SpigotStep: (container exits)
+    deactivate Docker
+
+    loop every 15s until the container stops (cancel signal checked every second)
+        SpigotStep -> Docker: is Spigot_build_<version> still running?
+        Docker --> SpigotStep: running / finished
+        SpigotStep -> SpigotStep: progress.taskUpdate(<version>, last BuildTools line)
+        note right
+          one row per version, the way docker pull
+          gives one per layer -- BuildTools reports
+          no total, so the row spins rather than
+          inventing a percentage
+        end note
+    end
+
+    SpigotStep -> FS: inspect staged jar (size, valid zip)
+    alt jar is valid
+        SpigotStep -> FS: move staging/<version>.jar\n-> server-types/Spigot/<version>.jar
+        SpigotStep -> Docker: removeContainer (a failed one is kept: its log is the diagnosis)
+    else jar missing or too small
+        SpigotStep -> Docker: logs(Spigot_build_<version>, 2000)
+        SpigotStep -> RunLog: attachment("spigot-<version>", lines)
+        note right
+          the whole BuildTools console, beside this
+          run's own log and under the same timestamp,
+          so it outlives the container (and rides
+          along in a diagnostics bundle); the last
+          12 lines also go inline in the failure
+        end note
+        SpigotStep -> SpigotStep: record failure (the container is KEPT, unlike a good build)
+    end
+end
+SpigotStep --> Runner: StepResult (built N/M, or failures)
+deactivate SpigotStep
+
+== Paper: prebuilt, just downloaded ==
+
+Runner -> PaperStep: perform(context)
+activate PaperStep
+loop for each selected Paper version not already on disk
+    PaperStep -> PaperApi: GET /v3/projects/paper/versions/<version>/builds
+    PaperApi --> PaperStep: [{id, channel, downloads."server:default".url}, ...]\n(newest first)
+    PaperStep -> PaperStep: first entry with channel == STABLE
+    alt a stable build exists
+        PaperStep -> PaperApi: GET <download url>
+        PaperApi --> PaperStep: jar bytes
+        PaperStep -> FS: write to <version>.jar.part, then rename\n-> server-types/Paper/<version>.jar
+    else no stable build for this version yet
+        PaperStep -> PaperStep: record failure ("the API listed no builds for it")
+    end
+end
+PaperStep --> Runner: StepResult (downloaded N/M, or failures)
+deactivate PaperStep
+
+Runner -> Runner: verify() every step\n(JarInspector: size + real zip + valid manifest)
+Runner --> Build: overall result
+deactivate Runner
+Build --> User: per-step [ok]/[FAIL] + remedy
+deactivate Build
+
+@enduml
