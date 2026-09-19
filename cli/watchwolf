@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+#
+# WatchWolf launcher. Run from a checkout of the WatchWolf repo -- it builds the CLI's image from
+# the Dockerfile sitting next to it (git clone https://github.com/watch-wolf/WatchWolf, then
+# bash cli/watchwolf build) and runs everything inside that image.
+#
+# There is no published WatchWolf CLI image, and this deliberately never invents a name to pull
+# one from. Defaulting to a guessable registry name (e.g. "watchwolf/cli:latest") would mean
+# anyone who registers that name on Docker Hub first gets this launcher to pull and run their
+# image, on every WatchWolf user's machine, with a mounted Docker socket. Building locally from a
+# source checkout has no such trust-on-first-use problem: the image is exactly what is in the repo.
+#
+# The scheme is "identity mounts": every host path the CLI will hand to the Docker daemon is
+# mounted inside the container AT THE SAME ABSOLUTE PATH. A path computed by Java is then valid
+# both for reading files (container view) and for `docker run -v <path>` (host view, because the
+# daemon resolves bind sources on the host). The ServersManager solves the same problem with
+# PARENT_PWD; this is that trick with the substitution set to the identity function.
+
+set -euo pipefail
+
+# Fixed, purely local tag -- see the header above for why this is never a registry name.
+IMAGE="watchwolf-cli:local"
+# The detached install started when the CLI exits 11 -- see the block at the bottom of this file.
+BACKGROUND_CONTAINER="WatchWolf_install"
+BASE="${WATCHWOLF_PATH:-$HOME/WatchWolf}"
+
+# --path wins over the env var; peek at argv without consuming it
+prev=""
+for a in "$@"; do
+    [ "$prev" = "--path" ] && BASE="$a"
+    prev="$a"
+done
+
+die() { echo "[e] $*" >&2; exit 1; }
+
+command -v docker >/dev/null 2>&1 \
+    || die "Docker is not installed, or is not on PATH. Check https://docs.docker.com/get-docker/."
+
+SOCK="${DOCKER_HOST:-}"
+SOCK="${SOCK#unix://}"
+[ -n "$SOCK" ] || SOCK=/var/run/docker.sock
+[ -S "$SOCK" ] || die "No Docker socket at $SOCK. Is the daemon running?"
+if [ ! -w "$SOCK" ]; then
+    echo "[w] $SOCK is not writable by $(id -un). You may need:" >&2
+    echo "[w]     sudo usermod -aG docker $(id -un)   # then log out and back in" >&2
+fi
+DOCKER_GID="$(stat -c '%g' "$SOCK" 2>/dev/null || echo 0)"
+
+mkdir -p "$BASE" || die "Cannot create the install base '$BASE'."
+# Identity mounts must not cross a symlink: the daemon would resolve the source differently.
+BASE="$(cd "$BASE" && pwd -P)"
+
+M2="$HOME/.m2"
+mkdir -p "$M2"
+
+TTY_FLAGS=""
+if [ -t 0 ] && [ -t 1 ]; then TTY_FLAGS="-it"; fi
+
+cli_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+
+# The checkout root (parent of cli/) so 'watchwolf update' can fetch/fast-forward it and rebuild
+# this image from inside the container. Only set when this launcher is actually sitting in a git
+# checkout -- e.g. not when someone copied just this file out on its own.
+REPO_ROOT=""
+if [ -d "$cli_dir/../.git" ]; then
+    REPO_ROOT="$(cd "$cli_dir/.." && pwd -P)"
+fi
+
+# Every host path so far, in the order claimed -- a later one nested inside an earlier one is
+# skipped rather than mounted again, which is what a nested bind mount would otherwise error on.
+MOUNTED_ROOTS=("$BASE" "$M2")
+covered_by_a_mount() {
+    local candidate="$1" root
+    for root in "${MOUNTED_ROOTS[@]}"; do
+        case "$candidate/" in "$root"/*|"$root/") return 0 ;; esac
+    done
+    return 1
+}
+
+REPO_MOUNT=()
+if [ -n "$REPO_ROOT" ] && ! covered_by_a_mount "$REPO_ROOT"; then
+    REPO_MOUNT=(-v "$REPO_ROOT:$REPO_ROOT")
+    MOUNTED_ROOTS+=("$REPO_ROOT")
+fi
+
+# Mount the cwd so `--out ./bundle.tar.gz` lands where the user is standing -- unless it is
+# already covered by one of the other identity mounts, which would be a duplicate mount error.
+PWD_REAL="$(pwd -P)"
+PWD_MOUNT=(-w "$PWD_REAL")
+if ! covered_by_a_mount "$PWD_REAL"; then
+    PWD_MOUNT=(-v "$PWD_REAL:$PWD_REAL" -w "$PWD_REAL")
+fi
+
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+    [ -f "$cli_dir/Dockerfile" ] \
+        || die "No Dockerfile next to this launcher ($cli_dir). Run it from a checkout of the WatchWolf repo: git clone https://github.com/watch-wolf/WatchWolf, then bash cli/watchwolf ..."
+    echo "[v] Building the WatchWolf CLI image from $cli_dir (this takes a few minutes the first time; cached after)..."
+    docker build --tag "$IMAGE" "$cli_dir" || die "Could not build the CLI image."
+fi
+
+STATE="$BASE/.watchwolf"
+mkdir -p "$STATE"
+
+# One definition of "run the CLI", used twice: attached for the normal case, and detached for the
+# hand-over below. Everything but the docker flags before the image has to stay identical, or the
+# background run would see a different install base than the session that asked for it.
+# $1 is an array name holding the extra docker flags; the rest is the CLI's own argv.
+run_cli() {
+    local -n extra_flags="$1"; shift
+    docker run "${extra_flags[@]}"                              \
+        --network host                                          \
+        --user "$(id -u):$(id -g)" --group-add "$DOCKER_GID"    \
+        -v "$SOCK":/var/run/docker.sock                         \
+        -v "$BASE":"$BASE"                                      \
+        -v "$M2":"$M2"                                          \
+        "${REPO_MOUNT[@]}"                                      \
+        "${PWD_MOUNT[@]}"                                       \
+        -e HOME="$HOME"                                         \
+        -e WW_BASE="$BASE"                                      \
+        -e WW_REPO_ROOT="$REPO_ROOT"                            \
+        -e WW_UID="$(id -u)" -e WW_GID="$(id -g)"               \
+        -e WW_HOST_PWD="$PWD_REAL"                              \
+        -e WW_LAUNCHER=2                                        \
+        -e WW_IMAGE="$IMAGE"                                    \
+        -e TERM -e COLUMNS -e LINES -e DOCKER_HOST              \
+        "$IMAGE" "$@"
+}
+
+ATTACHED_FLAGS=(--rm $TTY_FLAGS)
+
+set +e
+run_cli ATTACHED_FLAGS "$@"
+rc=$?
+set -e
+
+# Exit 10 means "host action required": the CLI cannot write /etc or drive systemd from inside an
+# unprivileged container, so it renders those commands into a script for the host to run. We show
+# it in full before running anything -- no hidden sudo.
+if [ $rc -eq 10 ] && [ -f "$STATE/host-action.sh" ]; then
+    echo
+    echo "[i] These commands must run on the host (the container cannot write /etc or drive systemd):"
+    echo
+    sed 's/^/    /' "$STATE/host-action.sh"
+    echo
+    if [ -f "$STATE/host-action.needs-root" ]; then
+        read -r -p "Run them with sudo? [y/N] " answer
+        case "${answer,,}" in y|yes) ;; *) echo "[i] Skipped. Nothing was changed."; exit 1 ;; esac
+        sudo bash "$STATE/host-action.sh"
+        rc=$?
+    else
+        read -r -p "Run them? [y/N] " answer
+        case "${answer,,}" in y|yes) ;; *) echo "[i] Skipped. Nothing was changed."; exit 1 ;; esac
+        bash "$STATE/host-action.sh"
+        rc=$?
+    fi
+    rm -f "$STATE/host-action.sh" "$STATE/host-action.needs-root"
+fi
+
+# Exit 11 means "keep installing without me". A foreground container cannot detach itself, so the
+# CLI saved the plan and the relaunch happens out here: same image, same mounts, no TTY, detached.
+# The container is deliberately NOT --rm, so 'docker logs' can still explain a failure afterwards.
+if [ $rc -eq 11 ]; then
+    docker rm -f "$BACKGROUND_CONTAINER" >/dev/null 2>&1 || true
+    DETACHED_FLAGS=(-d --name "$BACKGROUND_CONTAINER")
+    if run_cli DETACHED_FLAGS build --path "$BASE" --resume-background >/dev/null; then
+        echo "[i] Installing in the background as the container $BACKGROUND_CONTAINER."
+        echo "[i]     follow it:  docker logs -f $BACKGROUND_CONTAINER"
+        echo "[i]     the next 'watchwolf build' opens with how it ended."
+        rc=0
+    else
+        echo "[e] Could not start the background install." >&2
+        echo "[e] remedy: re-run 'watchwolf build' and let it finish in the foreground." >&2
+        rc=1
+    fi
+fi
+
+exit $rc
