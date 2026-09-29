@@ -4256,6 +4256,106 @@ As a response of the \textit{Start recording operation}, you'll get the recordin
 \caption{Stop recording petition response structure}
 \end{figure}
 
+\subsection{Get position operation}
+Get the client's current position without consulting the server component.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000010001}}
+\end{bytefield}
+\caption{Get position petition structure}
+\end{figure}
+
+\subsection{Get position response}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000010001}} & \bitbox[tlr]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:position]{position}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get position response structure}
+\end{figure}
+
+\subsection{Get pitch operation}
+Get the client's current pitch without consulting the server component.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000010010}}
+\end{bytefield}
+\caption{Get pitch petition structure}
+\end{figure}
+
+\subsection{Get pitch response}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000010010}} & \bitbox[tlr]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{pitch}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get pitch response structure}
+\end{figure}
+
+\subsection{Get yaw operation}
+Get the client's current yaw without consulting the server component.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000010011}}
+\end{bytefield}
+\caption{Get yaw petition structure}
+\end{figure}
+
+\subsection{Get yaw response}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000010011}} & \bitbox[tlr]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:double]{yaw}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get yaw response structure}
+\end{figure}
+
+\subsection{Get inventory operation}
+Get the client's current inventory without consulting the server component.
+
+\begin{figure}[H]
+\centering
+\begin{bytefield}{16}
+	\bitheader{0,2,3,4,15} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{0}} & \bitbox{12}{\hyperref[s:operation]{0b000000010100}}
+\end{bytefield}
+\caption{Get inventory petition structure}
+\end{figure}
+
+\subsection{Get inventory response}
+\begin{figure}[H]
+\centering
+\begin{bytefield}{32}
+	\bitheader{0,2,3,4,15,16,31} \\
+	\bitbox{3}{\hyperref[s:dst]{0b011}} & \bitbox{1}{\hyperref[s:response]{1}} & \bitbox{12}{\hyperref[s:operation]{0b000000010100}} & \bitbox[tlr]{16}{} \\
+	\wordbox[lr]{1}{\hyperref[type:container]{inventory}} \\
+	\skippedwords \\
+	\wordbox[lrb]{1}{}
+\end{bytefield}
+\caption{Get inventory response structure}
+\end{figure}
+
 \subsection{Get version operation}
 
 Get the WatchWolf version of the client.
@@ -4302,6 +4402,8 @@ The response of \textit{Get version operation} will be the WatchWolf version.
 		03/06/2023 & 4 & v0.2.0 & Check version, specify world type, and set difficulty. \\
 		\hline
 		14/07/2023 & 5 & v0.2.0 & Added invulnerability mode. \\
+		\hline
+		23/09/2026 & 6 & Unreleased & Added client-local position, pitch, yaw, and inventory operations. \\
 		\hline
 	\end{tabular}
 	\caption{Revision history}
